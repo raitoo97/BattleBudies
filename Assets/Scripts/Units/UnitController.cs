@@ -3,6 +3,7 @@ public class UnitController : MonoBehaviour
 {
     public Units selectedUnit;
     [SerializeField]private Node selectedEndNode;
+    [SerializeField]private PathDrawer pathDrawer;
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -12,8 +13,19 @@ public class UnitController : MonoBehaviour
             {
                 Units unit = hit.collider.GetComponent<Units>();
                 Node node = hit.collider.GetComponent<Node>();
-                if (unit != null) selectedUnit = unit;
-                if (node != null) selectedEndNode = node;
+                if (unit != null) 
+                {
+                    selectedUnit = unit;
+                    pathDrawer.ClearPath();
+                }
+                if (node != null) 
+                {
+                    selectedEndNode = node;
+                    if (selectedUnit != null)
+                    {
+                        pathDrawer.DrawPath(selectedUnit.currentNode, selectedEndNode);
+                    }
+                } 
             }
         }
         if (Input.GetKeyDown(KeyCode.Space) && selectedUnit != null && selectedEndNode != null)
@@ -21,6 +33,7 @@ public class UnitController : MonoBehaviour
             var path = PathFinding.CalculateAstart(selectedUnit.currentNode, selectedEndNode);
             selectedUnit.SetPath(path);
             selectedEndNode = null;
+            pathDrawer.ClearPath();
         }
     }
 }
