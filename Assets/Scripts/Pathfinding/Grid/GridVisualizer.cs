@@ -8,6 +8,7 @@ public class GridVisualizer : MonoBehaviour
     [Header("Line Settings")]
     [SerializeField] private Material lineMaterial;
     [SerializeField] private float lineWidth = 0.05f;
+    [SerializeField] private float _liftHeight = 0.05f;
     private LineRenderer[,] lines;
     private Node hoveredNode;
     private Node selectedNode;
@@ -63,10 +64,19 @@ public class GridVisualizer : MonoBehaviour
         if (hoveredNode != hitNode)
         {
             if (hoveredNode != null && hoveredNode != selectedNode)
+            {
                 SetColor(hoveredNode, defaultColor);
+                SetLinePosition(hoveredNode, false);
+            }
             hoveredNode = hitNode;
-            if (hoveredNode != null && hoveredNode != selectedNode)
-                SetColor(hoveredNode, hoverColor);
+            if (hoveredNode != null)
+            {
+                if (hoveredNode != selectedNode)
+                {
+                    SetColor(hoveredNode, hoverColor);
+                    SetLinePosition(hoveredNode, true);
+                }
+            }
         }
     }
     void DetectClick()
@@ -84,18 +94,27 @@ public class GridVisualizer : MonoBehaviour
     void SetSelection(Node node)
     {
         if (selectedNode != null)
+        {
             SetColor(selectedNode, defaultColor);
-
+            SetLinePosition(selectedNode, false);
+        }
         selectedNode = node;
         SetColor(selectedNode, selectedColor);
+        SetLinePosition(selectedNode, true);
     }
     void ResetSelection()
     {
-        foreach (var lr in lines)
-            SetColor(lr, defaultColor);
-
-        hoveredNode = null;
+        if (selectedNode != null)
+        {
+            SetColor(selectedNode, defaultColor);
+            SetLinePosition(selectedNode, false);
+        }
         selectedNode = null;
+        if (hoveredNode != null)
+        {
+            SetColor(hoveredNode, hoverColor);
+            SetLinePosition(hoveredNode, true);
+        }
     }
     void SetColor(Node n, Color c)
     {
@@ -108,5 +127,15 @@ public class GridVisualizer : MonoBehaviour
         lr.endColor = c;
         if (lr.material.HasProperty("_Color"))
             lr.material.SetColor("_Color", c);
+    }
+    void SetLinePosition(Node n, bool lifted)
+    {
+        var idx = n.GridIndex;
+        SetLinePosition(lines[idx.x, idx.y], lifted);
+    }
+    void SetLinePosition(LineRenderer lr, bool lifted)
+    {
+        float y = lifted ? _liftHeight : 0f;
+        lr.transform.localPosition = new Vector3(0, y, 0);
     }
 }
