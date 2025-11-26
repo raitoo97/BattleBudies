@@ -567,8 +567,10 @@ GameObject:
   - component: {fileID: 563951291}
   - component: {fileID: 563951290}
   - component: {fileID: 563951292}
+  - component: {fileID: 563951294}
+  - component: {fileID: 563951293}
   m_Layer: 0
-  m_Name: GridManager
+  m_Name: Managers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -627,6 +629,32 @@ MonoBehaviour:
   lineMaterial: {fileID: 2100000, guid: 7256ef2519428b043b199751e0b52ded, type: 2}
   lineWidth: 0.5
   _liftHeight: 0.05
+--- !u!114 &563951293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563951289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c1226b0f7907d74fafae525cedf3fd7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &563951294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563951289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5d507b0372868f47a96fa49090f7e74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectedUnit: {fileID: 1541069199}
+  selectedEndNode: {fileID: 0}
 --- !u!1 &744679564
 GameObject:
   m_ObjectHideFlags: 0
@@ -1031,6 +1059,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3655296514757864388}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1541069199 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7339616441086361811, guid: 2aeca483b7053c34cacedabe873053ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 835197329595615430}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adb6c5160ad900041b4bde26ac2f6042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1624657598
 GameObject:
   m_ObjectHideFlags: 0

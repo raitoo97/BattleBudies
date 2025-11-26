@@ -118,7 +118,7 @@ public class GridVisualizer : MonoBehaviour
     }
     void SetColor(Node n, Color c)
     {
-        var idx = n.GridIndex;
+        var idx = n.gridIndex;
         SetColor(lines[idx.x, idx.y], c);
     }
     void SetColor(LineRenderer lr, Color c)
@@ -130,7 +130,7 @@ public class GridVisualizer : MonoBehaviour
     }
     void SetLinePosition(Node n, bool lifted)
     {
-        var idx = n.GridIndex;
+        var idx = n.gridIndex;
         SetLinePosition(lines[idx.x, idx.y], lifted);
     }
     void SetLinePosition(LineRenderer lr, bool lifted)
