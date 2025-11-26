@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public class GridManager : MonoBehaviour
@@ -19,15 +20,10 @@ public class GridManager : MonoBehaviour
     void Start()
     {
         CreateGrid();
-        for (int r = 0; r < _rows; r++)
-        {
-            for (int c = 0; c < _columns; c++)
-            {
-                var l = _grid[r, c].Neighbors;
-            }
-        }
+        AddBridgeNeighbords();
+        InitializeNeighbors();
     }
-    void CreateGrid()
+    private void CreateGrid()
     {
         _grid = new Node[_rows, _columns];
         float totalWidth = (_columns - 1) * _offset;
@@ -52,6 +48,39 @@ public class GridManager : MonoBehaviour
                 node.Initalize(new Vector2Int(r, c));
                 node.name = $"Node_{r}_{c}";
                 _grid[r, c] = node;
+            }
+        }
+    }
+    private void AddBridgeNeighbords()
+    {
+        Dictionary<Vector2Int, Vector2Int> bridgeEdges = new Dictionary<Vector2Int, Vector2Int>();
+        bridgeEdges.Add(new Vector2Int(3, 2), new Vector2Int(2, 2));
+        bridgeEdges.Add(new Vector2Int(3, 7), new Vector2Int(2, 7));
+        bridgeEdges.Add(new Vector2Int(3, 12), new Vector2Int(2, 12));
+        bridgeEdges.Add(new Vector2Int(9, 2), new Vector2Int(10, 2));
+        bridgeEdges.Add(new Vector2Int(9, 7), new Vector2Int(10, 7));
+        bridgeEdges.Add(new Vector2Int(9, 12), new Vector2Int(10, 12));
+        foreach (var kvp in bridgeEdges)
+        {
+            Node bridgeNode = GetNode(kvp.Key.x, kvp.Key.y);
+            Node floorNode = GetNode(kvp.Value.x, kvp.Value.y);
+            if (bridgeNode != null && floorNode != null)
+            {
+                bridgeNode.SetFloorNeighbor(floorNode);
+                bridgeNode.maxStepUp = 2f;
+                bridgeNode.maxStepDown = 2f;
+                floorNode.maxStepUp = 2f;
+                floorNode.maxStepDown = 2f;
+            }
+        }
+    }
+    private void InitializeNeighbors()
+    {
+        for (int r = 0; r < _rows; r++)
+        {
+            for (int c = 0; c < _columns; c++)
+            {
+                _grid[r, c].InitializeGridNeighbors();
             }
         }
     }
