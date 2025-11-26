@@ -15,6 +15,13 @@ public class EnergyManager : MonoBehaviour
     {
         currentEnergy = maxEnergy;
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            AddEnergy(20);
+        }
+    }
     public bool TryConsumeEnergy(float amount)
     {
         if (currentEnergy >= amount)
