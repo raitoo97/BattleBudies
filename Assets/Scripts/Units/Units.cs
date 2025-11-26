@@ -30,8 +30,16 @@ public abstract class Units : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
         if (Vector3.Distance(transform.position, targetPos) <= arriveThreshold)
         {
-            currentNode = path[0];
-            path.RemoveAt(0);
+            float requiredEnergy = 1f;
+            if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy))
+            {
+                currentNode = path[0];
+                path.RemoveAt(0);
+            }
+            else
+            {
+                path.Clear();
+            }
         }
     }
 }

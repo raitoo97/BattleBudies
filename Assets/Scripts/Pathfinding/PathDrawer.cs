@@ -27,8 +27,15 @@ public class PathDrawer : MonoBehaviour
             lineRenderer.positionCount = 0;
             return;
         }
-        lineRenderer.positionCount = path.Count;
-        for (int i = 0; i < path.Count; i++)
+        int energyAvailable = Mathf.FloorToInt(EnergyManager.instance.currentEnergy);
+        int nodesToDraw = Mathf.Min(path.Count, energyAvailable + 1);
+        if (nodesToDraw == 0)
+        {
+            lineRenderer.positionCount = 0;
+            return;
+        }
+        lineRenderer.positionCount = nodesToDraw;
+        for (int i = 0; i < nodesToDraw; i++)
         {
             lineRenderer.SetPosition(i, path[i].transform.position + Vector3.up * 0.2f);
         }
