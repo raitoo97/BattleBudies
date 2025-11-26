@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7644689572133805831}
   - component: {fileID: 3920220405238791479}
   - component: {fileID: 7339616441086361811}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BearPiece
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,5 +122,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentNode: {fileID: 0}
-  targetNode: {fileID: 0}
   moveSpeed: 25
