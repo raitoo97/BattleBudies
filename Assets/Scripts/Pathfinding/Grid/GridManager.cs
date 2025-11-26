@@ -1,4 +1,5 @@
 using UnityEngine;
+[DefaultExecutionOrder(-100)]
 public class GridManager : MonoBehaviour
 {
     [SerializeField]private Node _node;
@@ -7,6 +8,14 @@ public class GridManager : MonoBehaviour
     [Range(0.1f,10f)][SerializeField]private float _offset;
     [SerializeField] private LayerMask _groundMask;
     [SerializeField] private float _rayHeight = 30f;
+    public static GridManager instance;
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+    }
     void Start()
     {
         CreateGrid();
@@ -14,12 +23,9 @@ public class GridManager : MonoBehaviour
     void CreateGrid()
     {
         _grid = new Node[_rows, _columns];
-
         float totalWidth = (_columns - 1) * _offset;
         float totalHeight = (_rows - 1) * _offset;
-
         Vector3 origin = transform.position - new Vector3(totalWidth / 2f, 0f, totalHeight / 2f);
-
         for (int r = 0; r < _rows; r++)
         {
             for (int c = 0; c < _columns; c++)
@@ -36,6 +42,7 @@ public class GridManager : MonoBehaviour
                     Debug.LogWarning($"Node {r},{c} no encontró suelo. Marcando como no walkable.");
                 }
                 Node node = Instantiate(_node, finalPos, Quaternion.identity, transform);
+                node.GridIndex = new Vector2Int(r, c);
                 node.name = $"Node_{r}_{c}";
                 _grid[r, c] = node;
             }
@@ -46,14 +53,16 @@ public class GridManager : MonoBehaviour
         if (r < 0 || r >= _rows || c < 0 || c >= _columns) return null;
         return _grid[r, c];
     }
+    public int Rows { get => _rows; }
+    public int Columns { get => _columns; }
+    public float Offset { get => _offset; }
     void OnDrawGizmos()
     {
         if (!Application.isPlaying)
         {
-            DrawGridRays();
+            //DrawGridRays();DebugGrilla
         }
     }
-
     void DrawGridRays()
     {
         Gizmos.color = Color.yellow;
