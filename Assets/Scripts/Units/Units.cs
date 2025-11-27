@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+[RequireComponent(typeof(GlowUnit))]
 public abstract class Units : MonoBehaviour
 {
     public Node currentNode;
@@ -7,10 +8,14 @@ public abstract class Units : MonoBehaviour
     private List<Node> path = new List<Node>();
     public float moveSpeed = 5f;
     private float arriveThreshold = 0.05f;
+    private GlowUnit _glow;
+    private float originalY;
     protected virtual void Start()
     {
         currentNode = NodeManager.GetClosetNode(transform.position);
         targetNode = null;
+        _glow = GetComponent<GlowUnit>();
+        originalY = transform.position.y;
     }
 
     protected virtual void Update()
@@ -27,6 +32,7 @@ public abstract class Units : MonoBehaviour
     {
         if (path == null || path.Count == 0) return;
         Vector3 targetPos = path[0].transform.position;
+        targetPos.y = originalY;
         transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
         if (Vector3.Distance(transform.position, targetPos) <= arriveThreshold)
         {
