@@ -69,6 +69,15 @@ public class CardPlayManager : MonoBehaviour
             Debug.LogWarning("No hay nodo o cardData disponible.");
             return;
         }
+        bool isPlayerTurn = GameManager.instance.isPlayerTurn;
+        if (isPlayerTurn)
+        {
+            EnergyManager.instance.currentEnergy -= currentCardData.cost;
+        }
+        else
+        {
+            EnergyManager.instance.enemyCurrentEnergy -= currentCardData.cost;
+        }
         Vector3 spawnPos = selectedNode.transform.position + Vector3.up * 5f;
         Instantiate(currentCardData.unitPrefab, spawnPos, Quaternion.identity);
         Destroy(currentUIcard.gameObject);
