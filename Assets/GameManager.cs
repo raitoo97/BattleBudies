@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
         {
             if (isPlayerTurn)
             {
-                Debug.Log("TURN — Player");
                 EnergyManager.instance.RefillPlayerEnergy();
                 DeckManager.instance.DrawCard(DeckManager.instance.playerHand);
                 yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.K));
@@ -30,7 +29,6 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("TURN — Enemy");
                 EnergyManager.instance.RefillEnemyEnergy();
                 DeckManager.instance.DrawCard(DeckManager.instance.enemyHand);
                 yield return new WaitForSeconds(turnDelay);

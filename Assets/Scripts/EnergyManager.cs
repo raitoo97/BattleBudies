@@ -32,11 +32,9 @@ public class EnergyManager : MonoBehaviour
     public void RefillPlayerEnergy()
     {
         currentEnergy = maxEnergy;
-        Debug.Log("Energía del jugador restaurada a " + currentEnergy);
     }
     public void RefillEnemyEnergy()
     {
         enemyCurrentEnergy = enemyMaxEnergy;
-        Debug.Log("Energía del enemigo restaurada a " + enemyCurrentEnergy);
     }
 }
