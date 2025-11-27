@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class UICard : MonoBehaviour
 {
-    private Image artworkImage;
+    public Image artworkImage;
     public CardData cardData;
     void Awake()
     {

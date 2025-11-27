@@ -18,6 +18,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     private RectTransform dragLayer;
     private RectTransform playerHand;
     private UICard uiCard;
+    [HideInInspector] public bool isPlayerCard = false;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -58,6 +59,10 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
                 targetScale = Vector3.one * normalScale;
         }
         rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, targetScale, Time.deltaTime * scaleSpeed);
+        if (isPlayerCard)
+        {
+            UpdateTint();
+        }
     }
     private bool IsMouseOverThisCard()
     {
@@ -103,7 +108,9 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         {
             insideHand = RectTransformUtility.RectangleContainsScreenPoint(playerHand, Input.mousePosition, canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null);
         }
-        if (insideHand)
+        bool isPlayerTurn = GameManager.instance.isPlayerTurn;
+        float currentEnergy = isPlayerTurn ? EnergyManager.instance.currentEnergy : EnergyManager.instance.enemyCurrentEnergy;
+        if (insideHand || currentEnergy < uiCard.cardData.cost)
         {
             transform.SetParent(originalParent, true);
             rectTransform.anchoredPosition = originalPosition;
@@ -111,6 +118,33 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         else
         {
             CardPlayManager.instance.TryPlayCard(this, uiCard.cardData);
+        }
+    }
+    public void UpdateTint()
+    {
+        if (uiCard == null || uiCard.artworkImage == null) return;
+        float currentEnergy = EnergyManager.instance.currentEnergy;
+        if (currentEnergy < uiCard.cardData.cost)
+            SetGrayTint();
+        else
+            ResetTint();
+    }
+    private void SetGrayTint()
+    {
+        if (uiCard.artworkImage != null)
+        {
+            Color c = uiCard.artworkImage.color;
+            c.r = 0.5f;
+            c.g = 0.5f;
+            c.b = 0.5f;
+            uiCard.artworkImage.color = c;
+        }
+    }
+    private void ResetTint()
+    {
+        if (uiCard.artworkImage != null)
+        {
+            uiCard.artworkImage.color = Color.white;
         }
     }
 }

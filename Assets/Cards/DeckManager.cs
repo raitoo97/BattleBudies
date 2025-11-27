@@ -29,6 +29,12 @@ public class DeckManager : MonoBehaviour
         CardData randomCard = deck[index];
         UICard newCard = Instantiate(cardPrefab, handParent);
         newCard.Setup(randomCard);
+        CardInteraction cardInteraction = newCard.GetComponent<CardInteraction>();
+        if (isPlayer && cardInteraction != null)
+        {
+            cardInteraction.isPlayerCard = true;
+            cardInteraction.UpdateTint();
+        }
     }
     public void DrawPlayerCard()
     {
