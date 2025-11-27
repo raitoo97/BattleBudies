@@ -42,6 +42,7 @@ public class CardPlayManager : MonoBehaviour
         currentUIcard = uiCard;
         currentCardData = cardData;
         placingMode = true;
+        GridVisualizer.instance.placingMode = true;
         HidePlayerHand();
     }
     public void NodeClicked(Node node)
@@ -69,6 +70,7 @@ public class CardPlayManager : MonoBehaviour
         selectedNode = null;
         currentUIcard = null;
         currentCardData = null;
+        GridVisualizer.instance.placingMode = false;
         ShowPlayerHand();
     }
 }
