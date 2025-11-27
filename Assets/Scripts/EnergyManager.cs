@@ -2,8 +2,12 @@ using UnityEngine;
 public class EnergyManager : MonoBehaviour
 {
     public static EnergyManager instance;
+    [Header("Player Energy")]
     public float maxEnergy = 10f;
     public float currentEnergy;
+    [Header("Enemy Energy")]
+    public float enemyMaxEnergy = 10f;
+    public float enemyCurrentEnergy;
     private void Awake()
     {
         if (instance == null)
@@ -14,13 +18,7 @@ public class EnergyManager : MonoBehaviour
     private void Start()
     {
         currentEnergy = maxEnergy;
-    }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            AddEnergy(20);
-        }
+        enemyCurrentEnergy = enemyMaxEnergy;
     }
     public bool TryConsumeEnergy(float amount)
     {
@@ -31,8 +29,14 @@ public class EnergyManager : MonoBehaviour
         }
         return false;
     }
-    public void AddEnergy(float amount)
+    public void RefillPlayerEnergy()
     {
-        currentEnergy = Mathf.Clamp(currentEnergy + amount, 0f, maxEnergy);
+        currentEnergy = maxEnergy;
+        Debug.Log("Energía del jugador restaurada a " + currentEnergy);
+    }
+    public void RefillEnemyEnergy()
+    {
+        enemyCurrentEnergy = enemyMaxEnergy;
+        Debug.Log("Energía del enemigo restaurada a " + enemyCurrentEnergy);
     }
 }

@@ -10,7 +10,6 @@ public abstract class Units : MonoBehaviour
     private float arriveThreshold = 0.05f;
     private GlowUnit _glow;
     private float originalY;
-    public CardInstance cardInstance;
     public int currentHealth;
     public int damage;
     protected virtual void Start()
@@ -19,11 +18,6 @@ public abstract class Units : MonoBehaviour
         targetNode = null;
         _glow = GetComponent<GlowUnit>();
         originalY = transform.position.y;
-        if (cardInstance != null)
-        {
-            currentHealth = cardInstance.currentHealth;
-            damage = cardInstance.GetDamage();
-        }
     }
     protected virtual void Update()
     {
@@ -56,18 +50,9 @@ public abstract class Units : MonoBehaviour
             }
         }
     }
-    public void SetCard(CardInstance card)
-    {
-        cardInstance = card;
-        currentHealth = card.currentHealth;
-        damage = card.GetDamage();
-    }
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        if (cardInstance != null)
-            cardInstance.TakeDamage(amount);
-
         if (currentHealth <= 0)
         {
             currentHealth = 0;
