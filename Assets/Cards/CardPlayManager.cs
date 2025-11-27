@@ -2,7 +2,7 @@ using UnityEngine;
 public class CardPlayManager : MonoBehaviour
 {
     public static CardPlayManager instance;
-    private bool placingMode = false;
+    public bool placingMode = false;
     private CardInteraction currentUIcard;
     private CardData currentCardData;
     private Node selectedNode;
@@ -44,6 +44,12 @@ public class CardPlayManager : MonoBehaviour
         placingMode = true;
         GridVisualizer.instance.placingMode = true;
         HidePlayerHand();
+        if (UnitController.instance != null && UnitController.instance.selectedUnit != null)
+        {
+            var glow = UnitController.instance.selectedUnit.GetComponent<GlowUnit>();
+            if (glow != null) glow.SetGlowOff();
+            UnitController.instance.selectedUnit = null;
+        }
     }
     public void NodeClicked(Node node)
     {

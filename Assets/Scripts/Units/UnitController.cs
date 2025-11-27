@@ -6,8 +6,28 @@ public class UnitController : MonoBehaviour
     [SerializeField]private PathDrawer pathDrawer;
     private GlowUnit hoverGlow;
     private Units hoverUnit;
+    public static UnitController instance;
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+    }
     void Update()
     {
+        if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
+        {
+            if (selectedUnit != null)
+            {
+                var glow = selectedUnit.GetComponent<GlowUnit>();
+                if (glow != null) glow.SetGlowOff();
+                selectedUnit = null;
+            }
+            pathDrawer.ClearPath();
+            selectedEndNode = null;
+            return;
+        }
         HandleMouseHover();
         HandleMouseClick();
         HandleMoveCommand();

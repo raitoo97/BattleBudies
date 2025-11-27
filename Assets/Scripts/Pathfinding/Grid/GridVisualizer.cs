@@ -6,7 +6,7 @@ public class GridVisualizer : MonoBehaviour
     [SerializeField] private Color defaultColor = Color.white;
     [SerializeField] private Color hoverColor = new Color(1f, 0.9f, 0f, 1f) * 2f;
     [SerializeField] private Color selectedColor = new Color(0, 0.4f, 1f, 1f) * 3f;
-    [SerializeField] private Color placementRowColor = Color.green;
+    [SerializeField] private Color placementRowColor = new Color(0f, 1f, 0f, 1f) * 3f;
     [Header("Line Settings")]
     [SerializeField] private Material lineMaterial;
     [SerializeField] private float lineWidth = 0.05f;
@@ -79,28 +79,24 @@ public class GridVisualizer : MonoBehaviour
     {
         var gm = GridManager.instance;
         int cols = gm.Columns;
-        float duration = 0.5f; // duración de cada “fase” de color
+        float duration = 0.5f;
         float t = 0f;
         bool toGreen = true;
-
         while (placingMode)
         {
             t += Time.deltaTime / duration;
             Color targetColor = toGreen ? placementRowColor : defaultColor;
             Color fromColor = toGreen ? defaultColor : placementRowColor;
-
             Color lerped = Color.Lerp(fromColor, targetColor, t);
-
             for (int c = 0; c < cols; c++)
             {
                 Node node = gm.GetNode(0, c);
                 if (node != null && node != hoveredNode && node != selectedNode)
                 {
                     SetColor(node, lerped);
-                    SetLinePosition(node, true); // mantener liftHeight
+                    SetLinePosition(node, true);
                 }
             }
-
             if (t >= 1f)
             {
                 t = 0f;
