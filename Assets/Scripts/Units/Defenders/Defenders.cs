@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bear : Ranger
+public abstract class Defenders : Units
 {
     override protected void Start()
     {

@@ -1,18 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-public class Card : MonoBehaviour
+[CreateAssetMenu(fileName = "NewCard", menuName = "Cards/CardData")]
+public class Card : ScriptableObject
 {
-    // Start is called before the first frame update
-    void Start()
+    [Header("Estadísticas de ficha")]
+    public int health;        
+    public int energyCost;
+    [Header("Daño")]
+    public int diceCount = 1; // Número de D6 que lanza la carta
+    [Header("Prefab y lógica")]
+    public GameObject fichaPrefab;
+    [Header("Arte de la carta (512x1024)")]
+    public Sprite artwork;
+    public int RollDamage()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        int total = 0;
+        for (int i = 0; i < diceCount; i++)
+            total += Random.Range(1, 7);
+        return total;
     }
 }
