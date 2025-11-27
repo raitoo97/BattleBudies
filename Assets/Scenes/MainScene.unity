@@ -871,7 +871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayerTurn: 1
-  turnDelay: 1
+  turnDelay: 10
 --- !u!1 &744679564
 GameObject:
   m_ObjectHideFlags: 0

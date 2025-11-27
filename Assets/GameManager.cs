@@ -4,7 +4,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public bool isPlayerTurn = true;
-    public float turnDelay = 1f;
+    public float turnDelay = 10f;
     private void Awake()
     {
         if (instance == null)
