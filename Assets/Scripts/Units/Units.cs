@@ -54,6 +54,14 @@ public abstract class Units : MonoBehaviour
             }
         }
     }
+    public void SetCurrentNode(Node newNode)
+    {
+        if (currentNode != null)
+            currentNode.unitOnNode = null;
+        currentNode = newNode;
+        if (currentNode != null)
+            currentNode.unitOnNode = this.gameObject;
+    }
     public int RollDamage()
     {
         int total = 0;

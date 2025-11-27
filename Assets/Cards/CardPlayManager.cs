@@ -86,7 +86,7 @@ public class CardPlayManager : MonoBehaviour
         selectedNode = node;
         PlaceUnitAtNode();
     }
-    private void PlaceUnitAtNode()
+    public void PlaceUnitAtNode()
     {
         if (selectedNode == null || currentCardData == null)
         {
@@ -103,7 +103,12 @@ public class CardPlayManager : MonoBehaviour
             EnergyManager.instance.enemyCurrentEnergy -= currentCardData.cost;
         }
         Vector3 spawnPos = selectedNode.transform.position + Vector3.up * 5f;
-        Instantiate(currentCardData.unitPrefab, spawnPos, Quaternion.identity);
+        GameObject unit = Instantiate(currentCardData.unitPrefab, spawnPos, Quaternion.identity);
+        if (selectedNode != null)
+            selectedNode.unitOnNode = unit;
+        Units unitScript = unit.GetComponent<Units>();
+        if (unitScript != null)
+            unitScript.SetCurrentNode(selectedNode);
         Destroy(currentUIcard.gameObject);
         placingMode = false;
         selectedNode = null;
@@ -112,4 +117,7 @@ public class CardPlayManager : MonoBehaviour
         GridVisualizer.instance.placingMode = false;
         ShowPlayerHand();
     }
+    public CardInteraction GetcurrentUIcard { get => currentUIcard; set => currentUIcard = value; }
+    public CardData GetcurrentCardData { get => currentCardData; set => currentCardData = value; }
+    public Node GetselectedNode { get => selectedNode; set => selectedNode = value; }
 }

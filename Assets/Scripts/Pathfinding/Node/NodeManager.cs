@@ -28,6 +28,20 @@ public static class NodeManager
         }
         return closestNode;
     }
+    public static Node GetRandomEmptyNodeOnRow(int row)
+    {
+        List<Node> emptyNodes = new List<Node>();
+        foreach (Node node in _totalNodes)
+        {
+            if (node.gridIndex.x == row && node.IsEmpty())
+            {
+                emptyNodes.Add(node);
+            }
+        }
+        if (emptyNodes.Count == 0) return null;
+        int index = Random.Range(0, emptyNodes.Count);
+        return emptyNodes[index];
+    }
     public static List<Node> GetNodeCount()
     {
         return _totalNodes;
