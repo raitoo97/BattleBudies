@@ -81,7 +81,6 @@ public class CardPlayManager : MonoBehaviour
         if (!placingMode) return;
         if (node.gridIndex.x != 0)
         {
-            Debug.LogWarning("Solo se pueden colocar unidades en la fila 0.");
             return;
         }
         selectedNode = node;
