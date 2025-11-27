@@ -66,6 +66,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     }
     private bool IsMouseOverThisCard()
     {
+        if (!isPlayerCard) return false;
         PointerEventData pointerData = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
         List<RaycastResult> hits = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointerData, hits);
@@ -77,7 +78,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (dragLayer == null) return;
+        if (!isPlayerCard || dragLayer == null) return;
         isDragging = true;
         originalParent = transform.parent;
         originalPosition = rectTransform.anchoredPosition;
@@ -90,7 +91,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     }
     public void OnDrag(PointerEventData eventData)
     {
-        if (!isDragging) return;
+        if (!isPlayerCard || !isDragging) return;
         Vector3 globalMousePos;
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(dragLayer, eventData.position, canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null, out globalMousePos))
         {
@@ -99,7 +100,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     }
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (!isDragging) return;
+        if (!isPlayerCard || !isDragging) return;
         isDragging = false;
         canvasGroup.blocksRaycasts = true;
         targetScale = Vector3.one * normalScale;
@@ -122,7 +123,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     }
     public void UpdateTint()
     {
-        if (uiCard == null || uiCard.artworkImage == null) return;
+        if (!isPlayerCard || uiCard == null || uiCard.artworkImage == null) return;
         float currentEnergy = EnergyManager.instance.currentEnergy;
         if (currentEnergy < uiCard.cardData.cost)
             SetGrayTint();
