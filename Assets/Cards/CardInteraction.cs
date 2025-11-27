@@ -16,6 +16,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     private Vector3 pointerOffset;
     private bool isDragging = false;
     private RectTransform dragLayer;
+    private RectTransform playerHand;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -32,7 +33,12 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
             if (dz != null)
                 dragLayer = dz.GetComponent<RectTransform>();
             else
-                Debug.LogError("No se encontró DragZone dentro del Canvas");
+                Debug.LogWarning("No se encontró DragZone dentro del Canvas");
+            Transform ph = canvas.transform.Find("PlayerHand");
+            if (ph != null)
+                playerHand = ph.GetComponent<RectTransform>();
+            else
+                Debug.LogWarning("No se encontró PlayerHand dentro del Canvas");
         }
     }
     private void Start()
@@ -58,15 +64,13 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         EventSystem.current.RaycastAll(pointerData, hits);
         foreach (RaycastResult hit in hits)
         {
-            if (hit.gameObject == gameObject)
-                return true;
+            if (hit.gameObject == gameObject) return true;
         }
         return false;
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (dragLayer == null)
-            return;
+        if (dragLayer == null) return;
         isDragging = true;
         originalParent = transform.parent;
         originalPosition = rectTransform.anchoredPosition;
@@ -86,14 +90,25 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
             rectTransform.position = globalMousePos + pointerOffset;
         }
     }
-
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!isDragging) return;
         isDragging = false;
         canvasGroup.blocksRaycasts = true;
         targetScale = Vector3.one * normalScale;
-        transform.SetParent(originalParent, true);
-        rectTransform.anchoredPosition = originalPosition;
+        bool insideHand = false;
+        if (playerHand != null)
+        {
+            insideHand = RectTransformUtility.RectangleContainsScreenPoint(playerHand, Input.mousePosition, canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null);
+        }
+        if (insideHand)
+        {
+            transform.SetParent(originalParent, true);
+            rectTransform.anchoredPosition = originalPosition;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }
