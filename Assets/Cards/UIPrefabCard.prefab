@@ -102,3 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b340f8b5639c14438f120ccd44f64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normalScale: 1
+  hoverScale: 2
+  scaleSpeed: 10
+  canvas: {fileID: 0}
