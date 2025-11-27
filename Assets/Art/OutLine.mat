@@ -39,12 +39,14 @@ Material:
     m_Ints: []
     m_Floats:
     - _ActivateGlow: 0
+    - _GlowThickness: 1
     - _IntensityColor: 5
     - _OutLineThickness: 1.2
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
     - _ColorOutLine: {r: 1, g: 0.5476825, b: 0, a: 0}
+    - _GlowColor: {r: 1, g: 0.54768246, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &2445906833973254247
 MonoBehaviour:

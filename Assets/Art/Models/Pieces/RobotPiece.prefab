@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10
+      value: 12.240001
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
@@ -141,6 +141,7 @@ MonoBehaviour:
   glowMaterialName: OutLine
   rend: {fileID: 0}
   matInstance: {fileID: 0}
+  glowThickness: 1.2
 --- !u!114 &1780592634440832315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentNode: {fileID: 0}
-  moveSpeed: 5
+  moveSpeed: 20
   currentHealth: 0
   damage: 0
 --- !u!136 &5846122604723798370

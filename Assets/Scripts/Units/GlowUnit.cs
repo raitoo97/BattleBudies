@@ -5,6 +5,8 @@ public class GlowUnit : MonoBehaviour
     [SerializeField]private string glowMaterialName = "OutLine";
     [SerializeField]private Renderer rend;
     [SerializeField]private Material matInstance;
+    [Header("Glow Thickness")]
+    [SerializeField] private float glowThickness;
     private void Awake()
     {
         rend = GetComponentInChildren<Renderer>();
@@ -29,6 +31,7 @@ public class GlowUnit : MonoBehaviour
         matInstance.SetInt("_ActivateGlow", 1);
         matInstance.SetFloat("_GlowIntensity", 1f);
         matInstance.SetColor("_GlowColor", Color.yellow);
+        matInstance.SetFloat("_OutLineThickness", glowThickness);
     }
     public void SetGlowSelected()
     {
@@ -36,5 +39,6 @@ public class GlowUnit : MonoBehaviour
         matInstance.SetInt("_ActivateGlow", 1);
         matInstance.SetFloat("_GlowIntensity", 1f);
         matInstance.SetColor("_GlowColor", Color.blue);
+        matInstance.SetFloat("_OutLineThickness", glowThickness);
     }
 }
