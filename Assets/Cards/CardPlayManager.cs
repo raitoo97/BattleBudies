@@ -24,6 +24,7 @@ public class CardPlayManager : MonoBehaviour
     }
     private void ToggleHandsVisibility()
     {
+        if (placingMode) return;
         foreach (Transform card in _playerHand)
         {
             card.gameObject.SetActive(!card.gameObject.activeSelf);
