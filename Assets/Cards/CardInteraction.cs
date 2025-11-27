@@ -17,11 +17,13 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     private bool isDragging = false;
     private RectTransform dragLayer;
     private RectTransform playerHand;
+    private UICard uiCard;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = gameObject.AddComponent<CanvasGroup>();
         canvasGroup.blocksRaycasts = true;
+        uiCard = GetComponent<UICard>();
         canvas = GetComponentInParent<Canvas>();
         if (canvas == null)
         {
@@ -108,7 +110,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         }
         else
         {
-            Destroy(gameObject);
+            CardPlayManager.instance.TryPlayCard(this, uiCard.cardData);
         }
     }
 }

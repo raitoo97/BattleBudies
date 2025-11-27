@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 12.240001
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
@@ -154,10 +154,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3b793cf5a7abe448b1b7fd29bbfe907, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentHealth: 30
+  diceCount: 2
+  damage: 0
   currentNode: {fileID: 0}
   moveSpeed: 20
-  currentHealth: 0
-  damage: 0
 --- !u!136 &5846122604723798370
 CapsuleCollider:
   m_ObjectHideFlags: 0

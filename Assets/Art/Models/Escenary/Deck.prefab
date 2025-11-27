@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7863848201861411104}
   - component: {fileID: 3425621840847028755}
   - component: {fileID: 7408256771315171528}
+  - component: {fileID: 651085554215918707}
   m_Layer: 0
   m_Name: Deck
   m_TagString: Untagged
@@ -125,4 +126,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 979aa2bcd87394d4e9164aed76b586f1, type: 2}
   cardPrefab: {fileID: 4466335426717585799, guid: 1d9506b00e55d5441b09d969dc58337a,
     type: 3}
-  cardParent: {fileID: 0}
+  playerHand: {fileID: 0}
+  enemyHand: {fileID: 0}
+  maxHandSize: 5
+--- !u!114 &651085554215918707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7996317367625133778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dbf1dcac443a5f47b3e470512a3d0d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -3,6 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(GlowUnit))]
 public abstract class Units : MonoBehaviour
 {
+    [Header("Stats")]
+    public int currentHealth;
+    public int diceCount = 1;
+    public int damage;
+    [Header("Movement")]
     public Node currentNode;
     private Node targetNode;
     private List<Node> path = new List<Node>();
@@ -10,8 +15,6 @@ public abstract class Units : MonoBehaviour
     private float arriveThreshold = 0.05f;
     private GlowUnit _glow;
     private float originalY;
-    public int currentHealth;
-    public int damage;
     protected virtual void Start()
     {
         currentNode = NodeManager.GetClosetNode(transform.position);
@@ -49,6 +52,15 @@ public abstract class Units : MonoBehaviour
                 path.Clear();
             }
         }
+    }
+    public int RollDamage()
+    {
+        int total = 0;
+        for (int i = 0; i < diceCount; i++)
+        {
+            total += Random.Range(1, 7);
+        }
+        return total;
     }
     public void TakeDamage(int amount)
     {

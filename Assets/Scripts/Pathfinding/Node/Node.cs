@@ -59,5 +59,12 @@ public class Node : MonoBehaviour
                 _gridNeighbors.Add(node);
         }
     }
+    private void OnMouseDown()
+    {
+        if (Input.GetMouseButtonDown(0) && CardPlayManager.instance != null)
+        {
+            CardPlayManager.instance.NodeClicked(this);
+        }
+    }
     public float Cost { get => _cost; }
 }

@@ -314,13 +314,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.5537032, y: -0.001971449, z: 0.0013741079, w: -0.8327107}
-  m_LocalPosition: {x: -0.32778078, y: 171.58559, z: -71.97516}
+  m_LocalRotation: {x: -0.54903, y: -0.0019637214, z: 0.0013851301, w: -0.8357993}
+  m_LocalPosition: {x: -0.32778078, y: 119.77, z: -71.97516}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 66.601, y: 0.254, z: -0.023}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,7 +637,6 @@ GameObject:
   - component: {fileID: 563951290}
   - component: {fileID: 563951292}
   - component: {fileID: 563951294}
-  - component: {fileID: 563951293}
   - component: {fileID: 563951296}
   - component: {fileID: 563951295}
   - component: {fileID: 563951297}
@@ -702,18 +701,6 @@ MonoBehaviour:
   lineMaterial: {fileID: 2100000, guid: 7256ef2519428b043b199751e0b52ded, type: 2}
   lineWidth: 0.5
   _liftHeight: 0.05
---- !u!114 &563951293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 563951289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c1226b0f7907d74fafae525cedf3fd7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &563951294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1809,6 +1796,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
+        type: 3}
+      propertyPath: _dragZone
+      value: 
+      objectReference: {fileID: 615267183}
+    - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
+        type: 3}
+      propertyPath: playerHand
+      value: 
+      objectReference: {fileID: 615267183}
+    - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
+        type: 3}
+      propertyPath: _playerHand
+      value: 
+      objectReference: {fileID: 1841899323}
     - target: {fileID: 917248301917491408, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1864,11 +1866,6 @@ PrefabInstance:
       propertyPath: enemyHand
       value: 
       objectReference: {fileID: 1832251424}
-    - target: {fileID: 7408256771315171528, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
-        type: 3}
-      propertyPath: cardParent
-      value: 
-      objectReference: {fileID: 1841899323}
     - target: {fileID: 7408256771315171528, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
         type: 3}
       propertyPath: playerHand
