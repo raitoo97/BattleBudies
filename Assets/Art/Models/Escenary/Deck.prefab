@@ -124,6 +124,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 04edba20c83366447bce0a130d513f3f, type: 2}
   - {fileID: 11400000, guid: cb9a6799dc5583747a0414604d44e853, type: 2}
   - {fileID: 11400000, guid: 979aa2bcd87394d4e9164aed76b586f1, type: 2}
+  enemyCards:
+  - {fileID: 11400000, guid: b083a2becdde8ea4fb1b49d36b6ddf2d, type: 2}
+  - {fileID: 11400000, guid: f22b9e1c8f7457a44a037ac9c7f3eb16, type: 2}
+  - {fileID: 11400000, guid: b28ca16ae79599d468f29c33dcc67e27, type: 2}
+  - {fileID: 11400000, guid: 38e9d1dca1ea2e942a575b8280ec547c, type: 2}
   cardPrefab: {fileID: 4466335426717585799, guid: 1d9506b00e55d5441b09d969dc58337a,
     type: 3}
   playerHand: {fileID: 0}
@@ -141,3 +146,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dbf1dcac443a5f47b3e470512a3d0d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  placingMode: 0
+  _playerHand: {fileID: 0}
+  _dragZone: {fileID: 0}

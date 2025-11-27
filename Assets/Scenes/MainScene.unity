@@ -698,9 +698,11 @@ MonoBehaviour:
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   hoverColor: {r: 1, g: 0.9203187, b: 0, a: 1}
   selectedColor: {r: 0, g: 0, b: 1, a: 1}
+  placementRowColor: {r: 0, g: 1, b: 0, a: 1}
   lineMaterial: {fileID: 2100000, guid: 7256ef2519428b043b199751e0b52ded, type: 2}
   lineWidth: 0.5
   _liftHeight: 0.05
+  placingMode: 0
 --- !u!114 &563951294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1799,11 +1801,6 @@ PrefabInstance:
     - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
         type: 3}
       propertyPath: _dragZone
-      value: 
-      objectReference: {fileID: 615267183}
-    - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
-        type: 3}
-      propertyPath: playerHand
       value: 
       objectReference: {fileID: 615267183}
     - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,

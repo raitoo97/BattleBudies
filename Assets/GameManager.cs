@@ -23,14 +23,14 @@ public class GameManager : MonoBehaviour
             if (isPlayerTurn)
             {
                 EnergyManager.instance.RefillPlayerEnergy();
-                DeckManager.instance.DrawCard(DeckManager.instance.playerHand);
+                DeckManager.instance.DrawPlayerCard();
                 yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.K));
                 isPlayerTurn = false;
             }
             else
             {
                 EnergyManager.instance.RefillEnemyEnergy();
-                DeckManager.instance.DrawCard(DeckManager.instance.enemyHand);
+                DeckManager.instance.DrawEnemyCard();
                 yield return new WaitForSeconds(turnDelay);
                 isPlayerTurn = true;
             }
