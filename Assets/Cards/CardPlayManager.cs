@@ -15,6 +15,31 @@ public class CardPlayManager : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ToggleHandsVisibility();
+        }
+    }
+    private void ToggleHandsVisibility()
+    {
+        foreach (Transform card in _playerHand)
+        {
+            card.gameObject.SetActive(!card.gameObject.activeSelf);
+        }
+        foreach (Transform card in _dragZone)
+        {
+            card.gameObject.SetActive(!card.gameObject.activeSelf);
+        }
+        if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
+        {
+            foreach (Transform card in DeckManager.instance.enemyHand)
+            {
+                card.gameObject.SetActive(!card.gameObject.activeSelf);
+            }
+        }
+    }
     private void HidePlayerHand()
     {
         foreach (Transform card in _playerHand)
