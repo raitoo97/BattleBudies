@@ -42,7 +42,8 @@ public abstract class Units : MonoBehaviour
         if (Vector3.Distance(transform.position, targetPos) <= arriveThreshold)
         {
             float requiredEnergy = 1f;
-            if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy))
+            bool isPlayerTurn = GameManager.instance.isPlayerTurn;
+            if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
                 currentNode = path[0];
                 path.RemoveAt(0);

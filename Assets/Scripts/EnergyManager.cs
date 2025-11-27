@@ -20,14 +20,26 @@ public class EnergyManager : MonoBehaviour
         currentEnergy = maxEnergy;
         enemyCurrentEnergy = enemyMaxEnergy;
     }
-    public bool TryConsumeEnergy(float amount)
+    public bool TryConsumeEnergy(float amount, bool isPlayer)
     {
-        if (currentEnergy >= amount)
+        if (isPlayer)
         {
-            currentEnergy -= amount;
-            return true;
+            if (currentEnergy >= amount)
+            {
+                currentEnergy -= amount;
+                return true;
+            }
+            return false;
         }
-        return false;
+        else
+        {
+            if (enemyCurrentEnergy >= amount)
+            {
+                enemyCurrentEnergy -= amount;
+                return true;
+            }
+            return false;
+        }
     }
     public void RefillPlayerEnergy()
     {
