@@ -39,7 +39,8 @@ public abstract class Units : MonoBehaviour
     {
         if (path == null || path.Count == 0) return;
         Vector3 targetPos = path[0].transform.position;
-        targetPos.y = originalY;
+        if (targetPos.y < originalY)
+            targetPos.y = originalY;
         transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
         if (Vector3.Distance(transform.position, targetPos) <= arriveThreshold)
         {
