@@ -41,7 +41,7 @@ public class PathDrawer : MonoBehaviour
             return;
         }
         bool danger = false;
-        if (NodeManager.PathTouchesEnemyNeighbor(path, out List<Node> nodesToMark))
+        if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> nodesToMark))
         {
             if (nodesToMark != null && nodesToMark.Count > 0)
             {

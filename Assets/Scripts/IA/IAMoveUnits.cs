@@ -18,9 +18,7 @@ public class IAMoveUnits : MonoBehaviour
         Units[] allUnits = FindObjectsOfType<Units>();
         List<Units> enemyUnits = new List<Units>();
         foreach (Units u in allUnits)
-        {
             if (!u.isPlayerUnit) enemyUnits.Add(u);
-        }
         foreach (Units enemy in enemyUnits)
         {
             if (enemy.currentNode == null) continue;
@@ -42,6 +40,15 @@ public class IAMoveUnits : MonoBehaviour
                     break;
             }
             if (path == null || path.Count == 0) continue;
+            if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
+            {
+                int index = path.FindIndex(n => dangerNodes.Contains(n));
+                if (index >= 0)
+                {
+                    path = path.GetRange(0, index + 1);
+                    Debug.Log($"IA: {enemy.name} se detiene en nodo {path[path.Count - 1].name} (primer nodo vecino al jugador incluido).");
+                }
+            }
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
                 path = path.GetRange(0, maxSteps);

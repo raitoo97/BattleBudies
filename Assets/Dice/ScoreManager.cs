@@ -18,7 +18,6 @@ public class ScoreManager : MonoBehaviour
     {
         if (_diceRoll == null)
             _diceRoll = FindObjectOfType<DiceRoll>();
-
         if (rollDiceButton != null)
             rollDiceButton.onClick.AddListener(RollDice);
         else

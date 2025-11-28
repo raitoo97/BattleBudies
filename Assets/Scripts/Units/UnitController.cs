@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 public class UnitController : MonoBehaviour
 {
@@ -145,9 +146,16 @@ public class UnitController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && selectedUnit != null && selectedEndNode != null)
         {
             var path = PathFinding.CalculateAstart(selectedUnit.currentNode, selectedEndNode);
+            if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
+            {
+                int index = path.FindIndex(n => dangerNodes.Contains(n));
+                if (index >= 0)
+                    path = path.GetRange(0, index + 1);
+            }
             selectedUnit.SetPath(path);
             selectedEndNode = null;
             pathDrawer.ClearPath();
         }
     }
 }
+
