@@ -73,6 +73,7 @@ public class CardPlayManager : MonoBehaviour
         currentCardData = cardData;
         placingMode = true;
         GridVisualizer.instance.placingMode = true;
+        HideAllHands();
         if (UnitController.instance != null && UnitController.instance.selectedUnit != null)
         {
             var glow = UnitController.instance.selectedUnit.GetComponent<GlowUnit>();
@@ -120,7 +121,20 @@ public class CardPlayManager : MonoBehaviour
         currentCardData = null;
         GridVisualizer.instance.placingMode = false;
         if (isPlayerTurn)
+        {
+            handsVisible = true;
             ShowAllHandsAtPlayerTurn();
+        }
+    }
+    public void HideAllHands()
+    {
+        SetHandActive(_playerHand, false);
+        SetHandActive(_dragZone, false);
+
+        if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
+            SetHandActive(DeckManager.instance.enemyHand, false);
+
+        handsVisible = false;
     }
     public CardInteraction GetcurrentUIcard { get => currentUIcard; set => currentUIcard = value; }
     public CardData GetcurrentCardData { get => currentCardData; set => currentCardData = value; }
