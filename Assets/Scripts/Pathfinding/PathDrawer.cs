@@ -86,6 +86,5 @@ public class PathDrawer : MonoBehaviour
         lineRenderer.material.color = c;
         lineRenderer.startColor = c;
         lineRenderer.endColor = c;
-    }
-    
+    }   
 }
