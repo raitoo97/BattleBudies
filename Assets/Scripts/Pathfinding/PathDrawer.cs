@@ -40,9 +40,31 @@ public class PathDrawer : MonoBehaviour
             GridVisualizer.instance.ClearDangerNodes();
             return;
         }
-        bool danger = PathTouchesEnemyNeighbor(path, out List<Node> nodesToMark);
+        bool danger = false;
+        if (PathTouchesEnemyNeighbor(path, out List<Node> nodesToMark))
+        {
+            if (nodesToMark != null && nodesToMark.Count > 0)
+            {
+                Node firstDangerNode = null;
+
+                foreach (var node in path)
+                {
+                    if (nodesToMark.Contains(node))
+                    {
+                        firstDangerNode = node;
+                        break;
+                    }
+                }
+                if (firstDangerNode != null)
+                {
+                    int index = path.IndexOf(firstDangerNode);
+                    if (index <= energyAvailable)
+                        danger = true;
+                }
+            }
+        }
         SetLineColor(danger ? dangerColor : safeColor);
-        if (danger && nodesToMark != null && nodesToMark.Count > 0)
+        if (danger)
             GridVisualizer.instance.SetDangerNodes(nodesToMark);
         else
             GridVisualizer.instance.ClearDangerNodes();
