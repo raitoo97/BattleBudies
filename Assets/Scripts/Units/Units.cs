@@ -17,6 +17,8 @@ public abstract class Units : MonoBehaviour
     private float arriveThreshold = 0.05f;
     private GlowUnit _glow;
     private float originalY;
+    [Header("Dice")]
+    public DiceRoll diceInstance;
     protected virtual void Start()
     {
         currentNode = NodeManager.GetClosetNode(transform.position);
@@ -67,15 +69,6 @@ public abstract class Units : MonoBehaviour
     public bool PathEmpty()
     {
         return path == null || path.Count == 0;
-    }
-    public int RollDamage()
-    {
-        int total = 0;
-        for (int i = 0; i < diceCount; i++)
-        {
-            total += Random.Range(1, 7);
-        }
-        return total;
     }
     public void TakeDamage(int amount)
     {

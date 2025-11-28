@@ -1457,6 +1457,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634344923}
   m_CullTransparentMesh: 1
+--- !u!114 &1796220183 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 508019700719267285, guid: a06e8498048a6a340a8f900cac3e9bb9,
+    type: 3}
+  m_PrefabInstance: {fileID: 4904884764416545334}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3f2d8245c16574d936264f4713a198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1832251423
 GameObject:
   m_ObjectHideFlags: 0
@@ -2235,6 +2247,16 @@ PrefabInstance:
       objectReference: {fileID: 615267183}
     - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
         type: 3}
+      propertyPath: enemyDice
+      value: 
+      objectReference: {fileID: 8867938991918229147}
+    - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
+        type: 3}
+      propertyPath: playerDice
+      value: 
+      objectReference: {fileID: 1796220183}
+    - target: {fileID: 651085554215918707, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4,
+        type: 3}
       propertyPath: _playerHand
       value: 
       objectReference: {fileID: 1841899323}
@@ -2308,6 +2330,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d5a58b74bbcbbc45a38f4c91f98ebe4, type: 3}
+--- !u!114 &8867938991918229147 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 413952021424114376, guid: ceb3bf3b7ef8a6f4b9de52a55b8ec2f5,
+    type: 3}
+  m_PrefabInstance: {fileID: 4106497033445693857}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3f2d8245c16574d936264f4713a198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

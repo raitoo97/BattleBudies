@@ -9,6 +9,9 @@ public class CardPlayManager : MonoBehaviour
     [SerializeField]private Transform _playerHand;
     [SerializeField]private Transform _dragZone;
     private bool handsVisible = true;
+    [Header("Dados")]
+    public DiceRoll playerDice;
+    public DiceRoll enemyDice;
     private void Awake()
     {
         if (instance == null)
@@ -114,6 +117,7 @@ public class CardPlayManager : MonoBehaviour
         {
             unitScript.SetCurrentNode(selectedNode);
             unitScript.isPlayerUnit = isPlayerTurn;
+            unitScript.diceInstance = isPlayerTurn ? playerDice : enemyDice;
         }
         Destroy(currentUIcard.gameObject);
         placingMode = false;
