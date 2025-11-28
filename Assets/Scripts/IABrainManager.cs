@@ -25,7 +25,6 @@ public class IABrainManager : MonoBehaviour
         {
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
         }
-
         GameManager.instance.StartPlayerTurn();
     }
 }
