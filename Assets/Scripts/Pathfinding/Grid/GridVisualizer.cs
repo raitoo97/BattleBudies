@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 public class GridVisualizer : MonoBehaviour
 {
     [Header("Colors")]
@@ -7,6 +8,7 @@ public class GridVisualizer : MonoBehaviour
     [SerializeField] private Color hoverColor = new Color(1f, 0.9f, 0f, 1f) * 2f;
     [SerializeField] private Color selectedColor = new Color(0, 0.4f, 1f, 1f) * 3f;
     [SerializeField] private Color placementRowColor = new Color(0f, 1f, 0f, 1f) * 3f;
+    [SerializeField] private Color dangerColor = new Color(1f, 0f, 0f, 1f) * 3f;
     [Header("Line Settings")]
     [SerializeField] private Material lineMaterial;
     [SerializeField] private float lineWidth = 0.05f;
@@ -17,6 +19,7 @@ public class GridVisualizer : MonoBehaviour
     public bool placingMode = false;
     private Coroutine placementHighlightCoroutine;
     public static GridVisualizer instance;
+    private HashSet<Node> dangerNodes = new HashSet<Node>();
     private void Awake()
     {
         if (instance == null)
@@ -129,16 +132,22 @@ public class GridVisualizer : MonoBehaviour
         {
             if (hoveredNode != null && hoveredNode != selectedNode)
             {
-                SetColor(hoveredNode, defaultColor);
-                SetLinePosition(hoveredNode, false);
+                if (!dangerNodes.Contains(hoveredNode))
+                {
+                    SetColor(hoveredNode, defaultColor);
+                    SetLinePosition(hoveredNode, false);
+                }
             }
             hoveredNode = hitNode;
             if (hoveredNode != null)
             {
                 if (hoveredNode != selectedNode)
                 {
-                    SetColor(hoveredNode, hoverColor);
-                    SetLinePosition(hoveredNode, true);
+                    if (!dangerNodes.Contains(hoveredNode))
+                    {
+                        SetColor(hoveredNode, hoverColor);
+                        SetLinePosition(hoveredNode, true);
+                    }
                 }
             }
         }
@@ -159,25 +168,37 @@ public class GridVisualizer : MonoBehaviour
     {
         if (selectedNode != null)
         {
-            SetColor(selectedNode, defaultColor);
-            SetLinePosition(selectedNode, false);
+            if (!dangerNodes.Contains(selectedNode))
+            {
+                SetColor(selectedNode, defaultColor);
+                SetLinePosition(selectedNode, false);
+            }
         }
         selectedNode = node;
-        SetColor(selectedNode, selectedColor);
-        SetLinePosition(selectedNode, true);
+        if (!dangerNodes.Contains(selectedNode))
+        {
+            SetColor(selectedNode, selectedColor);
+            SetLinePosition(selectedNode, true);
+        }
     }
     void ResetSelection()
     {
         if (selectedNode != null)
         {
-            SetColor(selectedNode, defaultColor);
-            SetLinePosition(selectedNode, false);
+            if (!dangerNodes.Contains(selectedNode))
+            {
+                SetColor(selectedNode, defaultColor);
+                SetLinePosition(selectedNode, false);
+            }
         }
         selectedNode = null;
         if (hoveredNode != null)
         {
-            SetColor(hoveredNode, hoverColor);
-            SetLinePosition(hoveredNode, true);
+            if (!dangerNodes.Contains(hoveredNode))
+            {
+                SetColor(hoveredNode, hoverColor);
+                SetLinePosition(hoveredNode, true);
+            }
         }
     }
     void SetColor(Node n, Color c)
@@ -201,5 +222,41 @@ public class GridVisualizer : MonoBehaviour
     {
         float y = lifted ? _liftHeight : 0f;
         lr.transform.localPosition = new Vector3(0, y, 0);
+    }
+    public void SetDangerNodes(IEnumerable<Node> nodes)
+    {
+        ClearDangerNodes();
+        foreach (Node n in nodes)
+        {
+            if (n == null) continue;
+            dangerNodes.Add(n);
+            SetColor(n, dangerColor);
+            SetLinePosition(n, true);
+        }
+    }
+    public void ClearDangerNodes()
+    {
+        if (dangerNodes.Count == 0) return;
+        var toClear = new List<Node>(dangerNodes);
+        dangerNodes.Clear();
+        foreach (Node n in toClear)
+        {
+            if (n == null) continue;
+            if (n == selectedNode)
+            {
+                SetColor(n, selectedColor);
+                SetLinePosition(n, true);
+            }
+            else if (n == hoveredNode)
+            {
+                SetColor(n, hoverColor);
+                SetLinePosition(n, true);
+            }
+            else
+            {
+                SetColor(n, defaultColor);
+                SetLinePosition(n, false);
+            }
+        }
     }
 }

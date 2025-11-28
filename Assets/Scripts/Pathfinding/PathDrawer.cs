@@ -4,27 +4,32 @@ using UnityEngine;
 public class PathDrawer : MonoBehaviour
 {
     private LineRenderer lineRenderer;
+    [Header("Path colors")]
+    [SerializeField] private Color safeColor = Color.blue;
+    [SerializeField] private Color dangerColor = Color.red;
     void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.positionCount = 0;
         Material mat = new Material(Shader.Find("Sprites/Default"));
-        mat.color = Color.blue;
+        mat.color = safeColor;
         lineRenderer.material = mat;
-        lineRenderer.startColor = Color.blue;
-        lineRenderer.endColor = Color.blue;
+        lineRenderer.startColor = safeColor;
+        lineRenderer.endColor = safeColor;
     }
     public void DrawPath(Node start, Node end)
     {
         if (start == null || end == null)
         {
             lineRenderer.positionCount = 0;
+            GridVisualizer.instance.ClearDangerNodes();
             return;
         }
         List<Node> path = PathFinding.CalculateAstart(start, end);
         if (path == null || path.Count == 0)
         {
             lineRenderer.positionCount = 0;
+            GridVisualizer.instance.ClearDangerNodes();
             return;
         }
         int energyAvailable = Mathf.FloorToInt(EnergyManager.instance.currentEnergy);
@@ -32,8 +37,15 @@ public class PathDrawer : MonoBehaviour
         if (nodesToDraw == 0)
         {
             lineRenderer.positionCount = 0;
+            GridVisualizer.instance.ClearDangerNodes();
             return;
         }
+        bool danger = PathTouchesEnemyNeighbor(path, out List<Node> nodesToMark);
+        SetLineColor(danger ? dangerColor : safeColor);
+        if (danger && nodesToMark != null && nodesToMark.Count > 0)
+            GridVisualizer.instance.SetDangerNodes(nodesToMark);
+        else
+            GridVisualizer.instance.ClearDangerNodes();
         lineRenderer.positionCount = nodesToDraw;
         for (int i = 0; i < nodesToDraw; i++)
         {
@@ -43,5 +55,48 @@ public class PathDrawer : MonoBehaviour
     public void ClearPath()
     {
         lineRenderer.positionCount = 0;
+        GridVisualizer.instance.ClearDangerNodes();
+    }
+    void SetLineColor(Color c)
+    {
+        if (lineRenderer.material == null)
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.material.color = c;
+        lineRenderer.startColor = c;
+        lineRenderer.endColor = c;
+    }
+    bool PathTouchesEnemyNeighbor(List<Node> path, out List<Node> nodesToMark)
+    {
+        nodesToMark = new List<Node>();
+        var allNodes = NodeManager.GetNodeCount();
+        if (allNodes == null || allNodes.Count == 0) return false;
+        foreach (var node in allNodes)
+        {
+            if (node == null || node.unitOnNode == null) continue;
+            var unitGo = node.unitOnNode;
+            var unitsScript = unitGo.GetComponent<Units>();
+            if (unitsScript == null) continue;
+            if (unitsScript.isPlayerUnit) continue;
+            if (path.Contains(node))
+            {
+                if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
+                foreach (var neigh in node.Neighbors)
+                    if (neigh != null && !nodesToMark.Contains(neigh))
+                        nodesToMark.Add(neigh);
+                continue;
+            }
+            foreach (var p in path)
+            {
+                if (node.Neighbors.Contains(p))
+                {
+                    if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
+                    foreach (var neigh in node.Neighbors)
+                        if (neigh != null && !nodesToMark.Contains(neigh))
+                            nodesToMark.Add(neigh);
+                    break;
+                }
+            }
+        }
+        return nodesToMark.Count > 0;
     }
 }
