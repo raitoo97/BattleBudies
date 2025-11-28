@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-public class ScoreManager : MonoBehaviour
+public class DamageManager : MonoBehaviour
 {
-    public static ScoreManager instance;
+    public static DamageManager instance;
     public DiceRoll _diceRoll;
     public Text scoreText;
     public Button rollDiceButton;
@@ -21,7 +21,7 @@ public class ScoreManager : MonoBehaviour
         if (rollDiceButton != null)
             rollDiceButton.onClick.AddListener(RollDice);
         else
-            Debug.LogError("ScoreManager: falta asignar el botón.");
+            Debug.LogError("DamageManager: falta asignar el botón.");
 
         UpdateScoreDisplay();
     }

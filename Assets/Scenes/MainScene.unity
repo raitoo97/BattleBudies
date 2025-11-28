@@ -132,7 +132,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 159849525}
-  - component: {fileID: 159849526}
   m_Layer: 5
   m_Name: Dice
   m_TagString: Untagged
@@ -161,21 +160,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &159849526
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 159849524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c180e5b8bbbcbe488e1f93d0e807cde, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _diceRoll: {fileID: 0}
-  scoreText: {fileID: 1634344925}
-  rollDiceButton: {fileID: 1220242531}
 --- !u!1 &250608711
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,6 +614,7 @@ GameObject:
   - component: {fileID: 563951298}
   - component: {fileID: 563951299}
   - component: {fileID: 563951300}
+  - component: {fileID: 563951301}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -879,6 +864,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1781648d68a8dd14fa70614f43bd7244, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &563951301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563951289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c6a4425f28088c469c3db79fb40f467, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _diceRoll: {fileID: 0}
+  scoreText: {fileID: 1634344925}
+  rollDiceButton: {fileID: 1220242531}
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0
