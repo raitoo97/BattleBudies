@@ -8,6 +8,7 @@ public class Node : MonoBehaviour
     [SerializeField]private float _cost;
     public float maxStepUp = 1f;
     public float maxStepDown = 1f;
+    public GameObject unitOnNode;
     public void Initalize(Vector2Int xY)
     {
         gridIndex = xY;
@@ -58,6 +59,17 @@ public class Node : MonoBehaviour
             if (heightDiff <= 1f)
                 _gridNeighbors.Add(node);
         }
+    }
+    private void OnMouseDown()
+    {
+        if (Input.GetMouseButtonDown(0) && CardPlayManager.instance != null)
+        {
+            CardPlayManager.instance.NodeClicked(this);
+        }
+    }
+    public bool IsEmpty()
+    {
+        return unitOnNode == null;
     }
     public float Cost { get => _cost; }
 }
