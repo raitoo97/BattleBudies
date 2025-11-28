@@ -7,6 +7,8 @@ public abstract class Units : MonoBehaviour
     public int currentHealth;
     public int diceCount = 1;
     public int damage;
+    [Header("Ownership")]
+    public bool isPlayerUnit = true;
     [Header("Movement")]
     public Node currentNode;
     private Node targetNode;

@@ -111,7 +111,10 @@ public class CardPlayManager : MonoBehaviour
             selectedNode.unitOnNode = unit;
         Units unitScript = unit.GetComponent<Units>();
         if (unitScript != null)
+        {
             unitScript.SetCurrentNode(selectedNode);
+            unitScript.isPlayerUnit = isPlayerTurn;
+        }
         Destroy(currentUIcard.gameObject);
         placingMode = false;
         selectedNode = null;
