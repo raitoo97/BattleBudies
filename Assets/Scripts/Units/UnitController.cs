@@ -122,6 +122,11 @@ public class UnitController : MonoBehaviour
                 }
                 else if (node != null && selectedUnit != null)
                 {
+                    if (!node.IsEmpty())
+                    {
+                        Debug.Log("Nodo ocupado, no se puede mover allí.");
+                        return;
+                    }
                     selectedEndNode = node;
                     pathDrawer.DrawPath(selectedUnit.currentNode, selectedEndNode);
                 }
