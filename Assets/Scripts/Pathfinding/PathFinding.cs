@@ -31,6 +31,7 @@ public static class PathFinding
             }
             foreach (var node in current.Neighbors)
             {
+                if (!node.IsEmpty()) continue;
                 float newCost = costSoFar[current] + node.Cost;
                 float distance = Vector3.Distance(node.transform.position, end.transform.position);
                 float priority = newCost + distance;

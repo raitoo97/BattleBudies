@@ -41,4 +41,12 @@ public class GlowUnit : MonoBehaviour
         matInstance.SetColor("_GlowColor", Color.blue);
         matInstance.SetFloat("_OutLineThickness", glowThickness);
     }
+    public void SetGlowEnemyHover()
+    {
+        if (matInstance == null) return;
+        matInstance.SetInt("_ActivateGlow", 1);
+        matInstance.SetFloat("_GlowIntensity", 1f);
+        matInstance.SetColor("_GlowColor", Color.red);
+        matInstance.SetFloat("_OutLineThickness", glowThickness);
+    }
 }
