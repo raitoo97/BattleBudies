@@ -20,7 +20,6 @@ public class DeckManager : MonoBehaviour
     {
         if (handParent.childCount >= maxHandSize)
         {
-            Debug.Log($"No se pueden robar más cartas, la mano de {handParent.name} está llena!");
             return;
         }
         CardData[] deck = isPlayer ? allCards : enemyCards;
