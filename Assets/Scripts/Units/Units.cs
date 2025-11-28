@@ -64,6 +64,10 @@ public abstract class Units : MonoBehaviour
         if (currentNode != null)
             currentNode.unitOnNode = this.gameObject;
     }
+    public bool PathEmpty()
+    {
+        return path == null || path.Count == 0;
+    }
     public int RollDamage()
     {
         int total = 0;
