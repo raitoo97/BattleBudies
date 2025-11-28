@@ -4,7 +4,6 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public bool isPlayerTurn = true;
-    public float turnDelay = 10f;
     private void Awake()
     {
         if (instance == null)
@@ -14,28 +13,30 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
+        DeckManager.instance.FillHandsAtStart();
         StartCoroutine(TurnLoop());
     }
     private IEnumerator TurnLoop()
     {
+        yield return new WaitUntil(() => IABrainManager.instance != null && DeckManager.instance != null);
         while (true)
         {
             if (isPlayerTurn)
             {
+                CardPlayManager.instance.ShowAllHandsAtPlayerTurn();
                 EnergyManager.instance.RefillPlayerEnergy();
                 DeckManager.instance.DrawPlayerCard();
                 yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.K));
                 isPlayerTurn = false;
+                CardPlayManager.instance.HideAllHandsAtAITurn();
+                StartCoroutine(IABrainManager.instance.ExecuteTurn());
             }
-            else
-            {
-                EnergyManager.instance.RefillEnemyEnergy();
-                DeckManager.instance.DrawEnemyCard();
-                yield return new WaitForSeconds(turnDelay);
-                isPlayerTurn = true;
-            }
-
             yield return null;
         }
+    }
+    public void StartPlayerTurn()
+    {
+        isPlayerTurn = true;
+        CardPlayManager.instance.ShowAllHandsAtPlayerTurn();
     }
 }

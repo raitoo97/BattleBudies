@@ -4,5 +4,22 @@ using UnityEngine;
 
 public class IABrainManager : MonoBehaviour
 {
-    //aca el enemigo eligira que hacer en cad auno de su turnos
+    public static IABrainManager instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+    }
+    public IEnumerator ExecuteTurn()
+    {
+        CardPlayManager.instance.HideAllHandsAtAITurn();
+        EnergyManager.instance.RefillEnemyEnergy();
+        DeckManager.instance.DrawEnemyCard();
+        yield return new WaitForSeconds(0.5f);
+        yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+        GameManager.instance.StartPlayerTurn();
+    }
 }

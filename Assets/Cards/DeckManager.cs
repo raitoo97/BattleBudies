@@ -44,4 +44,15 @@ public class DeckManager : MonoBehaviour
     {
         DrawCard(enemyHand, false);
     }
+    public void FillHandsAtStart()
+    {
+        while (playerHand.childCount < maxHandSize)
+        {
+            DrawPlayerCard();
+        }
+        while (enemyHand.childCount < maxHandSize)
+        {
+            DrawEnemyCard();
+        }
+    }
 }

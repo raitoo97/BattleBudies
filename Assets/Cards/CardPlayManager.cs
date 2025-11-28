@@ -8,6 +8,7 @@ public class CardPlayManager : MonoBehaviour
     private Node selectedNode;
     [SerializeField]private Transform _playerHand;
     [SerializeField]private Transform _dragZone;
+    private bool handsVisible = true;
     private void Awake()
     {
         if (instance == null)
@@ -17,51 +18,54 @@ public class CardPlayManager : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (!placingMode && GameManager.instance.isPlayerTurn)
         {
-            ToggleHandsVisibility();
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                ToggleHandsVisibility();
+            }
         }
     }
     private void ToggleHandsVisibility()
     {
-        if (placingMode) return;
-        foreach (Transform card in _playerHand)
-        {
-            card.gameObject.SetActive(!card.gameObject.activeSelf);
-        }
-        foreach (Transform card in _dragZone)
-        {
-            card.gameObject.SetActive(!card.gameObject.activeSelf);
-        }
+        handsVisible = !handsVisible;
+        SetHandActive(_playerHand, handsVisible);
+        SetHandActive(_dragZone, handsVisible);
         if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
         {
-            foreach (Transform card in DeckManager.instance.enemyHand)
-            {
-                card.gameObject.SetActive(!card.gameObject.activeSelf);
-            }
+            SetHandActive(DeckManager.instance.enemyHand, handsVisible);
         }
     }
-    private void HidePlayerHand()
+    private void SetHandActive(Transform hand, bool active)
     {
-        foreach (Transform card in _playerHand)
+        foreach (Transform card in hand)
         {
-            card.gameObject.SetActive(false);
-        }
-        foreach (Transform card in _dragZone)
-        {
-            card.gameObject.SetActive(false);
+            card.gameObject.SetActive(active);
         }
     }
-    private void ShowPlayerHand()
+    public void ShowAllHandsAtPlayerTurn()
     {
-        foreach (Transform card in _playerHand)
+        SetHandActive(_playerHand, true);
+        SetHandActive(_dragZone, true);
+
+        if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
         {
-            card.gameObject.SetActive(true);
+            SetHandActive(DeckManager.instance.enemyHand, true);
         }
-        foreach (Transform card in _dragZone)
+
+        handsVisible = true;
+    }
+    public void HideAllHandsAtAITurn()
+    {
+        SetHandActive(_playerHand, false);
+        SetHandActive(_dragZone, false);
+
+        if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
         {
-            card.gameObject.SetActive(false);
+            SetHandActive(DeckManager.instance.enemyHand, false);
         }
+
+        handsVisible = false;
     }
     public void TryPlayCard(CardInteraction uiCard, CardData cardData)
     {
@@ -69,7 +73,6 @@ public class CardPlayManager : MonoBehaviour
         currentCardData = cardData;
         placingMode = true;
         GridVisualizer.instance.placingMode = true;
-        HidePlayerHand();
         if (UnitController.instance != null && UnitController.instance.selectedUnit != null)
         {
             var glow = UnitController.instance.selectedUnit.GetComponent<GlowUnit>();
@@ -116,7 +119,8 @@ public class CardPlayManager : MonoBehaviour
         currentUIcard = null;
         currentCardData = null;
         GridVisualizer.instance.placingMode = false;
-        ShowPlayerHand();
+        if (isPlayerTurn)
+            ShowAllHandsAtPlayerTurn();
     }
     public CardInteraction GetcurrentUIcard { get => currentUIcard; set => currentUIcard = value; }
     public CardData GetcurrentCardData { get => currentCardData; set => currentCardData = value; }
