@@ -84,10 +84,8 @@ public class CardPlayManager : MonoBehaviour
     public void NodeClicked(Node node)
     {
         if (!placingMode) return;
-        if (node.gridIndex.x != 0)
-        {
-            return;
-        }
+        if (node.gridIndex.x != 0) return;
+        if (node.unitOnNode != null) return;
         selectedNode = node;
         PlaceUnitAtNode();
     }

@@ -45,7 +45,7 @@ public abstract class Units : MonoBehaviour
             bool isPlayerTurn = GameManager.instance.isPlayerTurn;
             if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
-                currentNode = path[0];
+                SetCurrentNode(path[0]);
                 path.RemoveAt(0);
             }
             else
@@ -56,7 +56,7 @@ public abstract class Units : MonoBehaviour
     }
     public void SetCurrentNode(Node newNode)
     {
-        if (currentNode != null)
+        if (currentNode != null && currentNode.unitOnNode == this.gameObject)
             currentNode.unitOnNode = null;
         currentNode = newNode;
         if (currentNode != null)
