@@ -123,7 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb6c5160ad900041b4bde26ac2f6042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 1
+  currentHealth: 25
   diceCount: 1
   isPlayerUnit: 1
   currentNode: {fileID: 0}
