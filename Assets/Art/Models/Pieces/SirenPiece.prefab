@@ -144,11 +144,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d595608d603fd446b6025dde546271a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 30
+  currentHealth: 1
   diceCount: 5
-  damage: 0
+  isPlayerUnit: 1
   currentNode: {fileID: 0}
   moveSpeed: 20
+  diceInstance: {fileID: 0}
 --- !u!136 &8707866418439025331
 CapsuleCollider:
   m_ObjectHideFlags: 0

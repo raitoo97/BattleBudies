@@ -41,7 +41,7 @@ public class PathDrawer : MonoBehaviour
             return;
         }
         bool danger = false;
-        if (PathTouchesEnemyNeighbor(path, out List<Node> nodesToMark))
+        if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> nodesToMark))
         {
             if (nodesToMark != null && nodesToMark.Count > 0)
             {
@@ -86,39 +86,5 @@ public class PathDrawer : MonoBehaviour
         lineRenderer.material.color = c;
         lineRenderer.startColor = c;
         lineRenderer.endColor = c;
-    }
-    bool PathTouchesEnemyNeighbor(List<Node> path, out List<Node> nodesToMark)
-    {
-        nodesToMark = new List<Node>();
-        var allNodes = NodeManager.GetNodeCount();
-        if (allNodes == null || allNodes.Count == 0) return false;
-        foreach (var node in allNodes)
-        {
-            if (node == null || node.unitOnNode == null) continue;
-            var unitGo = node.unitOnNode;
-            var unitsScript = unitGo.GetComponent<Units>();
-            if (unitsScript == null) continue;
-            if (unitsScript.isPlayerUnit) continue;
-            if (path.Contains(node))
-            {
-                if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
-                foreach (var neigh in node.Neighbors)
-                    if (neigh != null && !nodesToMark.Contains(neigh))
-                        nodesToMark.Add(neigh);
-                continue;
-            }
-            foreach (var p in path)
-            {
-                if (node.Neighbors.Contains(p))
-                {
-                    if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
-                    foreach (var neigh in node.Neighbors)
-                        if (neigh != null && !nodesToMark.Contains(neigh))
-                            nodesToMark.Add(neigh);
-                    break;
-                }
-            }
-        }
-        return nodesToMark.Count > 0;
-    }
+    }   
 }

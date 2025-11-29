@@ -9,6 +9,9 @@ public class CardPlayManager : MonoBehaviour
     [SerializeField]private Transform _playerHand;
     [SerializeField]private Transform _dragZone;
     private bool handsVisible = true;
+    [Header("Dados")]
+    public DiceRoll playerDice;
+    public DiceRoll enemyDice;
     private void Awake()
     {
         if (instance == null)
@@ -18,9 +21,14 @@ public class CardPlayManager : MonoBehaviour
     }
     private void Update()
     {
+        if (CombatManager.instance != null && CombatManager.instance.GetCombatActive)
+        {
+            HideAllHands();
+            return;
+        }
         if (!placingMode && GameManager.instance.isPlayerTurn)
         {
-            if (Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Tab))
             {
                 ToggleHandsVisibility();
             }
@@ -47,28 +55,29 @@ public class CardPlayManager : MonoBehaviour
     {
         SetHandActive(_playerHand, true);
         SetHandActive(_dragZone, true);
-
         if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
         {
             SetHandActive(DeckManager.instance.enemyHand, true);
         }
-
         handsVisible = true;
     }
     public void HideAllHandsAtAITurn()
     {
         SetHandActive(_playerHand, false);
         SetHandActive(_dragZone, false);
-
         if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
         {
             SetHandActive(DeckManager.instance.enemyHand, false);
         }
-
         handsVisible = false;
     }
     public void TryPlayCard(CardInteraction uiCard, CardData cardData)
     {
+        if (CombatManager.instance != null && CombatManager.instance.GetCombatActive)
+        {
+            Debug.Log("No se puede jugar cartas durante el combate.");
+            return;
+        }
         currentUIcard = uiCard;
         currentCardData = cardData;
         placingMode = true;
@@ -114,6 +123,7 @@ public class CardPlayManager : MonoBehaviour
         {
             unitScript.SetCurrentNode(selectedNode);
             unitScript.isPlayerUnit = isPlayerTurn;
+            unitScript.diceInstance = isPlayerTurn ? playerDice : enemyDice;
         }
         Destroy(currentUIcard.gameObject);
         placingMode = false;
@@ -131,10 +141,8 @@ public class CardPlayManager : MonoBehaviour
     {
         SetHandActive(_playerHand, false);
         SetHandActive(_dragZone, false);
-
         if (DeckManager.instance != null && DeckManager.instance.enemyHand != null)
             SetHandActive(DeckManager.instance.enemyHand, false);
-
         handsVisible = false;
     }
     public CardInteraction GetcurrentUIcard { get => currentUIcard; set => currentUIcard = value; }

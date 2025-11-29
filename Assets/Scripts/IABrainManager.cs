@@ -1,17 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 public class IABrainManager : MonoBehaviour
 {
     public static IABrainManager instance;
-
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
     }
-
     public IEnumerator ExecuteTurn()
     {
         CardPlayManager.instance.HideAllHandsAtAITurn();
@@ -25,7 +21,7 @@ public class IABrainManager : MonoBehaviour
         {
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
         }
-
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
         GameManager.instance.StartPlayerTurn();
     }
 }

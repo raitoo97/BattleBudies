@@ -42,6 +42,65 @@ public static class NodeManager
         int index = Random.Range(0, emptyNodes.Count);
         return emptyNodes[index];
     }
+    public static bool PathTouchesUnitNeighbor(List<Node> path, out List<Node> nodesToMark)
+    {
+        nodesToMark = new List<Node>();
+        var allNodes = GetNodeCount();
+        if (allNodes == null || allNodes.Count == 0) return false;
+        bool detectPlayerUnits = !GameManager.instance.isPlayerTurn;
+        foreach (var node in allNodes)
+        {
+            if (node == null || node.unitOnNode == null) continue;
+            var unitsScript = node.unitOnNode.GetComponent<Units>();
+            if (unitsScript == null) continue;
+            if (detectPlayerUnits && !unitsScript.isPlayerUnit) continue;
+            if (!detectPlayerUnits && unitsScript.isPlayerUnit) continue;
+            if (path.Contains(node))
+            {
+                if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
+                foreach (var neigh in node.Neighbors)
+                    if (neigh != null && !nodesToMark.Contains(neigh))
+                        nodesToMark.Add(neigh);
+                continue;
+            }
+            foreach (var p in path)
+            {
+                if (node.Neighbors.Contains(p))
+                {
+                    if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
+                    foreach (var neigh in node.Neighbors)
+                        if (neigh != null && !nodesToMark.Contains(neigh))
+                            nodesToMark.Add(neigh);
+                    break;
+                }
+            }
+        }
+        return nodesToMark.Count > 0;
+    }
+    public static Units GetFirstUnitInAttackZone(Units unit1, Units unit2)
+    {
+        List<Node> attackZone = new List<Node>();
+        if (unit1.currentNode != null)
+        {
+            attackZone.Add(unit1.currentNode);
+            attackZone.AddRange(unit1.currentNode.Neighbors);
+        }
+        if (unit2.currentNode != null && attackZone.Contains(unit2.currentNode))
+        {
+            return unit2;
+        }
+        foreach (var node in attackZone)
+        {
+            if (node == null || node.unitOnNode == null) continue;
+
+            Units unit = node.unitOnNode.GetComponent<Units>();
+            if (unit == null) continue;
+
+            if (unit.isPlayerUnit != unit1.isPlayerUnit)
+                return unit;
+        }
+        return null;
+    }
     public static List<Node> GetNodeCount()
     {
         return _totalNodes;
