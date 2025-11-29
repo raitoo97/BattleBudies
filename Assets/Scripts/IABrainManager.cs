@@ -23,6 +23,7 @@ public class IABrainManager : MonoBehaviour
         {
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
         }
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
         GameManager.instance.StartPlayerTurn();
     }
 }
