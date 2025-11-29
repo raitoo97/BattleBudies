@@ -23,8 +23,8 @@ public class IAMoveUnits : MonoBehaviour
         {
             if (enemy.currentNode == null) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
-            List<Node> emptyNodes = NodeManager.GetNodeCount().FindAll(n => n.IsEmpty());
-            if (emptyNodes.Count == 0) continue;
+            List<Node> validNodes = NodeManager.GetNodeCount().FindAll(n => n.unitOnNode == null);
+            if (validNodes.Count == 0) continue;
             Node targetNode = null;
             List<Node> path = null;
             int maxAttempts = 20;
@@ -32,10 +32,11 @@ public class IAMoveUnits : MonoBehaviour
             while (attempts < maxAttempts)
             {
                 attempts++;
-                targetNode = emptyNodes[Random.Range(0, emptyNodes.Count)];
+                targetNode = validNodes[Random.Range(0, validNodes.Count)];
                 if (targetNode == null) break;
                 path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
                 bool pathBlocked = path.Exists(n => n.unitOnNode != null);
+
                 if (!pathBlocked && path.Count > 0)
                     break;
             }
@@ -52,6 +53,19 @@ public class IAMoveUnits : MonoBehaviour
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
                 path = path.GetRange(0, maxSteps);
+            Node finalNode = path[path.Count - 1];
+            if (finalNode.unitOnNode != null)
+            {
+                int lastIndex = path.Count - 1;
+                while (lastIndex >= 0 && path[lastIndex].unitOnNode != null)
+                {
+                    lastIndex--;
+                }
+                if (lastIndex < 0) continue;
+                path = path.GetRange(0, lastIndex + 1);
+                finalNode = path[path.Count - 1];
+            }
+            finalNode.unitOnNode = enemy.gameObject;
             enemy.SetPath(path);
             movedAnyUnit = true;
             yield return new WaitUntil(() => enemy.PathEmpty());
