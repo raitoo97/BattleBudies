@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 public class CombatManager : MonoBehaviour
 {
-    //PreStopCombat
     public static CombatManager instance;
     private Units attackerUnit;
     private Units defenderUnit;
@@ -22,7 +21,7 @@ public class CombatManager : MonoBehaviour
         pendingDamage += value;
         Debug.Log($"Daño detectado: {value}, total acumulado: {(attackerUnit != null && attackerUnit.isPlayerUnit ? CanvasManager.instance.playerDamageUI : CanvasManager.instance.enemyDamageUI)}");
     }
-    public void StartCombat(Units unit1, Units unit2)
+    public void StartCombat(Units unit1, Units unit2, bool attackerStartsTurn)
     {
         if (combatActive) return;
         if (unit1 == null || unit2 == null)
@@ -37,21 +36,24 @@ public class CombatManager : MonoBehaviour
         }
         combatActive = true;
         CanvasManager.instance.ShowCombatUI(true);
-        attackerUnit = NodeManager.GetFirstUnitInAttackZone(unit1, unit2) ?? unit1;
+        attackerUnit = attackerStartsTurn ? unit1 : NodeManager.GetFirstUnitInAttackZone(unit1, unit2) ?? unit1;
         defenderUnit = (attackerUnit == unit1) ? unit2 : unit1;
         attackerDice = attackerUnit.diceInstance;
         defenderDice = defenderUnit.diceInstance;
         Debug.Log($"StartCombat: {attackerUnit.name} vs {defenderUnit.name}");
-        StartCoroutine(CombatFlow());
+        StartCoroutine(CombatFlow(attackerStartsTurn));
     }
-    private IEnumerator CombatFlow()
+    private IEnumerator CombatFlow(bool attackerStartsTurn)
     {
+        bool attackerTurn = true;
         while (combatActive)
         {
-            yield return StartCoroutine(UnitRollDice(attackerUnit, defenderUnit, attackerDice));
+            if (attackerTurn)
+                yield return StartCoroutine(UnitRollDice(attackerUnit, defenderUnit, attackerDice));
+            else
+                yield return StartCoroutine(UnitRollDice(defenderUnit, attackerUnit, defenderDice));
             if (!combatActive) yield break;
-            yield return StartCoroutine(UnitRollDice(defenderUnit, attackerUnit, defenderDice));
-            if (!combatActive) yield break;
+            attackerTurn = !attackerTurn;
         }
     }
     private IEnumerator UnitRollDice(Units unit, Units target, DiceRoll dice)

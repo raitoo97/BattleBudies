@@ -15,7 +15,6 @@ public class IAMoveUnits : MonoBehaviour
     public IEnumerator MoveAllEnemyUnits()
     {
         movedAnyUnit = false;
-
         Units[] allUnits = FindObjectsOfType<Units>();
         List<Units> enemyUnits = new List<Units>();
         foreach (Units u in allUnits)
@@ -59,7 +58,7 @@ public class IAMoveUnits : MonoBehaviour
                             if (playerUnit != null && playerUnit.isPlayerUnit)
                             {
                                 Debug.Log($"IA inicia combate: {enemy.name} vs {playerUnit.name}");
-                                CombatManager.instance.StartCombat(enemy, playerUnit);
+                                CombatManager.instance.StartCombat(enemy, playerUnit, true);
                                 yield break;
                             }
                         }

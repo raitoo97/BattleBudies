@@ -3,13 +3,11 @@ using UnityEngine;
 public class IABrainManager : MonoBehaviour
 {
     public static IABrainManager instance;
-
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
     }
-
     public IEnumerator ExecuteTurn()
     {
         CardPlayManager.instance.HideAllHandsAtAITurn();

@@ -166,7 +166,7 @@ public class UnitController : MonoBehaviour
                             Units enemy = node.unitOnNode.GetComponent<Units>();
                             if (enemy != null && enemy.isPlayerUnit != selectedUnit.isPlayerUnit)
                             {
-                                CombatManager.instance.StartCombat(selectedUnit, enemy);
+                                CombatManager.instance.StartCombat(selectedUnit, enemy, true);
                                 break;
                             }
                         }
