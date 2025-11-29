@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 public class CombatManager : MonoBehaviour
 {
+    //PreStopCombat
     public static CombatManager instance;
     private Units attackerUnit;
     private Units defenderUnit;
