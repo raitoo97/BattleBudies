@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class CanvasManager : MonoBehaviour
 {
+    //PREUI
     public static CanvasManager instance;
     [Header("Combat")]
     public Button rollButton;
