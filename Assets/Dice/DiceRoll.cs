@@ -2,7 +2,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class DiceRoll : MonoBehaviour
 {
-    [Header("Configuración")]
+    [Header("Config")]
     public float thresholdStill = 0.05f;
     public float resetTime = 1f;
     public Transform resetPoint;
@@ -20,10 +20,6 @@ public class DiceRoll : MonoBehaviour
     void Update()
     {
         CheckIfDiceIsStill();
-        if (hasBeenThrown && hasBeenCounted && IsDiceStill())
-        {
-            ResetDicePosition();
-        }
     }
     private void CheckIfDiceIsStill()
     {
@@ -86,7 +82,7 @@ public class DiceRoll : MonoBehaviour
         return rb.velocity.magnitude < thresholdStill &&
                rb.angularVelocity.magnitude < thresholdStill;
     }
-    private void ResetDicePosition()
+    public void ResetDicePosition()
     {
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;

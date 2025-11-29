@@ -77,6 +77,30 @@ public static class NodeManager
         }
         return nodesToMark.Count > 0;
     }
+    public static Units GetFirstUnitInAttackZone(Units unit1, Units unit2)
+    {
+        List<Node> attackZone = new List<Node>();
+        if (unit1.currentNode != null)
+        {
+            attackZone.Add(unit1.currentNode);
+            attackZone.AddRange(unit1.currentNode.Neighbors);
+        }
+        if (unit2.currentNode != null && attackZone.Contains(unit2.currentNode))
+        {
+            return unit2;
+        }
+        foreach (var node in attackZone)
+        {
+            if (node == null || node.unitOnNode == null) continue;
+
+            Units unit = node.unitOnNode.GetComponent<Units>();
+            if (unit == null) continue;
+
+            if (unit.isPlayerUnit != unit1.isPlayerUnit)
+                return unit;
+        }
+        return null;
+    }
     public static List<Node> GetNodeCount()
     {
         return _totalNodes;

@@ -614,7 +614,6 @@ GameObject:
   - component: {fileID: 563951298}
   - component: {fileID: 563951299}
   - component: {fileID: 563951300}
-  - component: {fileID: 563951301}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -861,24 +860,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 563951289}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1781648d68a8dd14fa70614f43bd7244, type: 3}
+  m_Script: {fileID: 11500000, guid: 790c36dc6ad66eb4b85d28bf7329c0a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &563951301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 563951289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c6a4425f28088c469c3db79fb40f467, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _diceRoll: {fileID: 0}
-  scoreText: {fileID: 1634344925}
-  rollDiceButton: {fileID: 1220242531}
+  rollButton: {fileID: 1220242531}
+  playerDamageText: {fileID: 1634344925}
+  enemyDamageText: {fileID: 780324014}
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0
@@ -1245,7 +1232,7 @@ Transform:
   m_GameObject: {fileID: 1175513581}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -102.19, y: 5.68, z: -7.2}
+  m_LocalPosition: {x: 109, y: 5.68, z: -7.2}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 1
   m_Children: []

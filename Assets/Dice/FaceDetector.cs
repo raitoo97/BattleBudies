@@ -17,13 +17,13 @@ public class FaceDetector : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
         if (hasBeenCounted) return;
-        if (_diceRoll == null || DamageManager.instance == null) return;
+        if (_diceRoll == null || CombatManager.instance == null) return;
         if (!_diceRoll.hasBeenThrown) return;
         if (_diceRoll.IsDiceStill())
         {
             if (!_diceRoll.hasBeenCounted)
             {
-                DamageManager.instance.AddDamage(faceValueNumber);
+                CombatManager.instance.AddDamage(faceValueNumber);
                 hasBeenCounted = true;
                 _diceRoll.hasBeenCounted = true;
                 Debug.Log($"Cara detectada: {faceValueNumber}");

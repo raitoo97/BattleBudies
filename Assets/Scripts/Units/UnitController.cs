@@ -150,7 +150,21 @@ public class UnitController : MonoBehaviour
             {
                 int index = path.FindIndex(n => dangerNodes.Contains(n));
                 if (index >= 0)
+                {
                     path = path.GetRange(0, index + 1);
+                    foreach (var node in dangerNodes)
+                    {
+                        if (node.unitOnNode != null)
+                        {
+                            Units enemy = node.unitOnNode.GetComponent<Units>();
+                            if (enemy != null && enemy.isPlayerUnit != selectedUnit.isPlayerUnit)
+                            {
+                                CombatManager.instance.StartCombat(selectedUnit, enemy);
+                                break;
+                            }
+                        }
+                    }
+                }
             }
             selectedUnit.SetPath(path);
             selectedEndNode = null;
