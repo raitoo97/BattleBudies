@@ -32,6 +32,13 @@ public class UnitController : MonoBehaviour
             HandleMouseHover();
             return;
         }
+        if (CombatManager.instance != null && CombatManager.instance.GetCombatActive)
+        {
+            DeselectUnit();
+            pathDrawer.ClearPath();
+            selectedEndNode = null;
+            return;
+        }
         HandleMouseHover();
         HandleMouseClick();
         HandleMoveCommand();

@@ -46,16 +46,13 @@ public class CombatManager : MonoBehaviour
     }
     private IEnumerator CombatFlow()
     {
-        while (attackerUnit.currentHealth > 0 && defenderUnit.currentHealth > 0)
+        while (combatActive)
         {
             yield return StartCoroutine(UnitRollDice(attackerUnit, defenderUnit, attackerDice));
-            if (defenderUnit.currentHealth <= 0) break;
+            if (!combatActive) yield break;
             yield return StartCoroutine(UnitRollDice(defenderUnit, attackerUnit, defenderDice));
+            if (!combatActive) yield break;
         }
-        Debug.Log(attackerUnit.currentHealth <= 0 ? $"{attackerUnit.name} muere." : $"{defenderUnit.name} muere.");
-        combatActive = false;
-        CanvasManager.instance.ResetDamageUI();
-        CanvasManager.instance.ShowCombatUI(false);
     }
     private IEnumerator UnitRollDice(Units unit, Units target, DiceRoll dice)
     {
@@ -80,10 +77,19 @@ public class CombatManager : MonoBehaviour
                 target.TakeDamage(pendingDamage);
                 CanvasManager.instance.AddDamageToUI(unit, pendingDamage);
                 Debug.Log($"{unit.name} inflige {pendingDamage} a {target.name}. Vida restante: {target.currentHealth}");
+                if (target.currentHealth <= 0)
+                {
+                    Debug.Log($"{target.name} ha muerto. Terminando combate.");
+                    combatActive = false;
+                    CanvasManager.instance.ResetDamageUI();
+                    CanvasManager.instance.ShowCombatUI(false);
+                    yield break;
+                }
             }
             pendingDamage = 0;
             dice.ResetDicePosition();
             yield return new WaitForSeconds(0.3f);
         }
     }
+    public bool GetCombatActive { get => combatActive; }
 }
