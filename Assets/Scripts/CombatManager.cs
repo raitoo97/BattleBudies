@@ -35,12 +35,12 @@ public class CombatManager : MonoBehaviour
             return;
         }
         combatActive = true;
-        CanvasManager.instance.ShowCombatUI(true);
         attackerUnit = attackerStartsTurn ? unit1 : NodeManager.GetFirstUnitInAttackZone(unit1, unit2) ?? unit1;
         defenderUnit = (attackerUnit == unit1) ? unit2 : unit1;
         attackerDice = attackerUnit.diceInstance;
         defenderDice = defenderUnit.diceInstance;
         Debug.Log($"StartCombat: {attackerUnit.name} vs {defenderUnit.name}");
+        CanvasManager.instance.ShowCombatUI(true, playerCanRoll: false);
         StartCoroutine(CombatFlow(attackerStartsTurn));
     }
     private IEnumerator CombatFlow(bool attackerStartsTurn)
@@ -64,12 +64,13 @@ public class CombatManager : MonoBehaviour
             if (unit.isPlayerUnit)
             {
                 CanvasManager.instance.rollClicked = false;
-                CanvasManager.instance.rollButton.gameObject.SetActive(true);
+                CanvasManager.instance.ShowCombatUI(true, playerCanRoll: true);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
-                CanvasManager.instance.rollButton.gameObject.SetActive(false);
+                CanvasManager.instance.ShowCombatUI(true, playerCanRoll: false);
             }
             else
             {
+                CanvasManager.instance.ShowCombatUI(true, playerCanRoll: false);
                 yield return new WaitForSeconds(0.5f);
             }
             dice.RollDice();
@@ -84,7 +85,6 @@ public class CombatManager : MonoBehaviour
                     Debug.Log($"{target.name} ha muerto. Terminando combate.");
                     combatActive = false;
                     CanvasManager.instance.ResetDamageUI();
-                    CanvasManager.instance.ShowCombatUI(false);
                     yield break;
                 }
             }
