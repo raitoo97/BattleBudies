@@ -15,6 +15,8 @@ public class CombatManager : MonoBehaviour
     private int pendingDamage = 0;
     private bool rollClicked = false;
     private bool combatActive = false;
+    private int playerDamageUI = 0;
+    private int enemyDamageUI = 0;
     private void Awake()
     {
         if (instance == null)
@@ -23,31 +25,36 @@ public class CombatManager : MonoBehaviour
             Destroy(gameObject);
         rollButton.onClick.AddListener(() => rollClicked = true);
         rollButton.gameObject.SetActive(false);
+        if (playerDamageText != null) playerDamageText.gameObject.SetActive(false);
+        if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(false);
     }
     public void AddDamage(int value)
     {
         pendingDamage += value;
+        Debug.Log($"Daño detectado: {value}, total acumulado: {(attackerUnit != null && attackerUnit.isPlayerUnit ? playerDamageUI : enemyDamageUI)}");
+    }
+    private void AddDamageToUI(Units attacker, int value)
+    {
+        if (attacker.isPlayerUnit)
+            playerDamageUI += value;
+        else
+            enemyDamageUI += value;
         UpdateDamageUI();
-        Debug.Log($"Daño detectado: {value}, total acumulado: {pendingDamage}");
     }
     private void UpdateDamageUI()
     {
-        if (attackerUnit == null) return;
-        if (attackerUnit.isPlayerUnit)
-        {
-            if (playerDamageText != null) playerDamageText.text = $"Damage: {pendingDamage}";
-            if (enemyDamageText != null) enemyDamageText.text = $"Damage: 0";
-        }
-        else
-        {
-            if (enemyDamageText != null) enemyDamageText.text = $"Damage: {pendingDamage}";
-            if (playerDamageText != null) playerDamageText.text = $"Damage: 0";
-        }
+        if (playerDamageText != null)
+            playerDamageText.text = $"Player Damage: {playerDamageUI}";
+        if (enemyDamageText != null)
+            enemyDamageText.text = $"Enemy Damage: {enemyDamageUI}";
     }
     private void ResetDamageUI()
     {
-        if (playerDamageText != null) playerDamageText.text = "Damage: 0";
-        if (enemyDamageText != null) enemyDamageText.text = "Damage: 0";
+        playerDamageUI = 0;
+        enemyDamageUI = 0;
+        UpdateDamageUI();
+        if (playerDamageText != null) playerDamageText.gameObject.SetActive(false);
+        if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(false);
     }
     public void StartCombat(Units unit1, Units unit2)
     {
@@ -63,6 +70,8 @@ public class CombatManager : MonoBehaviour
             return;
         }
         combatActive = true;
+        if (playerDamageText != null) playerDamageText.gameObject.SetActive(true);
+        if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(true);
         attackerUnit = NodeManager.GetFirstUnitInAttackZone(unit1, unit2) ?? unit1;
         defenderUnit = (attackerUnit == unit1) ? unit2 : unit1;
         attackerDice = attackerUnit.diceInstance;
@@ -86,8 +95,6 @@ public class CombatManager : MonoBehaviour
     {
         for (int i = 0; i < unit.diceCount; i++)
         {
-            pendingDamage = 0;
-            UpdateDamageUI();
             dice.PrepareForRoll();
             if (unit.isPlayerUnit)
             {
@@ -105,10 +112,10 @@ public class CombatManager : MonoBehaviour
             if (pendingDamage > 0)
             {
                 target.TakeDamage(pendingDamage);
+                AddDamageToUI(unit, pendingDamage);
                 Debug.Log($"{unit.name} inflige {pendingDamage} a {target.name}. Vida restante: {target.currentHealth}");
             }
             pendingDamage = 0;
-            UpdateDamageUI();
             dice.ResetDicePosition();
             yield return new WaitForSeconds(0.3f);
         }
