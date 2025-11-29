@@ -58,6 +58,9 @@ public class CombatManager : MonoBehaviour
     }
     private IEnumerator UnitRollDice(Units unit, Units target, DiceRoll dice)
     {
+        int playerDice = unit.isPlayerUnit ? unit.diceCount : CanvasManager.instance.playerDiceRemaining;
+        int enemyDice = !unit.isPlayerUnit ? unit.diceCount : CanvasManager.instance.enemyDiceRemaining;
+        CanvasManager.instance.UpdateDiceRemaining(playerDice, enemyDice);
         for (int i = 0; i < unit.diceCount; i++)
         {
             dice.PrepareForRoll();
@@ -75,6 +78,11 @@ public class CombatManager : MonoBehaviour
             }
             dice.RollDice();
             yield return new WaitUntil(() => dice.hasBeenThrown && dice.hasBeenCounted && dice.IsDiceStill());
+            if (unit.isPlayerUnit)
+                playerDice--;
+            else
+                enemyDice--;
+            CanvasManager.instance.UpdateDiceRemaining(playerDice, enemyDice);
             if (pendingDamage > 0)
             {
                 target.TakeDamage(pendingDamage);
@@ -84,7 +92,7 @@ public class CombatManager : MonoBehaviour
                 {
                     Debug.Log($"{target.name} ha muerto. Terminando combate.");
                     combatActive = false;
-                    CanvasManager.instance.ResetDamageUI();
+                    CanvasManager.instance.ResetUI();
                     yield break;
                 }
             }

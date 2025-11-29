@@ -7,16 +7,19 @@ public class CanvasManager : MonoBehaviour
     public Button rollButton;
     public Text playerDamageText;
     public Text enemyDamageText;
+    public Text playerDiceRemainingText;
+    public Text enemyDiceRemainingText;
     [HideInInspector] public bool rollClicked = false;
     [HideInInspector] public int playerDamageUI = 0;
     [HideInInspector] public int enemyDamageUI = 0;
+    [HideInInspector] public int playerDiceRemaining = 0;
+    [HideInInspector] public int enemyDiceRemaining = 0;
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
-
         rollButton.onClick.AddListener(() => rollClicked = true);
-        ResetDamageUI();
+        ResetUI();
     }
     public void AddDamageToUI(Units attacker, int value)
     {
@@ -29,19 +32,30 @@ public class CanvasManager : MonoBehaviour
         if (playerDamageText != null) playerDamageText.text = $"Player Damage: {playerDamageUI}";
         if (enemyDamageText != null) enemyDamageText.text = $"Enemy Damage: {enemyDamageUI}";
     }
-    public void ResetDamageUI()
+    public void ResetUI()
     {
         playerDamageUI = 0;
         enemyDamageUI = 0;
         UpdateDamageUI();
+        rollButton.gameObject.SetActive(false);
         if (playerDamageText != null) playerDamageText.gameObject.SetActive(false);
         if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(false);
-        rollButton.gameObject.SetActive(false);
+        if (playerDiceRemainingText != null) playerDiceRemainingText.gameObject.SetActive(false);
+        if (enemyDiceRemainingText != null) enemyDiceRemainingText.gameObject.SetActive(false);
     }
     public void ShowCombatUI(bool show, bool playerCanRoll = false)
     {
         if (playerDamageText != null) playerDamageText.gameObject.SetActive(show);
         if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(show);
+        if (playerDiceRemainingText != null) playerDiceRemainingText.gameObject.SetActive(show);
+        if (enemyDiceRemainingText != null) enemyDiceRemainingText.gameObject.SetActive(show);
         rollButton.gameObject.SetActive(playerCanRoll);
+    }
+    public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
+    {
+        if (playerDiceRemainingText != null)
+            playerDiceRemainingText.text = $"Dados restantes jugador: {playerRemaining}";
+        if (enemyDiceRemainingText != null)
+            enemyDiceRemainingText.text = $"Dados restantes enemigo: {enemyRemaining}";
     }
 }
