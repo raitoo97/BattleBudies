@@ -35,19 +35,19 @@ public class CombatManager : MonoBehaviour
         if (attackerUnit == null) return;
         if (attackerUnit.isPlayerUnit)
         {
-            if (playerDamageText != null) playerDamageText.text = $"Player Damage: {pendingDamage}";
-            if (enemyDamageText != null) enemyDamageText.text = $"Enemy Damage: 0";
+            if (playerDamageText != null) playerDamageText.text = $"Damage: {pendingDamage}";
+            if (enemyDamageText != null) enemyDamageText.text = $"Damage: 0";
         }
         else
         {
-            if (enemyDamageText != null) enemyDamageText.text = $"Enemy Damage: {pendingDamage}";
-            if (playerDamageText != null) playerDamageText.text = $"Player Damage: 0";
+            if (enemyDamageText != null) enemyDamageText.text = $"Damage: {pendingDamage}";
+            if (playerDamageText != null) playerDamageText.text = $"Damage: 0";
         }
     }
     private void ResetDamageUI()
     {
-        if (playerDamageText != null) playerDamageText.text = "Player Damage: 0";
-        if (enemyDamageText != null) enemyDamageText.text = "Enemy Damage: 0";
+        if (playerDamageText != null) playerDamageText.text = "Damage: 0";
+        if (enemyDamageText != null) enemyDamageText.text = "Damage: 0";
     }
     public void StartCombat(Units unit1, Units unit2)
     {
@@ -78,7 +78,6 @@ public class CombatManager : MonoBehaviour
             if (defenderUnit.currentHealth <= 0) break;
             yield return StartCoroutine(UnitRollDice(defenderUnit, attackerUnit, defenderDice));
         }
-
         Debug.Log(attackerUnit.currentHealth <= 0 ? $"{attackerUnit.name} muere." : $"{defenderUnit.name} muere.");
         combatActive = false;
         ResetDamageUI();
@@ -89,6 +88,7 @@ public class CombatManager : MonoBehaviour
         {
             pendingDamage = 0;
             UpdateDamageUI();
+            dice.PrepareForRoll();
             if (unit.isPlayerUnit)
             {
                 rollClicked = false;
@@ -100,8 +100,6 @@ public class CombatManager : MonoBehaviour
             {
                 yield return new WaitForSeconds(0.5f);
             }
-            dice.hasBeenThrown = false;
-            dice.hasBeenCounted = false;
             dice.RollDice();
             yield return new WaitUntil(() => dice.hasBeenThrown && dice.hasBeenCounted && dice.IsDiceStill());
             if (pendingDamage > 0)
