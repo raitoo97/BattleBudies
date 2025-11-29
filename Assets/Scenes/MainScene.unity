@@ -172,6 +172,7 @@ GameObject:
   - component: {fileID: 250608714}
   - component: {fileID: 250608713}
   - component: {fileID: 250608712}
+  - component: {fileID: 250608716}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -267,6 +268,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &250608716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250608711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62b179446eb315349af4956f9e93df50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rollButton: {fileID: 1220242531}
+  playerDamageText: {fileID: 1634344925}
+  enemyDamageText: {fileID: 780324014}
+  rollClicked: 0
+  playerDamageUI: 0
+  enemyDamageUI: 0
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -863,9 +882,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 790c36dc6ad66eb4b85d28bf7329c0a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rollButton: {fileID: 1220242531}
-  playerDamageText: {fileID: 1634344925}
-  enemyDamageText: {fileID: 780324014}
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0
