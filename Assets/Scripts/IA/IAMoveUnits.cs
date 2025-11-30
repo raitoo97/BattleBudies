@@ -34,36 +34,29 @@ public class IAMoveUnits : MonoBehaviour
                 attempts++;
                 targetNode = validNodes[Random.Range(0, validNodes.Count)];
                 if (targetNode == null) break;
+
                 path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
                 if (path == null || path.Count == 0) continue;
+
                 bool pathBlocked = path.Exists(n => n.unitOnNode != null);
                 if (!pathBlocked) break;
             }
             if (path == null || path.Count == 0) continue;
             if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
             {
-                int index = path.FindIndex(n => dangerNodes.Contains(n));
-                if (index >= 0)
+                Node firstDangerNode = null;
+                foreach (Node node in path)
                 {
-                    path = path.GetRange(0, index + 1);
-                    enemy.SetPath(path);
-                    movedAnyUnit = true;
-                    yield return new WaitUntil(() => enemy.PathEmpty());
-                    foreach (Node node in dangerNodes)
+                    if (dangerNodes.Contains(node))
                     {
-                        if (node.unitOnNode != null)
-                        {
-                            Units playerUnit = node.unitOnNode.GetComponent<Units>();
-                            if (playerUnit != null && playerUnit.isPlayerUnit)
-                            {
-                                Debug.Log($"IA inicia combate REAL en nodo: {node.gridIndex} -> {enemy.name} vs {playerUnit.name}");
-                                enemy.SetPath(new List<Node>());
-                                CombatManager.instance.StartCombat(enemy, playerUnit, true);
-                                break;
-                            }
-                        }
+                        firstDangerNode = node;
+                        break;
                     }
-                    continue;
+                }
+                if (firstDangerNode != null)
+                {
+                    int index = path.IndexOf(firstDangerNode);
+                    path = path.GetRange(0, index + 1);
                 }
             }
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
@@ -72,13 +65,42 @@ public class IAMoveUnits : MonoBehaviour
             enemy.SetPath(path);
             movedAnyUnit = true;
             yield return new WaitUntil(() => enemy.PathEmpty());
+
             if (path.Count > 0)
             {
                 Node finalNode = path[path.Count - 1];
                 enemy.SetCurrentNode(finalNode);
             }
-            yield return new WaitForSeconds(0.3f);
+            if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            {
+                yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+            }
+            yield return new WaitForSeconds(0.2f);
         }
     }
-}
+    private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
+    {
+        yield return new WaitUntil(() => attacker.PathEmpty());
+        CombatManager.instance.StartCombat(attacker, defender, true);
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
+    }
+    private bool TryGetPlayerNeighbor(Units enemy, out Units player)
+    {
+        player = null;
+        if (enemy.currentNode == null) return false;
 
+        foreach (Node neighbor in enemy.currentNode.Neighbors)
+        {
+            if (neighbor.unitOnNode != null)
+            {
+                Units unit = neighbor.unitOnNode.GetComponent<Units>();
+                if (unit != null && unit.isPlayerUnit)
+                {
+                    player = unit;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}

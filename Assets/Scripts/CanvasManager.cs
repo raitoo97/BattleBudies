@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class CanvasManager : MonoBehaviour
 {
-    //InstanciarUI energia y UI daño y vida undiades
+    //InstanciarUI energia y UI daño y vida undiades.
     public static CanvasManager instance;
     [Header("Combat")]
     public Button rollButton;
@@ -11,11 +12,14 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI enemyDamageText;
     public TextMeshProUGUI playerDiceRemainingText;
     public TextMeshProUGUI enemyDiceRemainingText;
-    [HideInInspector] public bool rollClicked = false;
-    [HideInInspector] public int playerDamageUI = 0;
-    [HideInInspector] public int enemyDamageUI = 0;
-    [HideInInspector] public int playerDiceRemaining = 0;
-    [HideInInspector] public int enemyDiceRemaining = 0;
+    [HideInInspector]public bool rollClicked = false;
+    [HideInInspector]public int playerDamageUI = 0;
+    [HideInInspector]public int enemyDamageUI = 0;
+    [HideInInspector]public int playerDiceRemaining = 0;
+    [HideInInspector]public int enemyDiceRemaining = 0;
+    [Header("Energy")]
+    public List<GameObject> energyPlayer = new List<GameObject>();
+    public List<GameObject> energyEnemy = new List<GameObject>();
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -59,5 +63,20 @@ public class CanvasManager : MonoBehaviour
             playerDiceRemainingText.text = $"Remaining Dices: {playerRemaining}";
         if (enemyDiceRemainingText != null)
             enemyDiceRemainingText.text = $"Remaining Dices: {enemyRemaining}";
+    }
+    public void UpdateEnergyUI()
+    {
+        int playerEnergy = Mathf.RoundToInt(EnergyManager.instance.currentEnergy);
+        int enemyEnergy = Mathf.RoundToInt(EnergyManager.instance.enemyCurrentEnergy);
+        for (int i = 0; i < energyPlayer.Count; i++)
+        {
+            int index = energyPlayer.Count - 1 - i;
+            energyPlayer[index].SetActive(i < playerEnergy);
+        }
+        for (int i = 0; i < energyEnemy.Count; i++)
+        {
+            int index = energyEnemy.Count - 1 - i;
+            energyEnemy[index].SetActive(i < enemyEnergy);
+        }
     }
 }

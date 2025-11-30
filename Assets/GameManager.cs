@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
             {
                 CardPlayManager.instance.ShowAllHandsAtPlayerTurn();
                 EnergyManager.instance.RefillPlayerEnergy();
+                CanvasManager.instance.UpdateEnergyUI();
                 DeckManager.instance.DrawPlayerCard();
                 yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.K));
                 isPlayerTurn = false;

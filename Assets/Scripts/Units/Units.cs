@@ -43,13 +43,20 @@ public abstract class Units : MonoBehaviour
     }
     private void FollowPath()
     {
-        if (path == null || path.Count == 0) return;
+        if (path == null || path.Count == 0)
+        {
+            Node closest = NodeManager.GetClosetNode(transform.position);
+            if (closest != null && closest != currentNode)
+                SetCurrentNode(closest);
+            return;
+        }
         Node nextNode = path[0];
         Vector3 targetPos = nextNode.transform.position;
         if (targetPos.y < originalY)
             targetPos.y = originalY;
         Vector3 moveDelta = (targetPos - transform.position);
         float step = moveSpeed * Time.deltaTime;
+
         if (moveDelta.magnitude <= step)
         {
             transform.position = GetSnappedPosition(nextNode);
@@ -72,14 +79,24 @@ public abstract class Units : MonoBehaviour
                 path.RemoveAt(0);
                 targetNode = path.Count > 0 ? path[0] : null;
                 transform.position = GetSnappedPosition(currentNode);
+                CanvasManager.instance.UpdateEnergyUI();
+                if (path.Count == 0)
+                {
+                    Node closest = NodeManager.GetClosetNode(transform.position);
+                    if (closest != null && closest != currentNode)
+                        SetCurrentNode(closest);
+                }
             }
             else
             {
                 path.Clear();
+                Node closest = NodeManager.GetClosetNode(transform.position);
+                if (closest != null && closest != currentNode)
+                    SetCurrentNode(closest);
             }
         }
     }
-    private Vector3 GetSnappedPosition(Node node)
+    public Vector3 GetSnappedPosition(Node node)
     {
         Vector3 pos = node.transform.position;
         if (pos.y < originalY)

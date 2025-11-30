@@ -114,12 +114,17 @@ public class CardPlayManager : MonoBehaviour
         {
             EnergyManager.instance.enemyCurrentEnergy -= currentCardData.cost;
         }
-        Vector3 spawnPos = selectedNode.transform.position + Vector3.up * 5f;
+        CanvasManager.instance.UpdateEnergyUI();
+        float spawnHeightOffset = 5f;
+        Vector3 spawnPos = selectedNode.transform.position + Vector3.up * spawnHeightOffset;
         GameObject unit = Instantiate(currentCardData.unitPrefab, spawnPos, Quaternion.identity);
         Units unitScript = unit.GetComponent<Units>();
         if (unitScript != null)
         {
             unitScript.SetCurrentNode(selectedNode);
+            Vector3 snappedPos = unitScript.GetSnappedPosition(selectedNode);
+            snappedPos.y += spawnHeightOffset;
+            unit.transform.position = snappedPos;
             unitScript.isPlayerUnit = isPlayerTurn;
             unitScript.diceInstance = isPlayerTurn ? playerDice : enemyDice;
         }
