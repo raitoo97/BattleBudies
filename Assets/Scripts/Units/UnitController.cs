@@ -207,4 +207,3 @@ public class UnitController : MonoBehaviour
         CombatManager.instance.StartCombat(unit, enemy, true);
     }
 }
-
