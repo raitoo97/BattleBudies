@@ -63,7 +63,9 @@ public abstract class Units : MonoBehaviour
             currentNode.unitOnNode = null;
         currentNode = newNode;
         if (currentNode != null)
+        {
             currentNode.unitOnNode = this.gameObject;
+        }
     }
     public bool PathEmpty()
     {
@@ -81,6 +83,8 @@ public abstract class Units : MonoBehaviour
     private void Die()
     {
         Debug.Log($"{gameObject.name} ha muerto.");
+        if (currentNode != null && currentNode.unitOnNode == this.gameObject)
+            currentNode.unitOnNode = null;
         Destroy(gameObject);
     }
 }

@@ -74,7 +74,7 @@ public class IAMoveUnits : MonoBehaviour
                 movedAnyUnit = true;
                 yield return new WaitUntil(() => enemy.PathEmpty());
                 Node finalNode = path[path.Count - 1];
-                finalNode.unitOnNode = enemy.gameObject;
+                enemy.SetCurrentNode(finalNode);
             }
             yield return new WaitForSeconds(0.3f);
         }

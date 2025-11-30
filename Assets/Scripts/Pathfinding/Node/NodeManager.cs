@@ -46,36 +46,57 @@ public static class NodeManager
     {
         nodesToMark = new List<Node>();
         var allNodes = GetNodeCount();
-        if (allNodes == null || allNodes.Count == 0) return false;
+
+        if (allNodes == null || allNodes.Count == 0)
+            return false;
+
         bool detectPlayerUnits = !GameManager.instance.isPlayerTurn;
+
         foreach (var node in allNodes)
         {
-            if (node == null || node.unitOnNode == null) continue;
-            var unitsScript = node.unitOnNode.GetComponent<Units>();
-            if (unitsScript == null) continue;
-            if (detectPlayerUnits && !unitsScript.isPlayerUnit) continue;
-            if (!detectPlayerUnits && unitsScript.isPlayerUnit) continue;
+            if (node == null) continue;
+
+            if (node.unitOnNode == null)
+                continue;
+
+            Units unit = node.unitOnNode.GetComponent<Units>();
+            if (unit == null) continue;
+
+            // Filtrar unidades por bando
+            if (detectPlayerUnits && !unit.isPlayerUnit) continue;
+            if (!detectPlayerUnits && unit.isPlayerUnit) continue;
+
+
             if (path.Contains(node))
             {
-                if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
+                AddNodeSafe(nodesToMark, node);
+
                 foreach (var neigh in node.Neighbors)
-                    if (neigh != null && !nodesToMark.Contains(neigh))
-                        nodesToMark.Add(neigh);
+                    AddNodeSafe(nodesToMark, neigh);
+
                 continue;
             }
+
             foreach (var p in path)
             {
                 if (node.Neighbors.Contains(p))
                 {
-                    if (!nodesToMark.Contains(node)) nodesToMark.Add(node);
+                    AddNodeSafe(nodesToMark, node);
+
                     foreach (var neigh in node.Neighbors)
-                        if (neigh != null && !nodesToMark.Contains(neigh))
-                            nodesToMark.Add(neigh);
+                        AddNodeSafe(nodesToMark, neigh);
+
                     break;
                 }
             }
         }
+
         return nodesToMark.Count > 0;
+    }
+    private static void AddNodeSafe(List<Node> list, Node n)
+    {
+        if (n != null && !list.Contains(n))
+            list.Add(n);
     }
     public static Units GetFirstUnitInAttackZone(Units unit1, Units unit2)
     {

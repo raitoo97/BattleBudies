@@ -116,8 +116,6 @@ public class CardPlayManager : MonoBehaviour
         }
         Vector3 spawnPos = selectedNode.transform.position + Vector3.up * 5f;
         GameObject unit = Instantiate(currentCardData.unitPrefab, spawnPos, Quaternion.identity);
-        if (selectedNode != null)
-            selectedNode.unitOnNode = unit;
         Units unitScript = unit.GetComponent<Units>();
         if (unitScript != null)
         {
