@@ -13,7 +13,7 @@ public abstract class Units : MonoBehaviour
     private Node targetNode;
     private List<Node> path = new List<Node>();
     public float moveSpeed = 5f;
-    private float arriveThreshold = 0.05f;
+    private float arriveThreshold = 0.1f;
     private GlowUnit _glow;
     private float originalY;
     [Header("Dice")]
@@ -56,13 +56,21 @@ public abstract class Units : MonoBehaviour
             bool isPlayerTurn = GameManager.instance.isPlayerTurn;
             if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
+                // Snap físico exacto al nodo antes de actualizar el nodo lógico
+                transform.position = GetSnappedPosition(path[0]);
+
+                // Actualizar nodo lógico
                 SetCurrentNode(path[0]);
-                transform.position = GetSnappedPosition(currentNode);
+
+                // Eliminar nodo de path
                 path.RemoveAt(0);
-                if (path.Count > 0)
-                    targetNode = path[0];
-                else
-                    targetNode = null;
+
+                // Actualizar targetNode
+                targetNode = path.Count > 0 ? path[0] : null;
+
+                // Si no hay más nodos, asegurarse que la posición coincide exactamente
+                if (path.Count == 0)
+                    transform.position = GetSnappedPosition(currentNode);
             }
             else
             {
