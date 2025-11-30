@@ -11,11 +11,11 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI enemyDamageText;
     public TextMeshProUGUI playerDiceRemainingText;
     public TextMeshProUGUI enemyDiceRemainingText;
-    [HideInInspector] public bool rollClicked = false;
-    [HideInInspector] public int playerDamageUI = 0;
-    [HideInInspector] public int enemyDamageUI = 0;
-    [HideInInspector] public int playerDiceRemaining = 0;
-    [HideInInspector] public int enemyDiceRemaining = 0;
+    [HideInInspector]public bool rollClicked = false;
+    [HideInInspector]public int playerDamageUI = 0;
+    [HideInInspector]public int enemyDamageUI = 0;
+    [HideInInspector]public int playerDiceRemaining = 0;
+    [HideInInspector]public int enemyDiceRemaining = 0;
     private void Awake()
     {
         if (instance == null) instance = this;

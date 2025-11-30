@@ -79,7 +79,7 @@ public abstract class Units : MonoBehaviour
             }
         }
     }
-    private Vector3 GetSnappedPosition(Node node)
+    public Vector3 GetSnappedPosition(Node node)
     {
         Vector3 pos = node.transform.position;
         if (pos.y < originalY)
