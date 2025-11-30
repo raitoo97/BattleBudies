@@ -34,8 +34,10 @@ public class IAMoveUnits : MonoBehaviour
                 attempts++;
                 targetNode = validNodes[Random.Range(0, validNodes.Count)];
                 if (targetNode == null) break;
+
                 path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
                 if (path == null || path.Count == 0) continue;
+
                 bool pathBlocked = path.Exists(n => n.unitOnNode != null);
                 if (!pathBlocked) break;
             }
@@ -43,6 +45,7 @@ public class IAMoveUnits : MonoBehaviour
             if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
             {
                 Node firstDangerNode = null;
+
                 foreach (Node node in path)
                 {
                     if (dangerNodes.Contains(node))
@@ -58,10 +61,22 @@ public class IAMoveUnits : MonoBehaviour
                     enemy.SetPath(path);
                     movedAnyUnit = true;
                     yield return new WaitUntil(() => enemy.PathEmpty());
-                    Units playerUnit = firstDangerNode.unitOnNode?.GetComponent<Units>();
-                    if (playerUnit != null && playerUnit.isPlayerUnit)
+                    Units playerUnit = null;
+                    foreach (Node neighbor in firstDangerNode.Neighbors)
                     {
-                        CombatManager.instance.StartCombat(enemy, playerUnit, true);
+                        if (neighbor.unitOnNode != null)
+                        {
+                            Units unit = neighbor.unitOnNode.GetComponent<Units>();
+                            if (unit != null && unit.isPlayerUnit)
+                            {
+                                playerUnit = unit;
+                                break;
+                            }
+                        }
+                    }
+                    if (playerUnit != null)
+                    {
+                        StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
                     }
                     continue;
                 }
@@ -80,5 +95,9 @@ public class IAMoveUnits : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
     }
+    private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
+    {
+        yield return new WaitUntil(() => attacker.PathEmpty());
+        CombatManager.instance.StartCombat(attacker, defender, true);
+    }
 }
-
