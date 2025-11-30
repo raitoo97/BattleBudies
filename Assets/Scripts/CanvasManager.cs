@@ -18,8 +18,8 @@ public class CanvasManager : MonoBehaviour
     [HideInInspector]public int playerDiceRemaining = 0;
     [HideInInspector]public int enemyDiceRemaining = 0;
     [Header("Energy")]
-    public List<GameManager> energyPlayer = new List<GameManager>();
-    public List<GameManager> energyEnemy = new List<GameManager>();
+    public List<GameObject> energyPlayer = new List<GameObject>();
+    public List<GameObject> energyEnemy = new List<GameObject>();
     private void Awake()
     {
         if (instance == null) instance = this;

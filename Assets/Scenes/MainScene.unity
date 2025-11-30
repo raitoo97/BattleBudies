@@ -699,8 +699,28 @@ MonoBehaviour:
   enemyDamageUI: 0
   playerDiceRemaining: 0
   enemyDiceRemaining: 0
-  energyPlayer: []
-  energyEnemy: []
+  energyPlayer:
+  - {fileID: 1805492956}
+  - {fileID: 767185830}
+  - {fileID: 2068963294}
+  - {fileID: 342855485}
+  - {fileID: 308429870}
+  - {fileID: 1840911015}
+  - {fileID: 408985569}
+  - {fileID: 1881075127}
+  - {fileID: 1893569710}
+  - {fileID: 1297059640}
+  energyEnemy:
+  - {fileID: 1088236147}
+  - {fileID: 725043625}
+  - {fileID: 1270441683}
+  - {fileID: 183351821}
+  - {fileID: 592086929}
+  - {fileID: 841087056}
+  - {fileID: 841912121}
+  - {fileID: 1433695907}
+  - {fileID: 578098579}
+  - {fileID: 531340021}
 --- !u!1 &308429870
 GameObject:
   m_ObjectHideFlags: 0
