@@ -24,6 +24,12 @@ public abstract class Units : MonoBehaviour
         targetNode = null;
         _glow = GetComponent<GlowUnit>();
         originalY = transform.position.y;
+        if (currentNode != null)
+        {
+            Vector3 snap = currentNode.transform.position;
+            snap.y = originalY;
+            transform.position = snap;
+        }
     }
     protected virtual void Update()
     {
@@ -49,13 +55,25 @@ public abstract class Units : MonoBehaviour
             if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
                 SetCurrentNode(path[0]);
+                transform.position = GetSnappedPosition(currentNode);
                 path.RemoveAt(0);
+                if (path.Count > 0)
+                    targetNode = path[0];
+                else
+                    targetNode = null;
             }
             else
             {
                 path.Clear();
             }
         }
+    }
+    private Vector3 GetSnappedPosition(Node node)
+    {
+        Vector3 pos = node.transform.position;
+        if (pos.y < originalY)
+            pos.y = originalY;
+        return pos;
     }
     public void SetCurrentNode(Node newNode)
     {
