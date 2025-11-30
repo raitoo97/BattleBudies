@@ -79,6 +79,7 @@ public abstract class Units : MonoBehaviour
                 path.RemoveAt(0);
                 targetNode = path.Count > 0 ? path[0] : null;
                 transform.position = GetSnappedPosition(currentNode);
+                CanvasManager.instance.UpdateEnergyUI();
                 if (path.Count == 0)
                 {
                     Node closest = NodeManager.GetClosetNode(transform.position);

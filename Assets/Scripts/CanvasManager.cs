@@ -64,4 +64,21 @@ public class CanvasManager : MonoBehaviour
         if (enemyDiceRemainingText != null)
             enemyDiceRemainingText.text = $"Remaining Dices: {enemyRemaining}";
     }
+    public void UpdateEnergyUI()
+    {
+        for (int i = 0; i < energyPlayer.Count; i++)
+        {
+            if (i < Mathf.RoundToInt(EnergyManager.instance.currentEnergy))
+                energyPlayer[i].SetActive(true);
+            else
+                energyPlayer[i].SetActive(false);
+        }
+        for (int i = 0; i < energyEnemy.Count; i++)
+        {
+            if (i < Mathf.RoundToInt(EnergyManager.instance.enemyCurrentEnergy))
+                energyEnemy[i].SetActive(true);
+            else
+                energyEnemy[i].SetActive(false);
+        }
+    }
 }

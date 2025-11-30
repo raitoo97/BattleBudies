@@ -114,6 +114,7 @@ public class CardPlayManager : MonoBehaviour
         {
             EnergyManager.instance.enemyCurrentEnergy -= currentCardData.cost;
         }
+        CanvasManager.instance.UpdateEnergyUI();
         float spawnHeightOffset = 5f;
         Vector3 spawnPos = selectedNode.transform.position + Vector3.up * spawnHeightOffset;
         GameObject unit = Instantiate(currentCardData.unitPrefab, spawnPos, Quaternion.identity);
