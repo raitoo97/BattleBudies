@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,9 @@ public class CanvasManager : MonoBehaviour
     [HideInInspector]public int enemyDamageUI = 0;
     [HideInInspector]public int playerDiceRemaining = 0;
     [HideInInspector]public int enemyDiceRemaining = 0;
+    [Header("Energy")]
+    public List<GameManager> energyPlayer = new List<GameManager>();
+    public List<GameManager> energyEnemy = new List<GameManager>();
     private void Awake()
     {
         if (instance == null) instance = this;

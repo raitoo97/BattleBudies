@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class UnitController : MonoBehaviour
@@ -153,29 +154,43 @@ public class UnitController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && selectedUnit != null && selectedEndNode != null)
         {
             var path = PathFinding.CalculateAstart(selectedUnit.currentNode, selectedEndNode);
+            if (path == null || path.Count == 0) return;
             if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
             {
-                int index = path.FindIndex(n => dangerNodes.Contains(n));
-                if (index >= 0)
+                Node firstDangerNode = null;
+                foreach (Node node in path)
                 {
-                    path = path.GetRange(0, index + 1);
-                    foreach (var node in dangerNodes)
+                    if (dangerNodes.Contains(node))
                     {
-                        if (node.unitOnNode != null)
+                        firstDangerNode = node;
+                        break;
+                    }
+                }
+                if (firstDangerNode != null)
+                {
+                    int index = path.IndexOf(firstDangerNode);
+                    path = path.GetRange(0, index + 1);
+                    selectedUnit.SetPath(path);
+                    selectedEndNode = null;
+                    pathDrawer.ClearPath();
+                    Units enemy = null;
+                    foreach (Node neighbor in firstDangerNode.Neighbors)
+                    {
+                        if (neighbor.unitOnNode != null)
                         {
-                            Units enemy = node.unitOnNode.GetComponent<Units>();
-                            if (enemy != null && enemy.isPlayerUnit != selectedUnit.isPlayerUnit)
+                            Units unit = neighbor.unitOnNode.GetComponent<Units>();
+                            if (unit != null && unit.isPlayerUnit != selectedUnit.isPlayerUnit)
                             {
-                                Debug.Log($"Iniciando combate en nodo: {node.gridIndex}");
-                                selectedUnit.SetPath(new List<Node>());
-                                selectedEndNode = null;
-                                pathDrawer.ClearPath();
-
-                                CombatManager.instance.StartCombat(selectedUnit, enemy, true);
+                                enemy = unit;
                                 break;
                             }
                         }
                     }
+                    if (enemy != null)
+                    {
+                        StartCoroutine(StartCombatAfterMove(selectedUnit, enemy));
+                    }
+                    return;
                 }
             }
             if (path.Count > 0)
@@ -185,6 +200,11 @@ public class UnitController : MonoBehaviour
                 pathDrawer.ClearPath();
             }
         }
+    }
+    private IEnumerator StartCombatAfterMove(Units unit, Units enemy)
+    {
+        yield return new WaitUntil(() => unit.PathEmpty());
+        CombatManager.instance.StartCombat(unit, enemy, true);
     }
 }
 

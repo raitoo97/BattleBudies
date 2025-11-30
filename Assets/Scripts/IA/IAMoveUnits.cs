@@ -42,26 +42,26 @@ public class IAMoveUnits : MonoBehaviour
             if (path == null || path.Count == 0) continue;
             if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
             {
-                int index = path.FindIndex(n => dangerNodes.Contains(n));
-                if (index >= 0)
+                Node firstDangerNode = null;
+                foreach (Node node in path)
                 {
+                    if (dangerNodes.Contains(node))
+                    {
+                        firstDangerNode = node;
+                        break;
+                    }
+                }
+                if (firstDangerNode != null)
+                {
+                    int index = path.IndexOf(firstDangerNode);
                     path = path.GetRange(0, index + 1);
                     enemy.SetPath(path);
                     movedAnyUnit = true;
                     yield return new WaitUntil(() => enemy.PathEmpty());
-                    foreach (Node node in dangerNodes)
+                    Units playerUnit = firstDangerNode.unitOnNode?.GetComponent<Units>();
+                    if (playerUnit != null && playerUnit.isPlayerUnit)
                     {
-                        if (node.unitOnNode != null)
-                        {
-                            Units playerUnit = node.unitOnNode.GetComponent<Units>();
-                            if (playerUnit != null && playerUnit.isPlayerUnit)
-                            {
-                                Debug.Log($"IA inicia combate REAL en nodo: {node.gridIndex} -> {enemy.name} vs {playerUnit.name}");
-                                enemy.SetPath(new List<Node>());
-                                CombatManager.instance.StartCombat(enemy, playerUnit, true);
-                                break;
-                            }
-                        }
+                        CombatManager.instance.StartCombat(enemy, playerUnit, true);
                     }
                     continue;
                 }
