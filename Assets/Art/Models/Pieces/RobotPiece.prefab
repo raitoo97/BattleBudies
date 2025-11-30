@@ -11,17 +11,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 943
+      value: 688
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 943
+      value: 688
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 943
+      value: 688
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5cd9cd358e3f0394b9d4e0a0ac89f0fd,
         type: 3}
@@ -156,9 +156,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentHealth: 30
   diceCount: 2
-  damage: 0
+  isPlayerUnit: 1
   currentNode: {fileID: 0}
   moveSpeed: 20
+  diceInstance: {fileID: 0}
 --- !u!136 &5846122604723798370
 CapsuleCollider:
   m_ObjectHideFlags: 0
