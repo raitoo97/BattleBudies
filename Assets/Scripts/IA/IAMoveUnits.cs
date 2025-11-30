@@ -27,16 +27,17 @@ public class IAMoveUnits : MonoBehaviour
             if (validNodes.Count == 0) continue;
             Node targetNode = null;
             List<Node> path = null;
-            int maxAttempts = 20;
             int attempts = 0;
+            int maxAttempts = 20;
             while (attempts < maxAttempts)
             {
                 attempts++;
                 targetNode = validNodes[Random.Range(0, validNodes.Count)];
                 if (targetNode == null) break;
                 path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
+                if (path == null || path.Count == 0) continue;
                 bool pathBlocked = path.Exists(n => n.unitOnNode != null);
-                if (!pathBlocked && path.Count > 0) break;
+                if (!pathBlocked) break;
             }
             if (path == null || path.Count == 0) continue;
             if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
@@ -45,34 +46,34 @@ public class IAMoveUnits : MonoBehaviour
                 if (index >= 0)
                 {
                     path = path.GetRange(0, index + 1);
-                    Node combatNode = path[path.Count - 1];
-                    Debug.Log($"IA: {enemy.name} se mueve hasta nodo {combatNode.name} (vecino al jugador)");
                     enemy.SetPath(path);
                     movedAnyUnit = true;
                     yield return new WaitUntil(() => enemy.PathEmpty());
-                    foreach (Node danger in dangerNodes)
+                    foreach (Node node in dangerNodes)
                     {
-                        if (danger.unitOnNode != null)
+                        if (node.unitOnNode != null)
                         {
-                            Units playerUnit = danger.unitOnNode.GetComponent<Units>();
+                            Units playerUnit = node.unitOnNode.GetComponent<Units>();
                             if (playerUnit != null && playerUnit.isPlayerUnit)
                             {
-                                Debug.Log($"IA inicia combate: {enemy.name} vs {playerUnit.name}");
+                                Debug.Log($"IA inicia combate REAL en nodo: {node.gridIndex} -> {enemy.name} vs {playerUnit.name}");
+                                enemy.SetPath(new List<Node>());
                                 CombatManager.instance.StartCombat(enemy, playerUnit, true);
-                                yield break;
+                                break;
                             }
                         }
                     }
+                    continue;
                 }
             }
-            else
+            int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+            if (path.Count > maxSteps)
+                path = path.GetRange(0, maxSteps);
+            enemy.SetPath(path);
+            movedAnyUnit = true;
+            yield return new WaitUntil(() => enemy.PathEmpty());
+            if (path.Count > 0)
             {
-                int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-                if (path.Count > maxSteps)
-                    path = path.GetRange(0, maxSteps);
-                enemy.SetPath(path);
-                movedAnyUnit = true;
-                yield return new WaitUntil(() => enemy.PathEmpty());
                 Node finalNode = path[path.Count - 1];
                 enemy.SetCurrentNode(finalNode);
             }

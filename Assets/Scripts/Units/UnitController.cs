@@ -166,6 +166,11 @@ public class UnitController : MonoBehaviour
                             Units enemy = node.unitOnNode.GetComponent<Units>();
                             if (enemy != null && enemy.isPlayerUnit != selectedUnit.isPlayerUnit)
                             {
+                                Debug.Log($"Iniciando combate en nodo: {node.gridIndex}");
+                                selectedUnit.SetPath(new List<Node>());
+                                selectedEndNode = null;
+                                pathDrawer.ClearPath();
+
                                 CombatManager.instance.StartCombat(selectedUnit, enemy, true);
                                 break;
                             }
@@ -173,9 +178,12 @@ public class UnitController : MonoBehaviour
                     }
                 }
             }
-            selectedUnit.SetPath(path);
-            selectedEndNode = null;
-            pathDrawer.ClearPath();
+            if (path.Count > 0)
+            {
+                selectedUnit.SetPath(path);
+                selectedEndNode = null;
+                pathDrawer.ClearPath();
+            }
         }
     }
 }

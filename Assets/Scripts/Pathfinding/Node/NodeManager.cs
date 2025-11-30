@@ -17,9 +17,12 @@ public static class NodeManager
     {
         Node closestNode = null;
         float closestDistance = Mathf.Infinity;
+        Vector2 posXZ = new Vector2(pos.x, pos.z);
         foreach (var node in _totalNodes)
         {
-            float currentDistance = Vector3.Distance(node.transform.position, pos);
+            Vector2 nodeXZ = new Vector2(node.transform.position.x, node.transform.position.z);
+            float currentDistance = Vector2.Distance(nodeXZ, posXZ);
+
             if (currentDistance < closestDistance)
             {
                 closestDistance = currentDistance;
@@ -108,6 +111,15 @@ public static class NodeManager
 
             if (unit.isPlayerUnit != unit1.isPlayerUnit)
                 return unit;
+        }
+        return null;
+    }
+    public static Node FindFirstDangerStep(List<Node> path, List<Node> dangerNodes)
+    {
+        foreach (Node step in path)
+        {
+            if (dangerNodes.Contains(step))
+                return step;
         }
         return null;
     }

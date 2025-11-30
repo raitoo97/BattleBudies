@@ -48,7 +48,9 @@ public abstract class Units : MonoBehaviour
         if (targetPos.y < originalY)
             targetPos.y = originalY;
         transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-        if (Vector3.Distance(transform.position, targetPos) <= arriveThreshold)
+        Vector2 posXZ = new Vector2(transform.position.x, transform.position.z);
+        Vector2 targetXZ = new Vector2(targetPos.x, targetPos.z);
+        if (Vector2.Distance(posXZ, targetXZ) <= arriveThreshold)
         {
             float requiredEnergy = 1f;
             bool isPlayerTurn = GameManager.instance.isPlayerTurn;
