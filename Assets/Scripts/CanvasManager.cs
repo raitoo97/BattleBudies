@@ -66,19 +66,17 @@ public class CanvasManager : MonoBehaviour
     }
     public void UpdateEnergyUI()
     {
+        int playerEnergy = Mathf.RoundToInt(EnergyManager.instance.currentEnergy);
+        int enemyEnergy = Mathf.RoundToInt(EnergyManager.instance.enemyCurrentEnergy);
         for (int i = 0; i < energyPlayer.Count; i++)
         {
-            if (i < Mathf.RoundToInt(EnergyManager.instance.currentEnergy))
-                energyPlayer[i].SetActive(true);
-            else
-                energyPlayer[i].SetActive(false);
+            int index = energyPlayer.Count - 1 - i;
+            energyPlayer[index].SetActive(i < playerEnergy);
         }
         for (int i = 0; i < energyEnemy.Count; i++)
         {
-            if (i < Mathf.RoundToInt(EnergyManager.instance.enemyCurrentEnergy))
-                energyEnemy[i].SetActive(true);
-            else
-                energyEnemy[i].SetActive(false);
+            int index = energyEnemy.Count - 1 - i;
+            energyEnemy[index].SetActive(i < enemyEnergy);
         }
     }
 }
