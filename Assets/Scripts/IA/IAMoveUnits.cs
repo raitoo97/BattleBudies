@@ -65,6 +65,7 @@ public class IAMoveUnits : MonoBehaviour
             enemy.SetPath(path);
             movedAnyUnit = true;
             yield return new WaitUntil(() => enemy.PathEmpty());
+
             if (path.Count > 0)
             {
                 Node finalNode = path[path.Count - 1];
@@ -72,7 +73,7 @@ public class IAMoveUnits : MonoBehaviour
             }
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
             {
-                StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+                yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
             }
             yield return new WaitForSeconds(0.2f);
         }
@@ -81,6 +82,7 @@ public class IAMoveUnits : MonoBehaviour
     {
         yield return new WaitUntil(() => attacker.PathEmpty());
         CombatManager.instance.StartCombat(attacker, defender, true);
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {
