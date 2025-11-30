@@ -26,7 +26,6 @@ public class FaceDetector : MonoBehaviour
                 CombatManager.instance.AddDamage(faceValueNumber);
                 hasBeenCounted = true;
                 _diceRoll.hasBeenCounted = true;
-                Debug.Log($"Cara detectada: {faceValueNumber}");
             }
         }
     }

@@ -19,7 +19,6 @@ public class CombatManager : MonoBehaviour
     public void AddDamage(int value)
     {
         pendingDamage += value;
-        Debug.Log($"Daño detectado: {value}, total acumulado: {(attackerUnit != null && attackerUnit.isPlayerUnit ? CanvasManager.instance.playerDamageUI : CanvasManager.instance.enemyDamageUI)}");
     }
     public void StartCombat(Units unit1, Units unit2, bool attackerStartsTurn)
     {
