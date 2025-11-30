@@ -1,15 +1,15 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class CanvasManager : MonoBehaviour
 {
-    //PREUI
     public static CanvasManager instance;
     [Header("Combat")]
     public Button rollButton;
-    public Text playerDamageText;
-    public Text enemyDamageText;
-    public Text playerDiceRemainingText;
-    public Text enemyDiceRemainingText;
+    public TextMeshProUGUI playerDamageText;
+    public TextMeshProUGUI enemyDamageText;
+    public TextMeshProUGUI playerDiceRemainingText;
+    public TextMeshProUGUI enemyDiceRemainingText;
     [HideInInspector] public bool rollClicked = false;
     [HideInInspector] public int playerDamageUI = 0;
     [HideInInspector] public int enemyDamageUI = 0;
@@ -55,8 +55,8 @@ public class CanvasManager : MonoBehaviour
     public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
     {
         if (playerDiceRemainingText != null)
-            playerDiceRemainingText.text = $"Dados restantes jugador: {playerRemaining}";
+            playerDiceRemainingText.text = $"Remaining Dices: {playerRemaining}";
         if (enemyDiceRemainingText != null)
-            enemyDiceRemainingText.text = $"Dados restantes enemigo: {enemyRemaining}";
+            enemyDiceRemainingText.text = $"Remaining Dices: {enemyRemaining}";
     }
 }
