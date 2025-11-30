@@ -13,6 +13,7 @@ public class IABrainManager : MonoBehaviour
         CardPlayManager.instance.HideAllHandsAtAITurn();
         EnergyManager.instance.RefillEnemyEnergy();
         DeckManager.instance.DrawEnemyCard();
+        CardPlayManager.instance.HideAllHandsAtAITurn();
         yield return null;
         yield return new WaitForSeconds(0.5f);
         yield return StartCoroutine(IAMoveUnits.instance.MoveAllEnemyUnits());
