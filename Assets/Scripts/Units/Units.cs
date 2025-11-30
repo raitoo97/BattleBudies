@@ -44,10 +44,22 @@ public abstract class Units : MonoBehaviour
     private void FollowPath()
     {
         if (path == null || path.Count == 0) return;
-        Vector3 targetPos = path[0].transform.position;
+        Node nextNode = path[0];
+        Vector3 targetPos = nextNode.transform.position;
         if (targetPos.y < originalY)
             targetPos.y = originalY;
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+        Vector3 moveDelta = (targetPos - transform.position);
+        float step = moveSpeed * Time.deltaTime;
+        if (moveDelta.magnitude <= step)
+        {
+            transform.position = GetSnappedPosition(nextNode);
+        }
+        else
+        {
+            transform.position += moveDelta.normalized * step;
+            if (transform.position.y < originalY)
+                transform.position = new Vector3(transform.position.x, originalY, transform.position.z);
+        }
         Vector2 posXZ = new Vector2(transform.position.x, transform.position.z);
         Vector2 targetXZ = new Vector2(targetPos.x, targetPos.z);
         if (Vector2.Distance(posXZ, targetXZ) <= arriveThreshold)
@@ -56,21 +68,10 @@ public abstract class Units : MonoBehaviour
             bool isPlayerTurn = GameManager.instance.isPlayerTurn;
             if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
-                // Snap físico exacto al nodo antes de actualizar el nodo lógico
-                transform.position = GetSnappedPosition(path[0]);
-
-                // Actualizar nodo lógico
-                SetCurrentNode(path[0]);
-
-                // Eliminar nodo de path
+                SetCurrentNode(nextNode);
                 path.RemoveAt(0);
-
-                // Actualizar targetNode
                 targetNode = path.Count > 0 ? path[0] : null;
-
-                // Si no hay más nodos, asegurarse que la posición coincide exactamente
-                if (path.Count == 0)
-                    transform.position = GetSnappedPosition(currentNode);
+                transform.position = GetSnappedPosition(currentNode);
             }
             else
             {
