@@ -151,59 +151,60 @@ public class UnitController : MonoBehaviour
     private void HandleMoveCommand()
     {
         if (!GameManager.instance.isPlayerTurn) return;
-        if (Input.GetKeyDown(KeyCode.Space) && selectedUnit != null && selectedEndNode != null)
+        if (!Input.GetKeyDown(KeyCode.Space)) return;
+        if (selectedUnit == null || selectedEndNode == null) return;
+        List<Node> path = PathFinding.CalculateAstart(selectedUnit.currentNode, selectedEndNode);
+        if (path == null || path.Count == 0) return;
+        if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
         {
-            var path = PathFinding.CalculateAstart(selectedUnit.currentNode, selectedEndNode);
-            if (path == null || path.Count == 0) return;
-            if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
+            Node firstDangerNode = null;
+            foreach (Node node in path)
             {
-                Node firstDangerNode = null;
-                foreach (Node node in path)
+                if (dangerNodes.Contains(node))
                 {
-                    if (dangerNodes.Contains(node))
-                    {
-                        firstDangerNode = node;
-                        break;
-                    }
-                }
-                if (firstDangerNode != null)
-                {
-                    int index = path.IndexOf(firstDangerNode);
-                    path = path.GetRange(0, index + 1);
-                    selectedUnit.SetPath(path);
-                    selectedEndNode = null;
-                    pathDrawer.ClearPath();
-                    Units enemy = null;
-                    foreach (Node neighbor in firstDangerNode.Neighbors)
-                    {
-                        if (neighbor.unitOnNode != null)
-                        {
-                            Units unit = neighbor.unitOnNode.GetComponent<Units>();
-                            if (unit != null && unit.isPlayerUnit != selectedUnit.isPlayerUnit)
-                            {
-                                enemy = unit;
-                                break;
-                            }
-                        }
-                    }
-                    if (enemy != null)
-                    {
-                        StartCoroutine(StartCombatAfterMove(selectedUnit, enemy));
-                    }
-                    return;
+                    firstDangerNode = node;
+                    break;
                 }
             }
-            if (path.Count > 0)
+            if (firstDangerNode != null)
             {
-                selectedUnit.SetPath(path);
-                selectedEndNode = null;
-                pathDrawer.ClearPath();
+                int index = path.IndexOf(firstDangerNode);
+                path = path.GetRange(0, index + 1);
             }
         }
+        if (path.Count > 0)
+        {
+            selectedUnit.SetPath(path);
+            selectedEndNode = null;
+            pathDrawer.ClearPath();
+            StartCoroutine(StartCombatAfterMove(selectedUnit));
+        }
     }
-    private IEnumerator StartCombatAfterMove(Units unit, Units enemy)
+    private IEnumerator StartCombatAfterMove(Units unit)
     {
         yield return new WaitUntil(() => unit.PathEmpty());
-        CombatManager.instance.StartCombat(unit, enemy, true);
+        if (unit.currentNode == null) yield break;
+        if (TryGetEnemyNeighbor(unit, out Units enemy))
+        {
+            CombatManager.instance.StartCombat(unit, enemy, true);
+        }
+    }
+    private bool TryGetEnemyNeighbor(Units unit, out Units enemy)
+    {
+        enemy = null;
+        if (unit.currentNode == null) return false;
+        foreach (var neighbor in unit.currentNode.Neighbors)
+        {
+            if (neighbor.unitOnNode != null)
+            {
+                Units other = neighbor.unitOnNode.GetComponent<Units>();
+                if (other != null && other.isPlayerUnit != unit.isPlayerUnit)
+                {
+                    enemy = other;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

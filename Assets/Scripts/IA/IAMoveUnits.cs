@@ -45,7 +45,6 @@ public class IAMoveUnits : MonoBehaviour
             if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
             {
                 Node firstDangerNode = null;
-
                 foreach (Node node in path)
                 {
                     if (dangerNodes.Contains(node))
@@ -58,27 +57,6 @@ public class IAMoveUnits : MonoBehaviour
                 {
                     int index = path.IndexOf(firstDangerNode);
                     path = path.GetRange(0, index + 1);
-                    enemy.SetPath(path);
-                    movedAnyUnit = true;
-                    yield return new WaitUntil(() => enemy.PathEmpty());
-                    Units playerUnit = null;
-                    foreach (Node neighbor in firstDangerNode.Neighbors)
-                    {
-                        if (neighbor.unitOnNode != null)
-                        {
-                            Units unit = neighbor.unitOnNode.GetComponent<Units>();
-                            if (unit != null && unit.isPlayerUnit)
-                            {
-                                playerUnit = unit;
-                                break;
-                            }
-                        }
-                    }
-                    if (playerUnit != null)
-                    {
-                        StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
-                    }
-                    continue;
                 }
             }
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
@@ -92,12 +70,35 @@ public class IAMoveUnits : MonoBehaviour
                 Node finalNode = path[path.Count - 1];
                 enemy.SetCurrentNode(finalNode);
             }
-            yield return new WaitForSeconds(0.3f);
+            if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            {
+                StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+            }
+            yield return new WaitForSeconds(0.2f);
         }
     }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {
         yield return new WaitUntil(() => attacker.PathEmpty());
         CombatManager.instance.StartCombat(attacker, defender, true);
+    }
+    private bool TryGetPlayerNeighbor(Units enemy, out Units player)
+    {
+        player = null;
+        if (enemy.currentNode == null) return false;
+
+        foreach (Node neighbor in enemy.currentNode.Neighbors)
+        {
+            if (neighbor.unitOnNode != null)
+            {
+                Units unit = neighbor.unitOnNode.GetComponent<Units>();
+                if (unit != null && unit.isPlayerUnit)
+                {
+                    player = unit;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
