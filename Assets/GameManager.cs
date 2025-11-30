@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
                 EnergyManager.instance.RefillPlayerEnergy();
                 CanvasManager.instance.UpdateEnergyUI();
                 DeckManager.instance.DrawPlayerCard();
-                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.K));
+                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.K) && !IsAnyPlayerUnitMoving() && !CombatManager.instance.GetCombatActive);
                 isPlayerTurn = false;
                 CardPlayManager.instance.HideAllHandsAtAITurn();
                 StartCoroutine(IABrainManager.instance.ExecuteTurn());
@@ -39,5 +39,15 @@ public class GameManager : MonoBehaviour
     {
         isPlayerTurn = true;
         CardPlayManager.instance.ShowAllHandsAtPlayerTurn();
+    }
+    private bool IsAnyPlayerUnitMoving()
+    {
+        Units[] allUnits = FindObjectsOfType<Units>();
+        foreach (Units u in allUnits)
+        {
+            if (u.isPlayerUnit && !u.PathEmpty())
+                return true;
+        }
+        return false;
     }
 }

@@ -65,7 +65,6 @@ public class IAMoveUnits : MonoBehaviour
             enemy.SetPath(path);
             movedAnyUnit = true;
             yield return new WaitUntil(() => enemy.PathEmpty());
-
             if (path.Count > 0)
             {
                 Node finalNode = path[path.Count - 1];
