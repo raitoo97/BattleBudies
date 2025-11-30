@@ -11,6 +11,7 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI playerDamageText;
     public TextMeshProUGUI enemyDamageText;
     public GameObject panelEnemy;
+    public GameObject panelPlayer;
     public TextMeshProUGUI playerDiceRemainingText;
     public TextMeshProUGUI enemyDiceRemainingText;
     [HideInInspector]public bool rollClicked = false;
@@ -57,6 +58,7 @@ public class CanvasManager : MonoBehaviour
         if (playerDamageText != null) playerDamageText.gameObject.SetActive(false);
         if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(false);
         if (panelEnemy != null) panelEnemy.gameObject.SetActive(false);
+        if (panelPlayer != null) panelPlayer.gameObject.SetActive(false);
         if (playerDiceRemainingText != null) playerDiceRemainingText.gameObject.SetActive(false);
         if (enemyDiceRemainingText != null) enemyDiceRemainingText.gameObject.SetActive(false);
     }
@@ -65,6 +67,7 @@ public class CanvasManager : MonoBehaviour
         if (playerDamageText != null) playerDamageText.gameObject.SetActive(show);
         if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(show);
         if (panelEnemy != null) panelEnemy.gameObject.SetActive(show);
+        if (panelPlayer != null) panelPlayer.gameObject.SetActive(show);
         if (playerDiceRemainingText != null) playerDiceRemainingText.gameObject.SetActive(show);
         if (enemyDiceRemainingText != null) enemyDiceRemainingText.gameObject.SetActive(show);
         rollButton.gameObject.SetActive(playerCanRoll);

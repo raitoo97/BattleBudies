@@ -151,6 +151,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 861494149}
   - {fileID: 1220242530}
   - {fileID: 937153769}
   m_Father: {fileID: 250608715}
@@ -667,6 +668,7 @@ MonoBehaviour:
   playerDamageText: {fileID: 220682204}
   enemyDamageText: {fileID: 1009201776}
   panelEnemy: {fileID: 531066663}
+  panelPlayer: {fileID: 861494148}
   playerDiceRemainingText: {fileID: 1468854110}
   enemyDiceRemainingText: {fileID: 193543492}
   rollClicked: 0
@@ -1443,7 +1445,7 @@ GameObject:
   - component: {fileID: 531066666}
   - component: {fileID: 531066665}
   m_Layer: 5
-  m_Name: Image
+  m_Name: PanelEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2940,7 +2942,7 @@ GameObject:
   - component: {fileID: 861494151}
   - component: {fileID: 861494150}
   m_Layer: 5
-  m_Name: Image
+  m_Name: PanelPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2953,16 +2955,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 861494148}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3.5638433, y: 1.2385, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1220242530}
+  m_Father: {fileID: 159849525}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 51, y: -141}
+  m_AnchoredPosition: {x: 136, y: -182}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &861494150
@@ -3582,7 +3584,6 @@ RectTransform:
   m_Children:
   - {fileID: 576580600}
   - {fileID: 827446097}
-  - {fileID: 861494149}
   m_Father: {fileID: 159849525}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
