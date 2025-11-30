@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class CanvasManager : MonoBehaviour
 {
+    //InstanciarUI energia y UI daño y vida undiades
     public static CanvasManager instance;
     [Header("Combat")]
     public Button rollButton;
