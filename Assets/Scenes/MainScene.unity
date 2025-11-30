@@ -722,6 +722,9 @@ MonoBehaviour:
   - {fileID: 1433695907}
   - {fileID: 578098579}
   - {fileID: 531340021}
+  unitStatsPanel: {fileID: 667921969}
+  unitHealthText: {fileID: 1104443068}
+  unitDiceText: {fileID: 1509737410}
 --- !u!1 &308429870
 GameObject:
   m_ObjectHideFlags: 0
@@ -2106,7 +2109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -101, y: 480}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &725043625

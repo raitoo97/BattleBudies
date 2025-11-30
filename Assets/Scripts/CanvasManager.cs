@@ -20,12 +20,21 @@ public class CanvasManager : MonoBehaviour
     [Header("Energy")]
     public List<GameObject> energyPlayer = new List<GameObject>();
     public List<GameObject> energyEnemy = new List<GameObject>();
+    [Header("Stats")]
+    public GameObject unitStatsPanel;
+    public TextMeshProUGUI unitHealthText;
+    public TextMeshProUGUI unitDiceText;
+    private Units hoveredUnit = null;
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
         rollButton.onClick.AddListener(() => rollClicked = true);
         ResetUI();
+    }
+    private void Update()
+    {
+        UpdateUnitStatsHover();
     }
     public void AddDamageToUI(Units attacker, int value)
     {
@@ -77,6 +86,36 @@ public class CanvasManager : MonoBehaviour
         {
             int index = energyEnemy.Count - 1 - i;
             energyEnemy[index].SetActive(i < enemyEnergy);
+        }
+    }
+    private void UpdateUnitStatsHover()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Units unit = hit.collider.GetComponent<Units>();
+            if (unit != null)
+            {
+                if (hoveredUnit != unit)
+                {
+                    hoveredUnit = unit;
+                    unitStatsPanel.SetActive(true);
+                }
+                unitHealthText.text = $"{unit.currentHealth}";
+                unitDiceText.text = $"{unit.diceCount}D6";
+                Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
+                unitStatsPanel.transform.position = panelPos;
+            }
+            else
+            {
+                hoveredUnit = null;
+                unitStatsPanel.SetActive(false);
+            }
+        }
+        else
+        {
+            hoveredUnit = null;
+            unitStatsPanel.SetActive(false);
         }
     }
 }
