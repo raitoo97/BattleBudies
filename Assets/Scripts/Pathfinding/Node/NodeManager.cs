@@ -46,27 +46,18 @@ public static class NodeManager
     {
         nodesToMark = new List<Node>();
         var allNodes = GetNodeCount();
-
         if (allNodes == null || allNodes.Count == 0)
             return false;
-
         bool detectPlayerUnits = !GameManager.instance.isPlayerTurn;
-
         foreach (var node in allNodes)
         {
             if (node == null) continue;
-
             if (node.unitOnNode == null)
                 continue;
-
             Units unit = node.unitOnNode.GetComponent<Units>();
             if (unit == null) continue;
-
-            // Filtrar unidades por bando
             if (detectPlayerUnits && !unit.isPlayerUnit) continue;
             if (!detectPlayerUnits && unit.isPlayerUnit) continue;
-
-
             if (path.Contains(node))
             {
                 AddNodeSafe(nodesToMark, node);
@@ -76,7 +67,6 @@ public static class NodeManager
 
                 continue;
             }
-
             foreach (var p in path)
             {
                 if (node.Neighbors.Contains(p))
@@ -90,7 +80,6 @@ public static class NodeManager
                 }
             }
         }
-
         return nodesToMark.Count > 0;
     }
     private static void AddNodeSafe(List<Node> list, Node n)
