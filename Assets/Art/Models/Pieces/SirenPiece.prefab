@@ -11,17 +11,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 1eda1246cd41e9f4683d835b9199d8ef,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 943
+      value: 688
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1eda1246cd41e9f4683d835b9199d8ef,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 943
+      value: 688
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1eda1246cd41e9f4683d835b9199d8ef,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 943
+      value: 688
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1eda1246cd41e9f4683d835b9199d8ef,
         type: 3}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d595608d603fd446b6025dde546271a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 1
+  currentHealth: 40
   diceCount: 5
   isPlayerUnit: 1
   currentNode: {fileID: 0}

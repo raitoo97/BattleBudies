@@ -13,7 +13,7 @@ public abstract class Units : MonoBehaviour
     private Node targetNode;
     private List<Node> path = new List<Node>();
     public float moveSpeed = 5f;
-    private float arriveThreshold = 0.05f;
+    private float arriveThreshold = 0.1f;
     private GlowUnit _glow;
     private float originalY;
     [Header("Dice")]
@@ -24,6 +24,12 @@ public abstract class Units : MonoBehaviour
         targetNode = null;
         _glow = GetComponent<GlowUnit>();
         originalY = transform.position.y;
+        if (currentNode != null)
+        {
+            Vector3 snap = currentNode.transform.position;
+            snap.y = originalY;
+            transform.position = snap;
+        }
     }
     protected virtual void Update()
     {
@@ -38,18 +44,34 @@ public abstract class Units : MonoBehaviour
     private void FollowPath()
     {
         if (path == null || path.Count == 0) return;
-        Vector3 targetPos = path[0].transform.position;
+        Node nextNode = path[0];
+        Vector3 targetPos = nextNode.transform.position;
         if (targetPos.y < originalY)
             targetPos.y = originalY;
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-        if (Vector3.Distance(transform.position, targetPos) <= arriveThreshold)
+        Vector3 moveDelta = (targetPos - transform.position);
+        float step = moveSpeed * Time.deltaTime;
+        if (moveDelta.magnitude <= step)
+        {
+            transform.position = GetSnappedPosition(nextNode);
+        }
+        else
+        {
+            transform.position += moveDelta.normalized * step;
+            if (transform.position.y < originalY)
+                transform.position = new Vector3(transform.position.x, originalY, transform.position.z);
+        }
+        Vector2 posXZ = new Vector2(transform.position.x, transform.position.z);
+        Vector2 targetXZ = new Vector2(targetPos.x, targetPos.z);
+        if (Vector2.Distance(posXZ, targetXZ) <= arriveThreshold)
         {
             float requiredEnergy = 1f;
             bool isPlayerTurn = GameManager.instance.isPlayerTurn;
             if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
-                SetCurrentNode(path[0]);
+                SetCurrentNode(nextNode);
                 path.RemoveAt(0);
+                targetNode = path.Count > 0 ? path[0] : null;
+                transform.position = GetSnappedPosition(currentNode);
             }
             else
             {
@@ -57,13 +79,22 @@ public abstract class Units : MonoBehaviour
             }
         }
     }
+    private Vector3 GetSnappedPosition(Node node)
+    {
+        Vector3 pos = node.transform.position;
+        if (pos.y < originalY)
+            pos.y = originalY;
+        return pos;
+    }
     public void SetCurrentNode(Node newNode)
     {
         if (currentNode != null && currentNode.unitOnNode == this.gameObject)
             currentNode.unitOnNode = null;
         currentNode = newNode;
         if (currentNode != null)
+        {
             currentNode.unitOnNode = this.gameObject;
+        }
     }
     public bool PathEmpty()
     {
@@ -81,6 +112,8 @@ public abstract class Units : MonoBehaviour
     private void Die()
     {
         Debug.Log($"{gameObject.name} ha muerto.");
+        if (currentNode != null && currentNode.unitOnNode == this.gameObject)
+            currentNode.unitOnNode = null;
         Destroy(gameObject);
     }
 }
