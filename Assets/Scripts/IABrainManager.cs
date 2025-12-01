@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 public class IABrainManager : MonoBehaviour
 {
@@ -17,8 +18,8 @@ public class IABrainManager : MonoBehaviour
         CanvasManager.instance.UpdateEnergyUI();
         yield return null;
         yield return new WaitForSeconds(0.5f);
-        yield return StartCoroutine(IAMoveUnits.instance.MoveAllEnemyUnits());
-        if (!IAMoveUnits.instance.movedAnyUnit)
+        yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
+        if (!IAMoveToTowers.instance.movedAnyUnit)
         {
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
         }

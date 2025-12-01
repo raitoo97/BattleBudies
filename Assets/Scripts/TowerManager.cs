@@ -99,6 +99,12 @@ public class TowerManager : MonoBehaviour
         else if (allPlayerTowersDown)
             GameManager.instance.SetEndGame(false);
     }
+    public IEnumerable<string> GetAttackNodes(Tower tower)
+    {
+        if (attackNodes.ContainsKey(tower))
+            return attackNodes[tower];
+        return new List<string>();
+    }
     private void DebugAttackNodes()
     {
         foreach (var kv in attackNodes)

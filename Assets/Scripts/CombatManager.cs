@@ -100,17 +100,14 @@ public class CombatManager : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
     }
+    #region//TowersPlayer
     public void StartCombatWithTower(Units attacker, Tower tower)
     {
         if (combatActive) return;
-        if (attacker == null || tower == null)
+        if (attacker == null || tower == null) return;
+        if (attacker.isPlayerUnit && tower.faction == Faction.Player)
         {
-            Debug.LogError("StartCombatWithTower: attacker o tower es null.");
-            return;
-        }
-        if (!attacker.isPlayerUnit)
-        {
-            Debug.Log("Por ahora sólo el player puede iniciar ataques a torres.");
+            Debug.Log("No puedes atacar tu propia torre.");
             return;
         }
         combatActive = true;
@@ -157,5 +154,70 @@ public class CombatManager : MonoBehaviour
         CanvasManager.instance.ResetUI();
         combatActive = false;
     }
+    #endregion
+    #region//TowersAI
+    public void StartCombatWithTowerAI(Units attacker, Tower tower)
+    {
+        if (combatActive) return;
+        if (attacker == null || tower == null) return;
+        if (!attacker.isPlayerUnit && tower.faction == Faction.Enemy)
+        {
+            Debug.Log("IA no puede atacar su propia torre.");
+            return;
+        }
+        combatActive = true;
+        attackerUnit = attacker;
+        defenderUnit = null;
+        attackerDice = attacker.diceInstance;
+        Debug.Log($"StartCombatWithTowerAI: {attackerUnit.name} ataca torre {tower.name}");
+        StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
+    }
+    public IEnumerator StartCombatWithTowerAI_Coroutine(Units attacker, Tower tower)
+    {
+        StartCombatWithTowerAI(attacker, tower);  // inicia combate
+        yield return new WaitUntil(() => !combatActive);  // espera a que termine
+    }
+    public IEnumerator StartCombatWithUnit_Coroutine(Units attacker, Units defender)
+    {
+        if (attacker == null || defender == null)
+        {
+            Debug.LogError("StartCombatWithUnit_Coroutine: alguna unidad es null.");
+            yield break;
+        }
+        StartCombat(attacker, defender, true);
+        yield return new WaitUntil(() => !combatActive);
+    }
+    private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
+    {
+        int remainingDice = attacker.diceCount;
+
+        while (remainingDice > 0)
+        {
+            attackerDice.PrepareForRoll();
+            attackerDice.RollDice();
+            yield return new WaitUntil(() => attackerDice.hasBeenThrown && attackerDice.hasBeenCounted && attackerDice.IsDiceStill());
+
+            if (pendingDamage > 0)
+            {
+                tower.TakeDamage(pendingDamage);
+                Debug.Log($"{attacker.name} inflige {pendingDamage} a torre {tower.name}. Vida restante: {tower.currentHealth}");
+                if (tower.currentHealth <= 0)
+                {
+                    Debug.Log($"Torre {tower.name} destruida por IA.");
+                    TowerManager.instance.NotifyTowerDestroyed(tower);
+                    break;
+                }
+            }
+
+            pendingDamage = 0;
+            attackerDice.ResetDicePosition();
+            remainingDice--;
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        attacker.hasAttackedTowerThisTurn = true;
+        combatActive = false;
+    }
+    #endregion
     public bool GetCombatActive { get => combatActive; }
 }
