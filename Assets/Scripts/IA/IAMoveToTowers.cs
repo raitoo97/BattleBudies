@@ -38,7 +38,6 @@ public class IAMoveToTowers : MonoBehaviour
                     if (parts.Length != 3) continue;
                     if (!int.TryParse(parts[1], out int x)) continue;
                     if (!int.TryParse(parts[2], out int y)) continue;
-
                     Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
                     if (node != null && !IsNodeReserved(node) && node.unitOnNode == null)
                     {
@@ -50,8 +49,7 @@ public class IAMoveToTowers : MonoBehaviour
                 if (targetTower != null) break;
             }
             if (targetTower == null || targetNode == null) continue;
-            List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
-            if (path == null) path = new List<Node>();
+            List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode) ?? new List<Node>();
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
                 path = path.GetRange(0, maxSteps);
@@ -68,11 +66,8 @@ public class IAMoveToTowers : MonoBehaviour
                     yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
             }
             if (TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
-            {
                 yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
-            }
             enemy.hasAttackedTowerThisTurn = true;
-            yield return new WaitForSeconds(0.1f);
         }
         unitReservedNodes.Clear();
         CombatManager.instance.ForceEndCombat();
