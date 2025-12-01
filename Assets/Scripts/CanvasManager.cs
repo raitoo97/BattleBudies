@@ -27,6 +27,10 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI unitHealthText;
     public TextMeshProUGUI unitDiceText;
     private Units hoveredUnit = null;
+    [Header("StatsTower")]
+    public GameObject towerStatsPanel;
+    public TextMeshProUGUI towerHealthText;
+    private Tower hoveredTower = null;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -37,6 +41,7 @@ public class CanvasManager : MonoBehaviour
     private void Update()
     {
         UpdateUnitStatsHover();
+        UpdateTowerStatsHover();
     }
     public void AddDamageToUI(Units attacker, int value)
     {
@@ -124,30 +129,50 @@ public class CanvasManager : MonoBehaviour
             unitStatsPanel.SetActive(false);
         }
     }
+    private void UpdateTowerStatsHover()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Tower tower = hit.collider.GetComponent<Tower>();
+            if (tower != null)
+            {
+                if (hoveredTower != tower)
+                {
+                    hoveredTower = tower;
+                    towerStatsPanel.SetActive(true);
+                }
+                towerHealthText.text = $"{tower.currentHealth}";
+                Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
+                towerStatsPanel.transform.position = panelPos;
+            }
+            else
+            {
+                hoveredTower = null;
+                towerStatsPanel.SetActive(false);
+            }
+        }
+        else
+        {
+            hoveredTower = null;
+            towerStatsPanel.SetActive(false);
+        }
+    }
     public void ShowTowerCombatUI(bool show, int attackerDiceCount, bool playerCanRoll = false)
     {
-        // Activar daño del jugador
         if (playerDamageText != null)
         {
-            playerDamageText.gameObject.SetActive(show);  // <-- asegurar que está visible
+            playerDamageText.gameObject.SetActive(show);
         }
-
-        // Activar dados restantes
         if (playerDiceRemainingText != null)
         {
             playerDiceRemainingText.gameObject.SetActive(show);
             playerDiceRemaining = attackerDiceCount;
             UpdateDiceRemaining(playerDiceRemaining, 0);
         }
-
-        // Ocultar paneles que no aplican
         if (panelEnemy != null) panelEnemy.SetActive(false);
         if (panelPlayer != null) panelPlayer.SetActive(false);
-
-        // Activar roll button si corresponde
         rollButton.gameObject.SetActive(playerCanRoll && show);
-
-        // Actualizar el daño acumulado
         UpdateDamageUI();
     }
 }
