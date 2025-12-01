@@ -1818,6 +1818,7 @@ GameObject:
   - component: {fileID: 563951299}
   - component: {fileID: 563951300}
   - component: {fileID: 563951301}
+  - component: {fileID: 563951302}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -2083,6 +2084,18 @@ MonoBehaviour:
   clips:
   - {fileID: 8300000, guid: f235aaffa1c93a949bf7a4fc1fa71cc3, type: 3}
   Pool_Size: 5
+--- !u!114 &563951302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563951289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd5e1efa7c6d7b9428eb946b16449a67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0

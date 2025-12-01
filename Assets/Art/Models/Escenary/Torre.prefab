@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2274370763977610863}
   - component: {fileID: 3116611162145831139}
   - component: {fileID: 947525890813233257}
+  - component: {fileID: 2505801546205863459}
   m_Layer: 0
   m_Name: Torre
   m_TagString: Untagged
@@ -26,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6290818119665115951}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -71, y: 14, z: -81.9}
   m_LocalScale: {x: 988, y: 988, z: 988}
   m_ConstrainProportionsScale: 1
@@ -83,3 +84,15 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &2505801546205863459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6290818119665115951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92967841858953f4c8048135f7e92545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
