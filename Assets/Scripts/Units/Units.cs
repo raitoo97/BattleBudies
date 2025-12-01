@@ -142,4 +142,9 @@ public abstract class Units : MonoBehaviour
     {
         hasAttackedTowerThisTurn = false;
     }
+    public void ClearPath()
+    {
+        path.Clear();         
+        targetNode = null;
+    }
 }

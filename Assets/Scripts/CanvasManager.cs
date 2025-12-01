@@ -171,8 +171,24 @@ public class CanvasManager : MonoBehaviour
             UpdateDiceRemaining(playerDiceRemaining, 0);
         }
         if (panelEnemy != null) panelEnemy.SetActive(false);
-        if (panelPlayer != null) panelPlayer.SetActive(false);
+        if (panelPlayer != null) panelPlayer.SetActive(true);
         rollButton.gameObject.SetActive(playerCanRoll && show);
+        UpdateDamageUI();
+    }
+    public void ShowTowerCombatUIIA(bool show, int attackerDiceCount)
+    {
+        if (enemyDamageText != null)
+        {
+            enemyDamageText.gameObject.SetActive(show);
+        }
+        if (enemyDiceRemainingText != null)
+        {
+            enemyDiceRemainingText.gameObject.SetActive(show);
+            enemyDiceRemaining = attackerDiceCount;
+            UpdateDiceRemaining(0, enemyDiceRemaining);
+        }
+        if (panelEnemy != null) panelEnemy.SetActive(true);
+        if (panelPlayer != null) panelPlayer.SetActive(false);
         UpdateDamageUI();
     }
 }

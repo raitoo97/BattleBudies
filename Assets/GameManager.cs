@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
         isPlayerTurn = true;
         CardPlayManager.instance.ShowAllHandsAtPlayerTurn();
     }
-    private bool IsAnyPlayerUnitMoving()
+    public bool IsAnyPlayerUnitMoving()
     {
         Units[] allUnits = FindObjectsOfType<Units>();
         foreach (Units u in allUnits)
@@ -80,7 +80,17 @@ public class GameManager : MonoBehaviour
                 if (!u.hasAttackedTowerThisTurn && TowerManager.instance.CanUnitAttackTower(u, tower))
                 {
                     CombatManager.instance.StartCombatWithTower(u, tower);
-                    yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
+
+                    float maxWaitTime = 5f;
+                    float elapsed = 0f;
+                    while (CombatManager.instance.GetCombatActive && elapsed < maxWaitTime)
+                    {
+                        elapsed += Time.deltaTime;
+                        yield return null;
+                    }
+
+                    if (CombatManager.instance.GetCombatActive)
+                        CombatManager.instance.ForceEndCombat();
                 }
             }
         }

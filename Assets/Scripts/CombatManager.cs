@@ -170,6 +170,7 @@ public class CombatManager : MonoBehaviour
         defenderUnit = null;
         attackerDice = attacker.diceInstance;
         Debug.Log($"StartCombatWithTowerAI: {attackerUnit.name} ataca torre {tower.name}");
+        CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
         StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
     }
     public IEnumerator StartCombatWithTowerAI_Coroutine(Units attacker, Tower tower)
@@ -193,11 +194,14 @@ public class CombatManager : MonoBehaviour
         while (remainingDice > 0)
         {
             attackerDice.PrepareForRoll();
+            CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
             attackerDice.RollDice();
             yield return new WaitUntil(() => attackerDice.hasBeenThrown && attackerDice.hasBeenCounted && attackerDice.IsDiceStill());
+            CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
             if (pendingDamage > 0)
             {
                 tower.TakeDamage(pendingDamage);
+                CanvasManager.instance.AddDamageToUI(attacker, pendingDamage);
                 Debug.Log($"{attacker.name} inflige {pendingDamage} a torre {tower.name}. Vida restante: {tower.currentHealth}");
                 if (tower.currentHealth <= 0)
                 {
@@ -212,6 +216,7 @@ public class CombatManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
         attacker.hasAttackedTowerThisTurn = true;
+        CanvasManager.instance.ResetUI();
         combatActive = false;
     }
     #endregion
