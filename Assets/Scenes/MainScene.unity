@@ -1894,6 +1894,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad187f01b3bc653429d679e44058f8cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sources: []
+  clips:
+  - {fileID: 8300000, guid: f235aaffa1c93a949bf7a4fc1fa71cc3, type: 3}
+  Pool_Size: 5
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0
