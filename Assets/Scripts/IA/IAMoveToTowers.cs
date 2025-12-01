@@ -51,11 +51,11 @@ public class IAMoveToTowers : MonoBehaviour
             }
             if (targetTower == null || targetNode == null) continue;
             List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
-            if (path == null || path.Count == 0) continue;
+            if (path == null) path = new List<Node>();
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
                 path = path.GetRange(0, maxSteps);
-            movedAnyUnit = true;
+            movedAnyUnit = path.Count > 0;
             foreach (Node step in path)
             {
                 ReleaseReservedNode(enemy);
@@ -71,8 +71,11 @@ public class IAMoveToTowers : MonoBehaviour
             {
                 yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
             }
-            yield return new WaitForSeconds(0.2f);
+            enemy.hasAttackedTowerThisTurn = true;
+            yield return new WaitForSeconds(0.1f);
         }
+        unitReservedNodes.Clear();
+        CombatManager.instance.ForceEndCombat();
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {

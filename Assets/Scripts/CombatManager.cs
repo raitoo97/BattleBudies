@@ -190,13 +190,11 @@ public class CombatManager : MonoBehaviour
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
     {
         int remainingDice = attacker.diceCount;
-
         while (remainingDice > 0)
         {
             attackerDice.PrepareForRoll();
             attackerDice.RollDice();
             yield return new WaitUntil(() => attackerDice.hasBeenThrown && attackerDice.hasBeenCounted && attackerDice.IsDiceStill());
-
             if (pendingDamage > 0)
             {
                 tower.TakeDamage(pendingDamage);
@@ -208,16 +206,22 @@ public class CombatManager : MonoBehaviour
                     break;
                 }
             }
-
             pendingDamage = 0;
             attackerDice.ResetDicePosition();
             remainingDice--;
             yield return new WaitForSeconds(0.2f);
         }
-
         attacker.hasAttackedTowerThisTurn = true;
         combatActive = false;
     }
     #endregion
+    public void ForceEndCombat()
+    {
+        if (combatActive)
+        {
+            combatActive = false;
+            CanvasManager.instance.ResetUI();
+        }
+    }
     public bool GetCombatActive { get => combatActive; }
 }
