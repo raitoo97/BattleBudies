@@ -58,4 +58,12 @@ public class GameManager : MonoBehaviour
         if (!IsAnyPlayerUnitMoving() && !CombatManager.instance.GetCombatActive)
             playerWantsToEndTurn = true;
     }
+    public void SetEndGame(bool playerWon)
+    {
+        StopAllCoroutines();
+        if (playerWon)
+            Debug.Log("VICTORIA DEL JUGADOR");
+        else
+            Debug.Log("DERROTA DEL JUGADOR");
+    }
 }
