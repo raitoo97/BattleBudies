@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-
 public class IAMoveToTowers : MonoBehaviour
 {
     public static IAMoveToTowers instance;
     [HideInInspector] public bool movedAnyUnit = false;
+    private Dictionary<Units, Node> unitReservedNodes = new Dictionary<Units, Node>();
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -39,8 +38,9 @@ public class IAMoveToTowers : MonoBehaviour
                     if (parts.Length != 3) continue;
                     if (!int.TryParse(parts[1], out int x)) continue;
                     if (!int.TryParse(parts[2], out int y)) continue;
+
                     Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
-                    if (node != null && node.unitOnNode == null)
+                    if (node != null && !IsNodeReserved(node) && node.unitOnNode == null)
                     {
                         targetTower = t;
                         targetNode = node;
@@ -58,13 +58,14 @@ public class IAMoveToTowers : MonoBehaviour
             movedAnyUnit = true;
             foreach (Node step in path)
             {
+                ReleaseReservedNode(enemy);
                 enemy.SetPath(new List<Node> { step });
                 yield return new WaitUntil(() => enemy.PathEmpty());
                 enemy.SetCurrentNode(step);
+                if (step == targetNode)
+                    ReserveNode(enemy, step);
                 if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
-                {
                     yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
-                }
             }
             if (TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
             {
@@ -90,5 +91,22 @@ public class IAMoveToTowers : MonoBehaviour
             }
         }
         return false;
+    }
+    private void ReserveNode(Units unit, Node node)
+    {
+        unitReservedNodes[unit] = node;
+    }
+    private void ReleaseReservedNode(Units unit)
+    {
+        if (unitReservedNodes.ContainsKey(unit))
+            unitReservedNodes.Remove(unit);
+    }
+    public bool IsNodeReserved(Node node)
+    {
+        return unitReservedNodes.ContainsValue(node);
+    }
+    public void ReleaseNodeOnDeath(Units unit)
+    {
+        ReleaseReservedNode(unit);
     }
 }
