@@ -154,6 +154,11 @@ public class CombatManager : MonoBehaviour
         CanvasManager.instance.ResetUI();
         combatActive = false;
     }
+    public IEnumerator StartCombatWithTower_Coroutine(Units attacker, Tower tower)
+    {
+        StartCombatWithTower(attacker, tower);
+        yield return new WaitUntil(() => !combatActive);
+    }
     #endregion
     #region//TowersAI
     public void StartCombatWithTowerAI(Units attacker, Tower tower)
