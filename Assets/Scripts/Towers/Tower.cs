@@ -13,13 +13,11 @@ public class Tower : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
-        TowerManager.instance.RegisterTower(this);
     }
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
         Debug.Log($"{name} recibió {amount} daño. Vida restante: {currentHealth}");
-
         if (currentHealth <= 0 && !isDestroyed)
         {
             isDestroyed = true;

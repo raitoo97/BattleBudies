@@ -100,5 +100,62 @@ public class CombatManager : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
     }
+    public void StartCombatWithTower(Units attacker, Tower tower)
+    {
+        if (combatActive) return;
+        if (attacker == null || tower == null)
+        {
+            Debug.LogError("StartCombatWithTower: attacker o tower es null.");
+            return;
+        }
+        if (!attacker.isPlayerUnit)
+        {
+            Debug.Log("Por ahora sólo el player puede iniciar ataques a torres.");
+            return;
+        }
+        combatActive = true;
+        attackerUnit = attacker;
+        defenderUnit = null;
+        attackerDice = attacker.diceInstance;
+        Debug.Log($"StartCombatWithTower: {attackerUnit.name} ataca torre {tower.name}");
+        CanvasManager.instance.ShowTowerCombatUI(true, attacker.diceCount, playerCanRoll: true);
+        StartCoroutine(TowerCombatFlow(attackerUnit, tower));
+    }
+    private IEnumerator TowerCombatFlow(Units attacker, Tower tower)
+    {
+        int remainingDice = attacker.diceCount;
+        CanvasManager.instance.UpdateDiceRemaining(remainingDice, 0);
+
+        while (remainingDice > 0)
+        {
+            attackerDice.PrepareForRoll();
+            CanvasManager.instance.rollClicked = false;
+            CanvasManager.instance.ShowTowerCombatUI(true, remainingDice, playerCanRoll: true);
+            yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
+            CanvasManager.instance.ShowTowerCombatUI(true, remainingDice, playerCanRoll: false);
+            attackerDice.RollDice();
+            yield return new WaitUntil(() => attackerDice.hasBeenThrown && attackerDice.hasBeenCounted && attackerDice.IsDiceStill());
+            if (pendingDamage > 0)
+            {
+                tower.TakeDamage(pendingDamage);
+                CanvasManager.instance.AddDamageToUI(attacker, pendingDamage);
+                Debug.Log($"{attacker.name} inflige {pendingDamage} a torre {tower.name}. Vida restante: {tower.currentHealth}");
+                if (tower.currentHealth <= 0)
+                {
+                    Debug.Log($"Torre {tower.name} destruida.");
+                    TowerManager.instance.NotifyTowerDestroyed(tower);
+                    break;
+                }
+            }
+            pendingDamage = 0;
+            attackerDice.ResetDicePosition();
+            remainingDice--;
+            CanvasManager.instance.UpdateDiceRemaining(remainingDice, 0);
+            yield return new WaitForSeconds(0.2f);
+        }
+        attacker.hasAttackedTowerThisTurn = true;
+        CanvasManager.instance.ResetUI();
+        combatActive = false;
+    }
     public bool GetCombatActive { get => combatActive; }
 }

@@ -774,6 +774,7 @@ MonoBehaviour:
   unitStatsPanel: {fileID: 667921969}
   unitHealthText: {fileID: 1104443068}
   unitDiceText: {fileID: 1509737410}
+  towerPanel: {fileID: 0}
 --- !u!1001 &265195169
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1651,7 +1652,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 100
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
@@ -4301,7 +4302,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 100
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
@@ -4682,7 +4683,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 100
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}

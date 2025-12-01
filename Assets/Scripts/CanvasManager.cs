@@ -27,6 +27,7 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI unitHealthText;
     public TextMeshProUGUI unitDiceText;
     private Units hoveredUnit = null;
+    public Button towerPanel;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -123,5 +124,19 @@ public class CanvasManager : MonoBehaviour
             hoveredUnit = null;
             unitStatsPanel.SetActive(false);
         }
+    }
+    public void ShowTowerCombatUI(bool show, int attackerDiceCount, bool playerCanRoll = false)
+    {
+        if (towerPanel != null) towerPanel.gameObject.SetActive(show);
+        if (playerDiceRemainingText != null)
+        {
+            playerDiceRemainingText.gameObject.SetActive(show);
+            playerDiceRemainingText.text = $"Remaining Dices: {attackerDiceCount}";
+        }
+        if (panelEnemy != null) panelEnemy.SetActive(false);
+        if (panelPlayer != null) panelPlayer.SetActive(false);
+        rollButton.gameObject.SetActive(playerCanRoll);
+        playerDiceRemaining = attackerDiceCount;
+        UpdateDiceRemaining(playerDiceRemaining, 0);
     }
 }

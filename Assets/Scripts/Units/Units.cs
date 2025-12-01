@@ -18,6 +18,7 @@ public abstract class Units : MonoBehaviour
     private float originalY;
     [Header("Dice")]
     public DiceRoll diceInstance;
+    [HideInInspector]public bool hasAttackedTowerThisTurn = false;
     protected virtual void Start()
     {
         currentNode = NodeManager.GetClosetNode(transform.position);
@@ -132,5 +133,9 @@ public abstract class Units : MonoBehaviour
         if (currentNode != null && currentNode.unitOnNode == this.gameObject)
             currentNode.unitOnNode = null;
         Destroy(gameObject);
+    }
+    public void ResetTurnFlags()
+    {
+        hasAttackedTowerThisTurn = false;
     }
 }
