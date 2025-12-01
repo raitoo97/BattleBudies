@@ -63,6 +63,15 @@ public class PathDrawer : MonoBehaviour
                 }
             }
         }
+        Node lastReachableNode = path[Mathf.Min(energyAvailable, path.Count - 1)];
+        if (TowerManager.instance.TryGetTowerAtNode(lastReachableNode, out Tower tower))
+        {
+            if (tower.faction == Faction.Enemy)
+            {
+                danger = true;
+                nodesToMark = new List<Node> { lastReachableNode };
+            }
+        }
         SetLineColor(danger ? dangerColor : safeColor);
         if (danger)
             GridVisualizer.instance.SetDangerNodes(nodesToMark);

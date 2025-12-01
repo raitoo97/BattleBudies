@@ -27,7 +27,6 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI unitHealthText;
     public TextMeshProUGUI unitDiceText;
     private Units hoveredUnit = null;
-    public Button towerPanel;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -127,16 +126,28 @@ public class CanvasManager : MonoBehaviour
     }
     public void ShowTowerCombatUI(bool show, int attackerDiceCount, bool playerCanRoll = false)
     {
-        if (towerPanel != null) towerPanel.gameObject.SetActive(show);
+        // Activar daño del jugador
+        if (playerDamageText != null)
+        {
+            playerDamageText.gameObject.SetActive(show);  // <-- asegurar que está visible
+        }
+
+        // Activar dados restantes
         if (playerDiceRemainingText != null)
         {
             playerDiceRemainingText.gameObject.SetActive(show);
-            playerDiceRemainingText.text = $"Remaining Dices: {attackerDiceCount}";
+            playerDiceRemaining = attackerDiceCount;
+            UpdateDiceRemaining(playerDiceRemaining, 0);
         }
+
+        // Ocultar paneles que no aplican
         if (panelEnemy != null) panelEnemy.SetActive(false);
         if (panelPlayer != null) panelPlayer.SetActive(false);
-        rollButton.gameObject.SetActive(playerCanRoll);
-        playerDiceRemaining = attackerDiceCount;
-        UpdateDiceRemaining(playerDiceRemaining, 0);
+
+        // Activar roll button si corresponde
+        rollButton.gameObject.SetActive(playerCanRoll && show);
+
+        // Actualizar el daño acumulado
+        UpdateDamageUI();
     }
 }
