@@ -4,6 +4,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public bool isPlayerTurn = true;
+    private bool playerWantsToEndTurn = false;
     private void Awake()
     {
         if (instance == null)
@@ -27,8 +28,9 @@ public class GameManager : MonoBehaviour
                 EnergyManager.instance.RefillPlayerEnergy();
                 CanvasManager.instance.UpdateEnergyUI();
                 DeckManager.instance.DrawPlayerCard();
-                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.K));
+                yield return new WaitUntil(() => playerWantsToEndTurn && !IsAnyPlayerUnitMoving() && !CombatManager.instance.GetCombatActive);
                 isPlayerTurn = false;
+                playerWantsToEndTurn = false;
                 CardPlayManager.instance.HideAllHandsAtAITurn();
                 StartCoroutine(IABrainManager.instance.ExecuteTurn());
             }
@@ -39,5 +41,21 @@ public class GameManager : MonoBehaviour
     {
         isPlayerTurn = true;
         CardPlayManager.instance.ShowAllHandsAtPlayerTurn();
+    }
+    private bool IsAnyPlayerUnitMoving()
+    {
+        Units[] allUnits = FindObjectsOfType<Units>();
+        foreach (Units u in allUnits)
+        {
+            if (u.isPlayerUnit && !u.PathEmpty())
+                return true;
+        }
+        return false;
+    }
+    public void PlayerRequestsEndTurn()
+    {
+        if (!isPlayerTurn) return;
+        if (!IsAnyPlayerUnitMoving() && !CombatManager.instance.GetCombatActive)
+            playerWantsToEndTurn = true;
     }
 }
