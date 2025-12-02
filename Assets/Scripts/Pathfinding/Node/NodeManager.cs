@@ -127,4 +127,8 @@ public static class NodeManager
     {
         return _totalNodes;
     }
+    public static List<Node> GetAllNodes()
+    {
+        return _totalNodes;
+    }
 }

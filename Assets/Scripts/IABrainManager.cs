@@ -10,6 +10,7 @@ public class IABrainManager : MonoBehaviour
     }
     public IEnumerator ExecuteTurn()
     {
+        ClearAllPaths();
         CardPlayManager.instance.HideAllHandsAtAITurn();
         EnergyManager.instance.RefillEnemyEnergy();
         DeckManager.instance.DrawEnemyCard();
@@ -17,12 +18,16 @@ public class IABrainManager : MonoBehaviour
         CanvasManager.instance.UpdateEnergyUI();
         yield return null;
         yield return new WaitForSeconds(0.5f);
-        yield return StartCoroutine(IAMoveUnits.instance.MoveAllEnemyUnits());
-        if (!IAMoveUnits.instance.movedAnyUnit)
-        {
+        if (EnergyManager.instance.enemyCurrentEnergy > 0f)
+            yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
+        if (!IAMoveToTowers.instance.movedAnyUnit)
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
-        }
         yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
         GameManager.instance.StartPlayerTurn();
+    }
+    private void ClearAllPaths()
+    {
+        foreach (Units u in FindObjectsOfType<Units>())
+            u.ClearPath();
     }
 }

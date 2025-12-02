@@ -41,12 +41,12 @@ public class PathDrawer : MonoBehaviour
             return;
         }
         bool danger = false;
-        if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> nodesToMark))
+        List<Node> nodesToMark = null;
+        if (NodeManager.PathTouchesUnitNeighbor(path, out nodesToMark))
         {
             if (nodesToMark != null && nodesToMark.Count > 0)
             {
                 Node firstDangerNode = null;
-
                 foreach (var node in path)
                 {
                     if (nodesToMark.Contains(node))
@@ -61,6 +61,17 @@ public class PathDrawer : MonoBehaviour
                     if (index <= energyAvailable)
                         danger = true;
                 }
+            }
+        }
+        Node lastReachableNode = path[Mathf.Min(energyAvailable, path.Count - 1)];
+        if (TowerManager.instance.TryGetTowerAtNode(lastReachableNode, out Tower tower))
+        {
+            if (tower.faction == Faction.Enemy)
+            {
+                danger = true;
+                if (nodesToMark == null) nodesToMark = new List<Node>();
+                if (!nodesToMark.Contains(lastReachableNode))
+                    nodesToMark.Add(lastReachableNode);
             }
         }
         SetLineColor(danger ? dangerColor : safeColor);

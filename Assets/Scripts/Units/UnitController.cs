@@ -9,6 +9,7 @@ public class UnitController : MonoBehaviour
     private GlowUnit hoverGlow;
     private Units hoverUnit;
     public static UnitController instance;
+    private bool previousIsPlayerTurn = false;
     private void Awake()
     {
         if (instance == null)
@@ -18,6 +19,11 @@ public class UnitController : MonoBehaviour
     }
     void Update()
     {
+        if (!previousIsPlayerTurn && GameManager.instance.isPlayerTurn)
+        {
+            ResetPlayerUnitsTurnFlags();
+        }
+        previousIsPlayerTurn = GameManager.instance.isPlayerTurn;
         if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
         {
             DeselectUnit();
@@ -188,6 +194,20 @@ public class UnitController : MonoBehaviour
         {
             CombatManager.instance.StartCombat(unit, enemy, true);
         }
+        if (!unit.isPlayerUnit) yield break;
+
+        if (TowerManager.instance.TryGetTowerAtNode(unit.currentNode, out Tower tower))
+        {
+            if (unit.hasAttackedTowerThisTurn)
+            {
+                Debug.Log($"Unidad {unit.name} ya atacó una torre este turno.");
+                yield break;
+            }
+            if (TowerManager.instance.CanUnitAttackTower(unit, tower))
+            {
+                CombatManager.instance.StartCombatWithTower(unit, tower);
+            }
+        }
     }
     private bool TryGetEnemyNeighbor(Units unit, out Units enemy)
     {
@@ -206,5 +226,14 @@ public class UnitController : MonoBehaviour
             }
         }
         return false;
+    }
+    private void ResetPlayerUnitsTurnFlags()
+    {
+        Units[] allUnits = FindObjectsOfType<Units>();
+        foreach (var u in allUnits)
+        {
+            if (u.isPlayerUnit)
+                u.ResetTurnFlags();
+        }
     }
 }

@@ -27,6 +27,10 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI unitHealthText;
     public TextMeshProUGUI unitDiceText;
     private Units hoveredUnit = null;
+    [Header("StatsTower")]
+    public GameObject towerStatsPanel;
+    public TextMeshProUGUI towerHealthText;
+    private Tower hoveredTower = null;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -37,6 +41,7 @@ public class CanvasManager : MonoBehaviour
     private void Update()
     {
         UpdateUnitStatsHover();
+        UpdateTowerStatsHover();
     }
     public void AddDamageToUI(Units attacker, int value)
     {
@@ -123,5 +128,67 @@ public class CanvasManager : MonoBehaviour
             hoveredUnit = null;
             unitStatsPanel.SetActive(false);
         }
+    }
+    private void UpdateTowerStatsHover()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Tower tower = hit.collider.GetComponent<Tower>();
+            if (tower != null)
+            {
+                if (hoveredTower != tower)
+                {
+                    hoveredTower = tower;
+                    towerStatsPanel.SetActive(true);
+                }
+                towerHealthText.text = $"{tower.currentHealth}";
+                Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
+                towerStatsPanel.transform.position = panelPos;
+            }
+            else
+            {
+                hoveredTower = null;
+                towerStatsPanel.SetActive(false);
+            }
+        }
+        else
+        {
+            hoveredTower = null;
+            towerStatsPanel.SetActive(false);
+        }
+    }
+    public void ShowTowerCombatUI(bool show, int attackerDiceCount, bool playerCanRoll = false)
+    {
+        if (playerDamageText != null)
+        {
+            playerDamageText.gameObject.SetActive(show);
+        }
+        if (playerDiceRemainingText != null)
+        {
+            playerDiceRemainingText.gameObject.SetActive(show);
+            playerDiceRemaining = attackerDiceCount;
+            UpdateDiceRemaining(playerDiceRemaining, 0);
+        }
+        if (panelEnemy != null) panelEnemy.SetActive(false);
+        if (panelPlayer != null) panelPlayer.SetActive(true);
+        rollButton.gameObject.SetActive(playerCanRoll && show);
+        UpdateDamageUI();
+    }
+    public void ShowTowerCombatUIIA(bool show, int attackerDiceCount)
+    {
+        if (enemyDamageText != null)
+        {
+            enemyDamageText.gameObject.SetActive(show);
+        }
+        if (enemyDiceRemainingText != null)
+        {
+            enemyDiceRemainingText.gameObject.SetActive(show);
+            enemyDiceRemaining = attackerDiceCount;
+            UpdateDiceRemaining(0, enemyDiceRemaining);
+        }
+        if (panelEnemy != null) panelEnemy.SetActive(true);
+        if (panelPlayer != null) panelPlayer.SetActive(false);
+        UpdateDamageUI();
     }
 }
