@@ -18,7 +18,8 @@ public class IABrainManager : MonoBehaviour
         CanvasManager.instance.UpdateEnergyUI();
         yield return null;
         yield return new WaitForSeconds(0.5f);
-        yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
+        if (EnergyManager.instance.enemyCurrentEnergy > 0f)
+            yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
         if (!IAMoveToTowers.instance.movedAnyUnit)
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
         yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);

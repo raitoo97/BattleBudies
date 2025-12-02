@@ -20,8 +20,9 @@ public class IAMoveToTowers : MonoBehaviour
             if (!u.isPlayerUnit) enemyUnits.Add(u);
         foreach (Units enemy in enemyUnits)
         {
-            if (enemy.currentNode == null) continue;
-            if (EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
+            bool unitDidAction = false;
+            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
+                continue;
             Tower targetTower = null;
             Node targetNode = null;
             Tower[] allTowers = FindObjectsOfType<Tower>();
@@ -48,29 +49,44 @@ public class IAMoveToTowers : MonoBehaviour
                 }
                 if (targetTower != null) break;
             }
-            if (targetTower == null || targetNode == null) continue;
+            if (targetTower == null || targetNode == null)
+                continue;
             List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode) ?? new List<Node>();
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
                 path = path.GetRange(0, maxSteps);
-            movedAnyUnit = path.Count > 0;
+            if (path.Count > 0)
+                unitDidAction = true;
             foreach (Node step in path)
             {
+                if (enemy == null) break;
                 ReleaseReservedNode(enemy);
                 enemy.SetPath(new List<Node> { step });
-                yield return new WaitUntil(() => enemy.PathEmpty());
+                yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
+                if (enemy == null) break;
                 enemy.SetCurrentNode(step);
                 if (step == targetNode)
                     ReserveNode(enemy, step);
                 if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+                {
+                    if (enemy == null) break;
                     yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
+                    if (enemy == null) break;
+                }
             }
-            if (TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
+            if (enemy != null && TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
+            {
+                unitDidAction = true;
                 yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
-            enemy.hasAttackedTowerThisTurn = true;
+            }
+            if (enemy != null)
+            {
+                enemy.hasAttackedTowerThisTurn = true;
+                if (unitDidAction)
+                    movedAnyUnit = true;
+            }
         }
         unitReservedNodes.Clear();
-        CombatManager.instance.ForceEndCombat();
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {

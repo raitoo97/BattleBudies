@@ -225,13 +225,5 @@ public class CombatManager : MonoBehaviour
         combatActive = false;
     }
     #endregion
-    public void ForceEndCombat()
-    {
-        if (combatActive)
-        {
-            combatActive = false;
-            CanvasManager.instance.ResetUI();
-        }
-    }
     public bool GetCombatActive { get => combatActive; }
 }
