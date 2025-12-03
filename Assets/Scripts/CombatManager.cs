@@ -23,6 +23,7 @@ public class CombatManager : MonoBehaviour
     public void StartCombat(Units unit1, Units unit2, bool attackerStartsTurn)
     {
         if (combatActive) return;
+        if (SalvationManager.instance.GetOnSavingThrow) return;
         if (unit1 == null || unit2 == null)
         {
             Debug.LogError("StartCombat: alguna unidad es null.");
@@ -39,7 +40,7 @@ public class CombatManager : MonoBehaviour
         attackerDice = attackerUnit.diceInstance;
         defenderDice = defenderUnit.diceInstance;
         Debug.Log($"StartCombat: {attackerUnit.name} vs {defenderUnit.name}");
-        CanvasManager.instance.ShowCombatUI(true, playerCanRoll: false);
+        CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
         StartCoroutine(CombatFlow(attackerStartsTurn));
     }
     private IEnumerator CombatFlow(bool attackerStartsTurn)
@@ -66,13 +67,13 @@ public class CombatManager : MonoBehaviour
             if (unit.isPlayerUnit)
             {
                 CanvasManager.instance.rollClicked = false;
-                CanvasManager.instance.ShowCombatUI(true, playerCanRoll: true);
+                CanvasManager.instance.TryShowCombatUI(playerCanRoll: true);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
-                CanvasManager.instance.ShowCombatUI(true, playerCanRoll: false);
+                CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
             }
             else
             {
-                CanvasManager.instance.ShowCombatUI(true, playerCanRoll: false);
+                CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
                 yield return new WaitForSeconds(0.5f);
             }
             dice.RollDice();
@@ -104,6 +105,7 @@ public class CombatManager : MonoBehaviour
     public void StartCombatWithTower(Units attacker, Tower tower)
     {
         if (combatActive) return;
+        if (SalvationManager.instance.GetOnSavingThrow) return;
         if (attacker == null || tower == null) return;
         if (attacker.isPlayerUnit && tower.faction == Faction.Player)
         {
@@ -164,6 +166,7 @@ public class CombatManager : MonoBehaviour
     public void StartCombatWithTowerAI(Units attacker, Tower tower)
     {
         if (combatActive) return;
+        if (SalvationManager.instance.GetOnSavingThrow) return;
         if (attacker == null || tower == null) return;
         if (!attacker.isPlayerUnit && tower.faction == Faction.Enemy)
         {

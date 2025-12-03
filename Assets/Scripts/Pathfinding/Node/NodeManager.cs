@@ -127,6 +127,47 @@ public static class NodeManager
     {
         return _totalNodes;
     }
+    public static List<Node> TouchDangerousNodes()
+    {
+        var dangerNodes = new List<Node>();
+        foreach (var node in _totalNodes)
+        {
+            if (node == null) continue;
+            if (node.IsDangerous)
+                dangerNodes.Add(node);
+        }
+        return dangerNodes;
+    }
+    public static Node FindFirstDangerousNode(List<Node> path)
+    {
+        var dangerous = TouchDangerousNodes();
+        foreach (var step in path)
+        {
+            if (dangerous.Contains(step))
+                return step;
+        }
+        return null;
+    }
+    public static Node GetForwardSafeNode(Node safeNode, Node currentNode)
+    {
+        if(safeNode == null || currentNode == null)
+        return null;
+        int dirX = Mathf.Clamp(currentNode.gridIndex.x - safeNode.gridIndex.x, -1, 1);
+        int dirY = Mathf.Clamp(currentNode.gridIndex.y - safeNode.gridIndex.y, -1, 1);
+        int targetX = currentNode.gridIndex.x + dirX;
+        int targetY = currentNode.gridIndex.y + dirY;
+        foreach (var node in NodeManager.GetAllNodes())
+        {
+            if (node == null) continue;
+            if (node.gridIndex.x != targetX) continue;
+            if (node.gridIndex.y != targetY) continue;
+            if (node.IsDangerous) continue;
+            if (!node.IsEmpty()) continue;
+
+            return node;
+        }
+        return null;
+    }
     public static List<Node> GetAllNodes()
     {
         return _totalNodes;

@@ -11,6 +11,7 @@ public abstract class Units : MonoBehaviour
     [Header("Movement")]
     public Node currentNode;
     private Node targetNode;
+    public Node lastSafeNode;
     private List<Node> path = new List<Node>();
     public float moveSpeed = 5f;
     private float arriveThreshold = 0.1f;

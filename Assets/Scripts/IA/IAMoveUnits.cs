@@ -14,6 +14,7 @@ public class IAMoveUnits : MonoBehaviour
     }
     public IEnumerator MoveAllEnemyUnits()
     {
+        //Agregar trrampas y torres despues
         movedAnyUnit = false;
         Units[] allUnits = FindObjectsOfType<Units>();
         List<Units> enemyUnits = new List<Units>();

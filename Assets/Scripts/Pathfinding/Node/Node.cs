@@ -5,14 +5,16 @@ public class Node : MonoBehaviour
     public Vector2Int gridIndex;
     [SerializeField] private List<Node> _gridNeighbors = new List<Node>();
     [SerializeField] private List<Node> _extraNeighbors = new List<Node>();
-    [SerializeField]private float _cost;
+    [SerializeField] private float _cost;
     public float maxStepUp = 1f;
     public float maxStepDown = 1f;
     public GameObject unitOnNode;
+    [SerializeField]private bool _isDangerous;
     public void Initalize(Vector2Int xY)
     {
         gridIndex = xY;
         _cost = 1;
+        _isDangerous = false;
         NodeManager.RegisterNode(this);
     }
     private void OnDestroy()
@@ -71,5 +73,14 @@ public class Node : MonoBehaviour
     {
         return unitOnNode == null;
     }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == 8)
+        {
+            _cost++;
+            _isDangerous = true;
+        }
+    }
     public float Cost { get => _cost; }
+    public bool IsDangerous { get => _isDangerous; }
 }

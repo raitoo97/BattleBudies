@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class IAMoveToTowers : MonoBehaviour
 {
+    //hace q si el nodo seguro esta ocupado, el enemigo recalcule el camino a otra luga
     public static IAMoveToTowers instance;
     [HideInInspector] public bool movedAnyUnit = false;
     private Dictionary<Units, Node> unitReservedNodes = new Dictionary<Units, Node>();
@@ -21,8 +23,7 @@ public class IAMoveToTowers : MonoBehaviour
         foreach (Units enemy in enemyUnits)
         {
             bool unitDidAction = false;
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
-                continue;
+            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
             Tower targetTower = null;
             Node targetNode = null;
             Tower[] allTowers = FindObjectsOfType<Tower>();
@@ -49,25 +50,54 @@ public class IAMoveToTowers : MonoBehaviour
                 }
                 if (targetTower != null) break;
             }
-            if (targetTower == null || targetNode == null)
-                continue;
-            List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode) ?? new List<Node>();
+            if (targetTower == null || targetNode == null)continue;
+            Node previousStep = enemy.currentNode;
+            List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
                 path = path.GetRange(0, maxSteps);
             if (path.Count > 0)
                 unitDidAction = true;
-            foreach (Node step in path)
+            for (int i = 0; i < path.Count; i++)
             {
+                Node step = path[i];
                 if (enemy == null) break;
                 ReleaseReservedNode(enemy);
                 enemy.SetPath(new List<Node> { step });
                 yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
                 if (enemy == null) break;
                 enemy.SetCurrentNode(step);
+                Units playerUnit = null;
+                if (step.IsDangerous)
+                {
+                    if (previousStep != null)
+                        enemy.lastSafeNode = previousStep;
+                    SalvationManager.instance.StartSavingThrow(enemy);
+                    yield return new WaitUntil(() => enemy == null || !SalvationManager.instance.GetOnSavingThrow);
+                    yield return new WaitForSeconds(1f);
+                    if (enemy == null) break;
+                    Node startNode = (enemy.currentNode != previousStep) ? enemy.currentNode : enemy.lastSafeNode;
+                    path = PathFinding.CalculateAstart(startNode, targetNode);
+                    maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+                    if (path.Count > maxSteps)
+                        path = path.GetRange(0, maxSteps);
+                    i = (path.Count > 0 && path[0] == enemy.currentNode) ? 0 : -1;
+                    if (TryGetPlayerNeighbor(enemy, out playerUnit))
+                    {
+                        if (enemy == null) break;
+                        yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
+                        if (enemy == null) break;
+                    }
+                    continue;
+                }
+                else
+                {
+                    enemy.lastSafeNode = step;
+                }
+                previousStep = step;
                 if (step == targetNode)
                     ReserveNode(enemy, step);
-                if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+                if (TryGetPlayerNeighbor(enemy,out playerUnit))
                 {
                     if (enemy == null) break;
                     yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
