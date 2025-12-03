@@ -27,8 +27,8 @@ public class IAMoveToTowers : MonoBehaviour
             //CAMINO HACIA LA TORRE
             Node previousStep = enemy.currentNode;
             List<Node> path = PreparePath(enemy, targetNode, ref unitDidAction); //calcula path y limita pasos según energy
-            //MOVIMIENTO PASO A PASO
-            yield return StartCoroutine(ExecuteMovementPath(enemy, path, previousStep, targetTower)); //mueve unidad paso a paso
+                                                                                 //MOVIMIENTO PASO A PASO
+            yield return StartCoroutine(ExecuteMovementPath(enemy, path, previousStep)); //mueve unidad paso a paso
             //ATAQUE A TORRE
             if (enemy != null && TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
             {
@@ -94,7 +94,7 @@ public class IAMoveToTowers : MonoBehaviour
             unitDidAction = true;
         return path;
     }
-    IEnumerator ExecuteMovementPath(Units enemy, List<Node> path, Node previousStep, Tower targetTower) // mueve paso por paso
+    IEnumerator ExecuteMovementPath(Units enemy, List<Node> path, Node previousStep)
     {
         for (int i = 0; i < path.Count; i++)
         {
@@ -104,14 +104,12 @@ public class IAMoveToTowers : MonoBehaviour
             enemy.SetPath(new List<Node> { step });
             yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
             if (enemy == null) yield break;
-            enemy.SetCurrentNode(step);
-            //NODO PELIGROSO  CORTA MOVIMIENTO Y REHACE PATH COMO ANTES
             if (IsDangerousNode(step))
             {
-                yield return StartCoroutine(HandleDangerAndRepath(enemy, previousStep));
-                yield break; // igual que el código original: frena este movimiento
+                Node lastSafe = previousStep != null ? previousStep : enemy.lastSafeNode;
+                yield return StartCoroutine(HandleDangerAndRepath(enemy, lastSafe));
+                yield break;
             }
-            // nodo seguro
             enemy.lastSafeNode = step;
             previousStep = step;
             Units playerUnit;
@@ -120,7 +118,7 @@ public class IAMoveToTowers : MonoBehaviour
                 yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
                 if (enemy == null) yield break;
             }
-            if (step == path[path.Count - 1])
+            if (i == path.Count - 1)
                 ReserveNode(enemy, step);
         }
     }
@@ -128,21 +126,19 @@ public class IAMoveToTowers : MonoBehaviour
     {
         return step.IsDangerous;
     }
-    IEnumerator HandleDangerAndRepath(Units enemy, Node previousStep)
+    IEnumerator HandleDangerAndRepath(Units enemy, Node lastSafeNode)
     {
         if (enemy == null) yield break;
-        if (previousStep != null)
-            enemy.lastSafeNode = previousStep;
+        enemy.lastSafeNode = lastSafeNode;
         SalvationManager.instance.StartSavingThrow(enemy);
         yield return new WaitUntil(() => enemy == null || !SalvationManager.instance.GetOnSavingThrow);
-        yield return new WaitForSeconds(0.1f);
         if (enemy == null) yield break;
-        Node startNode = (enemy.currentNode != enemy.lastSafeNode) ? enemy.currentNode : enemy.lastSafeNode;
+        Node startNode = enemy.lastSafeNode;
         if (startNode == null) yield break;
         Tower targetTower;
         Node targetNode;
-        if (!GetClosestValidTowerNode(out targetTower, out targetNode)) yield break; // si no hay torre, termina
-        if (targetNode == null) yield break;
+        if (!GetClosestValidTowerNode(out targetTower, out targetNode))
+            yield break;
         List<Node> fullPath = PathFinding.CalculateAstart(startNode, targetNode);
         if (fullPath.Count == 0) yield break;
         int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
@@ -151,6 +147,7 @@ public class IAMoveToTowers : MonoBehaviour
         enemy.SetPath(fullPath);
         if (fullPath.Count > 0)
             ReserveNode(enemy, fullPath[fullPath.Count - 1]);
+        yield return StartCoroutine(ExecuteMovementPath(enemy, fullPath, enemy.lastSafeNode));
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {
