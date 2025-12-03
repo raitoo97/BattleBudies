@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class IAMoveToTowers : MonoBehaviour
 {
-    //hace q si el nodo seguro esta ocupado, el enemigo recalcule el camino a otra lugar
+    //hace q si el nodo seguro esta ocupado, el enemigo recalcule el camino a otra luga
     public static IAMoveToTowers instance;
     [HideInInspector] public bool movedAnyUnit = false;
     private Dictionary<Units, Node> unitReservedNodes = new Dictionary<Units, Node>();
