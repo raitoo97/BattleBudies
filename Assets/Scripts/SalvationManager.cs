@@ -51,20 +51,33 @@ public class SalvationManager : MonoBehaviour
         if (pendingSalvation >= salvationTreshold)
         {
             Debug.Log("Tirada de salvación exitosa");
+            Node forwardSafeNode = NodeManager.GetForwardSafeNode(unit.lastSafeNode, unit.currentNode);
+            if (forwardSafeNode != null)
+            {
+                unit.SetCurrentNode(forwardSafeNode);
+                unit.transform.position = unit.GetSnappedPosition(forwardSafeNode);
+            }
+            else
+            {
+                if (unit.lastSafeNode != null)
+                {
+                    unit.SetCurrentNode(unit.lastSafeNode);
+                    unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
+                }
+            }
             OnSalvingThrow = false;
             CanvasManager.instance.ShowCombatUI(false);
         }
         else
         {
+            Debug.Log("Tirada de salvacion fallida");
             if (unit.lastSafeNode != null)
             {
                 unit.SetCurrentNode(unit.lastSafeNode);
                 unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
                 unit.TakeDamage(3);
                 CanvasManager.instance.ShowCombatUI(false);
-                Debug.Log("Unidad retrocede al último nodo seguro: " + unit.lastSafeNode.name);
             }
-            Debug.Log("Tirada de salvación fallida");
         }
         pendingSalvation = 0;
         diceRoll.ResetDicePosition();

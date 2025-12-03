@@ -9,7 +9,9 @@ public class CanvasManager : MonoBehaviour
     [Header("Combat")]
     public Button rollButton;
     public TextMeshProUGUI playerDamageText;
+    public TextMeshProUGUI playerSalvationText;
     public TextMeshProUGUI enemyDamageText;
+    public TextMeshProUGUI enemySalvationText;
     public GameObject panelEnemy;
     public GameObject panelPlayer;
     public TextMeshProUGUI playerDiceRemainingText;
@@ -54,6 +56,11 @@ public class CanvasManager : MonoBehaviour
         if (playerDamageText != null) playerDamageText.text = $"Player Damage: {playerDamageUI}";
         if (enemyDamageText != null) enemyDamageText.text = $"Enemy Damage: {enemyDamageUI}";
     }
+    public void UpdateSalvageUI()
+    {
+        if (playerDamageText != null) playerDamageText.text = $"Player Damage: {playerDamageUI}";
+        if (enemyDamageText != null) enemyDamageText.text = $"Enemy Damage: {enemyDamageUI}";
+    }
     public void ResetUI()
     {
         playerDamageUI = 0;
@@ -68,6 +75,16 @@ public class CanvasManager : MonoBehaviour
         if (enemyDiceRemainingText != null) enemyDiceRemainingText.gameObject.SetActive(false);
     }
     public void ShowCombatUI(bool show, bool playerCanRoll = false)
+    {
+        if (playerDamageText != null) playerDamageText.gameObject.SetActive(show);
+        if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(show);
+        if (panelEnemy != null) panelEnemy.gameObject.SetActive(show);
+        if (panelPlayer != null) panelPlayer.gameObject.SetActive(show);
+        if (playerDiceRemainingText != null) playerDiceRemainingText.gameObject.SetActive(show);
+        if (enemyDiceRemainingText != null) enemyDiceRemainingText.gameObject.SetActive(show);
+        rollButton.gameObject.SetActive(playerCanRoll);
+    }
+    public void ShowSalvationUI(bool show, bool playerCanRoll = false)
     {
         if (playerDamageText != null) playerDamageText.gameObject.SetActive(show);
         if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(show);
