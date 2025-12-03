@@ -182,6 +182,8 @@ public class UnitController : MonoBehaviour
         if (firstSalvationNode != null)
         {
             int index = path.IndexOf(firstSalvationNode);
+            if (index - 1 >= 0)
+                selectedUnit.lastSafeNode = path[index - 1];
             path = path.GetRange(0, index + 1);
         }
         if (path.Count > 0)

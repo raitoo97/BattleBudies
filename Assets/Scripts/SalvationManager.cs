@@ -56,6 +56,12 @@ public class SalvationManager : MonoBehaviour
         }
         else
         {
+            if (unit.lastSafeNode != null)
+            {
+                unit.SetCurrentNode(unit.lastSafeNode);
+                unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
+                Debug.Log("Unidad retrocede al último nodo seguro: " + unit.lastSafeNode.name);
+            }
             Debug.Log("Tirada de salvación fallida");
         }
         pendingSalvation = 0;
