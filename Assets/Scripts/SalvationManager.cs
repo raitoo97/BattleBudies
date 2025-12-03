@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 public class SalvationManager : MonoBehaviour
 {
@@ -30,8 +31,9 @@ public class SalvationManager : MonoBehaviour
             if(!OnSalvingThrow) yield break;
         }
     }
-    IEnumerator UnitRollDiceSalvation(Units unit , int salvationTreshold)
+    IEnumerator UnitRollDiceSalvation(Units unit, int salvationTreshold)
     {
+        Node safeNodeBeforeRoll = unit.lastSafeNode;
         diceRoll.PrepareForRoll();
         if (unit.isPlayerUnit)
         {
@@ -50,29 +52,44 @@ public class SalvationManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         if (pendingSalvation >= salvationTreshold)
         {
-            Debug.Log("Tirada de salvación exitosa");
-            Node forwardSafeNode = NodeManager.GetForwardSafeNode(unit.lastSafeNode, unit.currentNode);
-            if (forwardSafeNode != null)
+            Node safeBeforeRoll = unit.lastSafeNode; // nodo seguro antes de la tirada
+            Node forwardNode = NodeManager.GetForwardSafeNode(safeBeforeRoll, unit.currentNode);
+            Node nodeToMove = null;
+            if (forwardNode != null)
             {
-                unit.SetCurrentNode(forwardSafeNode);
-                unit.transform.position = unit.GetSnappedPosition(forwardSafeNode);
+                if (forwardNode.IsEmpty())
+                {
+                    nodeToMove = forwardNode;
+                }
+                else
+                {
+                    List<Node> neighbors = NodeManager.GetNeighborsInRow(forwardNode);
+                    Node freeNeighbor = neighbors.Find(n => n.IsEmpty());
+                    if (freeNeighbor != null)
+                    {
+                        nodeToMove = freeNeighbor;
+                    }
+                    else
+                    {
+                        nodeToMove = safeBeforeRoll;
+                    }
+                }
             }
             else
             {
-                if (unit.lastSafeNode != null)
-                {
-                    unit.SetCurrentNode(unit.lastSafeNode);
-                    unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
-                }
+                nodeToMove = safeBeforeRoll;
             }
+            unit.SetCurrentNode(nodeToMove);
+            unit.transform.position = unit.GetSnappedPosition(nodeToMove);
+            if (nodeToMove != safeBeforeRoll)
+                unit.lastSafeNode = nodeToMove;
         }
         else
         {
-            Debug.Log("Tirada de salvacion fallida");
-            if (unit.lastSafeNode != null)
+            if (safeNodeBeforeRoll != null)
             {
-                unit.SetCurrentNode(unit.lastSafeNode);
-                unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
+                unit.SetCurrentNode(safeNodeBeforeRoll);
+                unit.transform.position = unit.GetSnappedPosition(safeNodeBeforeRoll);
                 unit.TakeDamage(3);
             }
         }

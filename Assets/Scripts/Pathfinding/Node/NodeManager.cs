@@ -150,23 +150,27 @@ public static class NodeManager
     }
     public static Node GetForwardSafeNode(Node safeNode, Node currentNode)
     {
-        if(safeNode == null || currentNode == null)
-        return null;
+        if (safeNode == null || currentNode == null)
+            return null;
         int dirX = Mathf.Clamp(currentNode.gridIndex.x - safeNode.gridIndex.x, -1, 1);
         int dirY = Mathf.Clamp(currentNode.gridIndex.y - safeNode.gridIndex.y, -1, 1);
         int targetX = currentNode.gridIndex.x + dirX;
         int targetY = currentNode.gridIndex.y + dirY;
-        foreach (var node in NodeManager.GetAllNodes())
+        Node forwardNode = GetAllNodes().Find(node => node != null && node.gridIndex.x == targetX && node.gridIndex.y == targetY && !node.IsDangerous);
+        return forwardNode;
+    }
+    public static List<Node> GetNeighborsInRow(Node node)
+    {
+        List<Node> neighbors = new List<Node>();
+        foreach (var neigh in node.Neighbors)
         {
-            if (node == null) continue;
-            if (node.gridIndex.x != targetX) continue;
-            if (node.gridIndex.y != targetY) continue;
-            if (node.IsDangerous) continue;
-            if (!node.IsEmpty()) continue;
-
-            return node;
+            if (neigh.gridIndex.x == node.gridIndex.x)
+            {
+                neighbors.Add(neigh);
+                Debug.Log(neigh.gameObject.name);
+            }
         }
-        return null;
+        return neighbors;
     }
     public static List<Node> GetAllNodes()
     {
