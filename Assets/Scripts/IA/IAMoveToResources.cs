@@ -12,7 +12,7 @@ public class IAMoveToResources : MonoBehaviour
         else
             Destroy(gameObject);
     }
-    public IEnumerator MoveAllEnemyUnits()
+    public IEnumerator MoveAllEnemyUnitsToResorces()
     {
         //Agregar trrampas y torres despues
         movedAnyUnit = false;

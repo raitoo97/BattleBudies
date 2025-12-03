@@ -152,7 +152,6 @@ public static class NodeManager
     {
         if (safeNode == null || currentNode == null)
             return null;
-
         int dirX = Mathf.Clamp(currentNode.gridIndex.x - safeNode.gridIndex.x, -1, 1);
         int dirY = Mathf.Clamp(currentNode.gridIndex.y - safeNode.gridIndex.y, -1, 1);
         int targetX = currentNode.gridIndex.x + dirX;
