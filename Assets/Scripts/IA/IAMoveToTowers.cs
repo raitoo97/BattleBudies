@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class IAMoveToTowers : MonoBehaviour
 {
+    //hace q si el nodo seguro esta ocupado, el enemigo recalcule el camino a otra lugar
     public static IAMoveToTowers instance;
     [HideInInspector] public bool movedAnyUnit = false;
     private Dictionary<Units, Node> unitReservedNodes = new Dictionary<Units, Node>();
@@ -66,6 +67,7 @@ public class IAMoveToTowers : MonoBehaviour
                 yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
                 if (enemy == null) break;
                 enemy.SetCurrentNode(step);
+                Units playerUnit = null;
                 if (step.IsDangerous)
                 {
                     if (previousStep != null)
@@ -80,6 +82,12 @@ public class IAMoveToTowers : MonoBehaviour
                     if (path.Count > maxSteps)
                         path = path.GetRange(0, maxSteps);
                     i = (path.Count > 0 && path[0] == enemy.currentNode) ? 0 : -1;
+                    if (TryGetPlayerNeighbor(enemy, out playerUnit))
+                    {
+                        if (enemy == null) break;
+                        yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
+                        if (enemy == null) break;
+                    }
                     continue;
                 }
                 else
@@ -89,7 +97,7 @@ public class IAMoveToTowers : MonoBehaviour
                 previousStep = step;
                 if (step == targetNode)
                     ReserveNode(enemy, step);
-                if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+                if (TryGetPlayerNeighbor(enemy,out playerUnit))
                 {
                     if (enemy == null) break;
                     yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));

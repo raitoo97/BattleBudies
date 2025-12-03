@@ -879,7 +879,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rollButton: {fileID: 1220242531}
   playerDamageText: {fileID: 220682204}
+  playerSalvationText: {fileID: 0}
   enemyDamageText: {fileID: 1009201776}
+  enemySalvationText: {fileID: 0}
   panelEnemy: {fileID: 531066663}
   panelPlayer: {fileID: 861494148}
   playerDiceRemainingText: {fileID: 1468854110}

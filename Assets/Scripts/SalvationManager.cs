@@ -36,13 +36,13 @@ public class SalvationManager : MonoBehaviour
         if (unit.isPlayerUnit)
         {
             CanvasManager.instance.rollClicked = false;
-            CanvasManager.instance.ShowCombatUI(true, playerCanRoll: true);
+            CanvasManager.instance.TryShowCombatUI(playerCanRoll: true);
             yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
-            CanvasManager.instance.ShowCombatUI(true, playerCanRoll: false);
+            CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
         }
         else
         {
-            CanvasManager.instance.ShowCombatUI(true, playerCanRoll: true);
+            CanvasManager.instance.TryShowCombatUI(playerCanRoll: true);
             yield return new WaitForSeconds(0.5f);
         }
         diceRoll.RollDice();
@@ -77,7 +77,7 @@ public class SalvationManager : MonoBehaviour
             }
         }
         OnSalvingThrow = false;
-        CanvasManager.instance.ShowCombatUI(false);
+        CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
         pendingSalvation = 0;
         diceRoll.ResetDicePosition();
         yield return new WaitForSeconds(0.3f);

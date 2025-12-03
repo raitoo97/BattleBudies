@@ -208,4 +208,12 @@ public class CanvasManager : MonoBehaviour
         if (panelPlayer != null) panelPlayer.SetActive(false);
         UpdateDamageUI();
     }
+    public void TryShowCombatUI(bool playerCanRoll = false)
+    {
+        ShowCombatUI(true, playerCanRoll);
+        if (SalvationManager.instance.GetOnSavingThrow && !GameManager.instance.isPlayerTurn)
+        {
+            rollButton.gameObject.SetActive(false);
+        }
+    }
 }
