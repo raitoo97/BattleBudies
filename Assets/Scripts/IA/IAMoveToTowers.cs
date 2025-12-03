@@ -1,10 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class IAMoveToTowers : MonoBehaviour
 {
-    //hace q si el nodo seguro esta ocupado, el enemigo recalcule el camino a otra luga
     public static IAMoveToTowers instance;
     [HideInInspector] public bool movedAnyUnit = false;
     private Dictionary<Units, Node> unitReservedNodes = new Dictionary<Units, Node>();
@@ -41,7 +39,7 @@ public class IAMoveToTowers : MonoBehaviour
                     if (!int.TryParse(parts[1], out int x)) continue;
                     if (!int.TryParse(parts[2], out int y)) continue;
                     Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
-                    if (node != null && !IsNodeReserved(node) && node.unitOnNode == null)
+                    if (node != null && !IsNodeReserved(node) && node.IsEmpty())
                     {
                         targetTower = t;
                         targetNode = node;
@@ -77,7 +75,22 @@ public class IAMoveToTowers : MonoBehaviour
                     yield return new WaitForSeconds(1f);
                     if (enemy == null) break;
                     Node startNode = (enemy.currentNode != previousStep) ? enemy.currentNode : enemy.lastSafeNode;
-                    path = PathFinding.CalculateAstart(startNode, targetNode);
+                    if (candidateTowers.Count == 0) continue;
+                    Tower randomTower = candidateTowers[Random.Range(0, candidateTowers.Count)];
+                    List<Node> validNodes = new List<Node>();
+                    foreach (var nodeKey in TowerManager.instance.GetAttackNodes(randomTower))
+                    {
+                        string[] parts = nodeKey.Split('_');
+                        if (parts.Length != 3) continue;
+                        if (!int.TryParse(parts[1], out int x)) continue;
+                        if (!int.TryParse(parts[2], out int y)) continue;
+                        Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
+                        if (node != null && !IsNodeReserved(node) && node.IsEmpty())
+                            validNodes.Add(node);
+                    }
+                    if (validNodes.Count == 0)continue;
+                    Node randomTargetNode = validNodes[Random.Range(0, validNodes.Count)];
+                    path = PathFinding.CalculateAstart(startNode, randomTargetNode);
                     maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
                     if (path.Count > maxSteps)
                         path = path.GetRange(0, maxSteps);
