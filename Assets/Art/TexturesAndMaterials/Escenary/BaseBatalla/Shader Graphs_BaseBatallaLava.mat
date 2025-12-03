@@ -46,7 +46,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Lerp: 0.5
+    - _Lerp: 0.446
     - _Metallic: 0
     - _NoiseScale: 5
     - _NormalStrenght: 0
@@ -54,8 +54,8 @@ Material:
     - _QueueOffset: 0
     - _Smothness: 0
     m_Colors:
-    - _NoiseOffset: {r: 0.03, g: 0, b: 0, a: 0}
-    - _TextureOffset: {r: 0.01, g: 0, b: 0, a: 0}
+    - _NoiseOffset: {r: 0.02, g: 0, b: 0, a: 0}
+    - _TextureOffset: {r: 0.3, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &3686209625760064893
 MonoBehaviour:
