@@ -162,12 +162,14 @@ public static class NodeManager
     public static List<Node> GetNeighborsInRow(Node node)
     {
         List<Node> neighbors = new List<Node>();
-        int row = node.gridIndex.x;
-        int col = node.gridIndex.y;
-        Node left = GetAllNodes().Find(n => n.gridIndex.x == row && n.gridIndex.y == col - 1);
-        Node right = GetAllNodes().Find(n => n.gridIndex.x == row && n.gridIndex.y == col + 1);
-        if (left != null) neighbors.Add(left);
-        if (right != null) neighbors.Add(right);
+        foreach (var neigh in node.Neighbors)
+        {
+            if (neigh.gridIndex.x == node.gridIndex.x)
+            {
+                neighbors.Add(neigh);
+                Debug.Log(neigh.gameObject.name);
+            }
+        }
         return neighbors;
     }
     public static List<Node> GetAllNodes()
