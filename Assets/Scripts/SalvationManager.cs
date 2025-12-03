@@ -55,6 +55,7 @@ public class SalvationManager : MonoBehaviour
             if (forwardSafeNode != null)
             {
                 unit.SetCurrentNode(forwardSafeNode);
+                unit.lastSafeNode = forwardSafeNode;
                 unit.transform.position = unit.GetSnappedPosition(forwardSafeNode);
             }
             else
