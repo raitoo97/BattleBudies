@@ -65,8 +65,6 @@ public class SalvationManager : MonoBehaviour
                     unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
                 }
             }
-            OnSalvingThrow = false;
-            CanvasManager.instance.ShowCombatUI(false);
         }
         else
         {
@@ -76,9 +74,10 @@ public class SalvationManager : MonoBehaviour
                 unit.SetCurrentNode(unit.lastSafeNode);
                 unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
                 unit.TakeDamage(3);
-                CanvasManager.instance.ShowCombatUI(false);
             }
         }
+        OnSalvingThrow = false;
+        CanvasManager.instance.ShowCombatUI(false);
         pendingSalvation = 0;
         diceRoll.ResetDicePosition();
         yield return new WaitForSeconds(0.3f);
