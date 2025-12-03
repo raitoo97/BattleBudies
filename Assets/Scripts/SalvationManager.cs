@@ -60,6 +60,8 @@ public class SalvationManager : MonoBehaviour
             {
                 unit.SetCurrentNode(unit.lastSafeNode);
                 unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
+                unit.TakeDamage(3);
+                CanvasManager.instance.ShowCombatUI(false);
                 Debug.Log("Unidad retrocede al último nodo seguro: " + unit.lastSafeNode.name);
             }
             Debug.Log("Tirada de salvación fallida");
