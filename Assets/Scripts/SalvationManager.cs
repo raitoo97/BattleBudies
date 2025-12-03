@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 public class SalvationManager : MonoBehaviour
 {
@@ -30,8 +31,10 @@ public class SalvationManager : MonoBehaviour
             if(!OnSalvingThrow) yield break;
         }
     }
-    IEnumerator UnitRollDiceSalvation(Units unit , int salvationTreshold)
+    IEnumerator UnitRollDiceSalvation(Units unit, int salvationTreshold)
     {
+        Node safeNodeBeforeRoll = unit.lastSafeNode; // <-- nodo seguro antes de tirar
+
         diceRoll.PrepareForRoll();
         if (unit.isPlayerUnit)
         {
@@ -45,38 +48,68 @@ public class SalvationManager : MonoBehaviour
             CanvasManager.instance.TryShowCombatUI(playerCanRoll: true);
             yield return new WaitForSeconds(0.5f);
         }
+
         diceRoll.RollDice();
         yield return new WaitUntil(() => diceRoll.hasBeenCounted && diceRoll.hasBeenThrown && diceRoll.IsDiceStill());
         yield return new WaitForSeconds(0.5f);
+
         if (pendingSalvation >= salvationTreshold)
         {
             Debug.Log("Tirada de salvación exitosa");
-            Node forwardSafeNode = NodeManager.GetForwardSafeNode(unit.lastSafeNode, unit.currentNode);
+
+            Node forwardSafeNode = NodeManager.GetForwardSafeNode(safeNodeBeforeRoll, unit.currentNode);
+
             if (forwardSafeNode != null)
             {
+                if (!forwardSafeNode.IsEmpty())
+                {
+                    List<Node> neighborNodes = NodeManager.GetNeighborsInRow(forwardSafeNode);
+                    Node freeNeighbor = neighborNodes.Find(n => n.IsEmpty());
+
+                    if (freeNeighbor != null)
+                    {
+                        forwardSafeNode = freeNeighbor;
+                        unit.lastSafeNode = forwardSafeNode; // actualizamos porque avanzó a un nodo libre
+                    }
+                    else
+                    {
+                        // No hay nodo libre adelante ni vecinos ? retrocede
+                        forwardSafeNode = safeNodeBeforeRoll;
+                        OnSalvingThrow = false;
+                        Debug.Log("No hay nodo libre adelante ni vecinos, retrocede al safeNodeBeforeRoll");
+                    }
+                }
+                else
+                {
+                    // Nodo directo libre ? actualizamos lastSafeNode
+                    unit.lastSafeNode = forwardSafeNode;
+                }
+
                 unit.SetCurrentNode(forwardSafeNode);
-                unit.lastSafeNode = forwardSafeNode;
                 unit.transform.position = unit.GetSnappedPosition(forwardSafeNode);
             }
             else
             {
-                if (unit.lastSafeNode != null)
+                Debug.Log("No hay forwardSafeNode, retrocede al safeNodeBeforeRoll");
+                if (safeNodeBeforeRoll != null)
                 {
-                    unit.SetCurrentNode(unit.lastSafeNode);
-                    unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
+                    unit.SetCurrentNode(safeNodeBeforeRoll);
+                    unit.transform.position = unit.GetSnappedPosition(safeNodeBeforeRoll);
+                    unit.TakeDamage(3);
                 }
             }
         }
         else
         {
-            Debug.Log("Tirada de salvacion fallida");
-            if (unit.lastSafeNode != null)
+            Debug.Log("Tirada de salvación fallida");
+            if (safeNodeBeforeRoll != null)
             {
-                unit.SetCurrentNode(unit.lastSafeNode);
-                unit.transform.position = unit.GetSnappedPosition(unit.lastSafeNode);
+                unit.SetCurrentNode(safeNodeBeforeRoll);
+                unit.transform.position = unit.GetSnappedPosition(safeNodeBeforeRoll);
                 unit.TakeDamage(3);
             }
         }
+
         OnSalvingThrow = false;
         CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
         pendingSalvation = 0;
