@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class IAMoveUnits : MonoBehaviour
+public class IAMoveToResources : MonoBehaviour
 {
-    public static IAMoveUnits instance;
+    public static IAMoveToResources instance;
     [HideInInspector]public bool movedAnyUnit = false;
     private void Awake()
     {
