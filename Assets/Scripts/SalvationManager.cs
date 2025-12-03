@@ -33,7 +33,7 @@ public class SalvationManager : MonoBehaviour
     }
     IEnumerator UnitRollDiceSalvation(Units unit, int salvationTreshold)
     {
-        Node safeNodeBeforeRoll = unit.lastSafeNode; // <-- nodo seguro antes de tirar
+        Node safeNodeBeforeRoll = unit.lastSafeNode;
         diceRoll.PrepareForRoll();
         if (unit.isPlayerUnit)
         {
@@ -52,11 +52,8 @@ public class SalvationManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         if (pendingSalvation >= salvationTreshold)
         {
-            Debug.Log("Tirada de salvación exitosa");
             Node safeBeforeRoll = unit.lastSafeNode; // nodo seguro antes de la tirada
             Node forwardNode = NodeManager.GetForwardSafeNode(safeBeforeRoll, unit.currentNode);
-            print("Nodo seguro antes de la tirada: " + safeBeforeRoll);
-            print("Nodo siguiente antes de la tirada: " + forwardNode);
             Node nodeToMove = null;
             if (forwardNode != null)
             {
@@ -75,14 +72,12 @@ public class SalvationManager : MonoBehaviour
                     else
                     {
                         nodeToMove = safeBeforeRoll;
-                        Debug.Log("No hay nodo libre adelante ni vecinos, retrocede al nodo seguro anterior");
                     }
                 }
             }
             else
             {
                 nodeToMove = safeBeforeRoll;
-                Debug.Log("No hay forwardSafeNode, retrocede al nodo seguro anterior");
             }
             unit.SetCurrentNode(nodeToMove);
             unit.transform.position = unit.GetSnappedPosition(nodeToMove);
@@ -91,7 +86,6 @@ public class SalvationManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Tirada de salvación fallida");
             if (safeNodeBeforeRoll != null)
             {
                 unit.SetCurrentNode(safeNodeBeforeRoll);
