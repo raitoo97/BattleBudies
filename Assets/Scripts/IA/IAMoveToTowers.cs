@@ -15,108 +15,21 @@ public class IAMoveToTowers : MonoBehaviour
     {
         movedAnyUnit = false;
         Units[] allUnits = FindObjectsOfType<Units>();
-        List<Units> enemyUnits = new List<Units>();
-        foreach (Units u in allUnits)
-            if (!u.isPlayerUnit) enemyUnits.Add(u);
+        List<Units> enemyUnits = GetEnemyUnits(allUnits); //obtiene solo unidades enemigas
         foreach (Units enemy in enemyUnits)
         {
+            if (!CanEnemyAct(enemy)) continue; //valida energía y nodo
             bool unitDidAction = false;
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
-            Tower targetTower = null;
-            Node targetNode = null;
-            Tower[] allTowers = FindObjectsOfType<Tower>();
-            List<Tower> candidateTowers = new List<Tower>();
-            foreach (Tower t in allTowers)
-                if (t.faction == Faction.Player && !t.isDestroyed)
-                    candidateTowers.Add(t);
-            candidateTowers.Sort((a, b) => a.currentHealth.CompareTo(b.currentHealth));
-            foreach (Tower t in candidateTowers)
-            {
-                foreach (var nodeKey in TowerManager.instance.GetAttackNodes(t))
-                {
-                    string[] parts = nodeKey.Split('_');
-                    if (parts.Length != 3) continue;
-                    if (!int.TryParse(parts[1], out int x)) continue;
-                    if (!int.TryParse(parts[2], out int y)) continue;
-                    Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
-                    if (node != null && !IsNodeReserved(node) && node.IsEmpty())
-                    {
-                        targetTower = t;
-                        targetNode = node;
-                        break;
-                    }
-                }
-                if (targetTower != null) break;
-            }
-            if (targetTower == null || targetNode == null)continue;
+            //SELECCIÓN DE TORRE Y NODO
+            Tower targetTower;
+            Node targetNode;
+            if (!GetClosestValidTowerNode(out targetTower, out targetNode)) continue; //busca torre y nodo libre
+            //CAMINO HACIA LA TORRE
             Node previousStep = enemy.currentNode;
-            List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
-            int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-            if (path.Count > maxSteps)
-                path = path.GetRange(0, maxSteps);
-            if (path.Count > 0)
-                unitDidAction = true;
-            for (int i = 0; i < path.Count; i++)
-            {
-                Node step = path[i];
-                if (enemy == null) break;
-                ReleaseReservedNode(enemy);
-                enemy.SetPath(new List<Node> { step });
-                yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
-                if (enemy == null) break;
-                enemy.SetCurrentNode(step);
-                Units playerUnit = null;
-                if (step.IsDangerous)
-                {
-                    if (previousStep != null)
-                        enemy.lastSafeNode = previousStep;
-                    SalvationManager.instance.StartSavingThrow(enemy);
-                    yield return new WaitUntil(() => enemy == null || !SalvationManager.instance.GetOnSavingThrow);
-                    yield return new WaitForSeconds(1f);
-                    if (enemy == null) break;
-                    Node startNode = (enemy.currentNode != previousStep) ? enemy.currentNode : enemy.lastSafeNode;
-                    if (candidateTowers.Count == 0) continue;
-                    Tower randomTower = candidateTowers[Random.Range(0, candidateTowers.Count)];
-                    List<Node> validNodes = new List<Node>();
-                    foreach (var nodeKey in TowerManager.instance.GetAttackNodes(randomTower))
-                    {
-                        string[] parts = nodeKey.Split('_');
-                        if (parts.Length != 3) continue;
-                        if (!int.TryParse(parts[1], out int x)) continue;
-                        if (!int.TryParse(parts[2], out int y)) continue;
-                        Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
-                        if (node != null && !IsNodeReserved(node) && node.IsEmpty())
-                            validNodes.Add(node);
-                    }
-                    if (validNodes.Count == 0)continue;
-                    Node randomTargetNode = validNodes[Random.Range(0, validNodes.Count)];
-                    path = PathFinding.CalculateAstart(startNode, randomTargetNode);
-                    maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-                    if (path.Count > maxSteps)
-                        path = path.GetRange(0, maxSteps);
-                    i = (path.Count > 0 && path[0] == enemy.currentNode) ? 0 : -1;
-                    if (TryGetPlayerNeighbor(enemy, out playerUnit))
-                    {
-                        if (enemy == null) break;
-                        yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
-                        if (enemy == null) break;
-                    }
-                    continue;
-                }
-                else
-                {
-                    enemy.lastSafeNode = step;
-                }
-                previousStep = step;
-                if (step == targetNode)
-                    ReserveNode(enemy, step);
-                if (TryGetPlayerNeighbor(enemy,out playerUnit))
-                {
-                    if (enemy == null) break;
-                    yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
-                    if (enemy == null) break;
-                }
-            }
+            List<Node> path = PreparePath(enemy, targetNode, ref unitDidAction); //calcula path y limita pasos según energy
+            //MOVIMIENTO PASO A PASO
+            yield return StartCoroutine(ExecuteMovementPath(enemy, path, previousStep, targetTower)); //mueve unidad paso a paso
+            //ATAQUE A TORRE
             if (enemy != null && TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
             {
                 unitDidAction = true;
@@ -130,6 +43,124 @@ public class IAMoveToTowers : MonoBehaviour
             }
         }
         unitReservedNodes.Clear();
+    }
+    private List<Units> GetEnemyUnits(Units[] allUnits)// devuelve lista de unidades enemigas
+    {
+        List<Units> enemyUnits = new List<Units>();
+        foreach (Units u in allUnits)
+            if (!u.isPlayerUnit) enemyUnits.Add(u);
+        return enemyUnits;
+    }
+    private bool CanEnemyAct(Units enemy) // valida energía + referencias
+    {
+        return !(enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f);
+    }
+    private bool GetClosestValidTowerNode(out Tower targetTower, out Node targetNode)// busca torre objetivo y nodo de ataque
+    {
+        targetTower = null;
+        targetNode = null;
+        Tower[] allTowers = FindObjectsOfType<Tower>();
+        List<Tower> candidateTowers = new List<Tower>();
+        foreach (Tower t in allTowers)
+            if (t.faction == Faction.Player && !t.isDestroyed)
+                candidateTowers.Add(t);
+        candidateTowers.Sort((a, b) => a.currentHealth.CompareTo(b.currentHealth));
+        foreach (Tower tower in candidateTowers)
+        {
+            foreach (var nodeKey in TowerManager.instance.GetAttackNodes(tower))
+            {
+                string[] parts = nodeKey.Split('_');
+                if (parts.Length != 3) continue;
+                if (!int.TryParse(parts[1], out int x)) continue;
+                if (!int.TryParse(parts[2], out int y)) continue;
+                Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
+                if (node != null && !IsNodeReserved(node) && node.IsEmpty())
+                {
+                    targetTower = tower;
+                    targetNode = node;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private List<Node> PreparePath(Units enemy, Node targetNode, ref bool unitDidAction)// calcula path y lo limita por energía
+    {
+        List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
+        int maxStep = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+        if (path.Count > maxStep)
+            path = path.GetRange(0, maxStep);
+        if(path.Count > 0)
+            unitDidAction = true;
+        return path;
+    }
+    IEnumerator ExecuteMovementPath(Units enemy, List<Node> path, Node previousStep, Tower targetTower) // mueve paso por paso
+    {
+        for (int i = 0; i < path.Count; i++)
+        {
+            Node step = path[i];
+            if (enemy == null) yield break;
+            ReleaseReservedNode(enemy);
+            enemy.SetPath(new List<Node> { step });
+            yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
+            if (enemy == null) yield break;
+            enemy.SetCurrentNode(step);
+            //NODO PELIGROSO  CORTA MOVIMIENTO Y REHACE PATH COMO ANTES
+            if (IsDangerousNode(step))
+            {
+                yield return StartCoroutine(HandleDangerAndRepath(enemy, previousStep));
+                yield break; // igual que el código original: frena este movimiento
+            }
+            // nodo seguro
+            enemy.lastSafeNode = step;
+            previousStep = step;
+            Units playerUnit;
+            if (TryGetPlayerNeighbor(enemy, out playerUnit))
+            {
+                yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
+                if (enemy == null) yield break;
+            }
+            if (step == path[path.Count - 1])
+                ReserveNode(enemy, step);
+        }
+    }
+    private bool IsDangerousNode(Node step)
+    {
+        return step.IsDangerous;
+    }
+    IEnumerator HandleDangerAndRepath(Units enemy, Node previousStep)
+    {
+        if (previousStep != null)
+            enemy.lastSafeNode = previousStep;
+        SalvationManager.instance.StartSavingThrow(enemy);
+        yield return new WaitUntil(() => enemy == null || !SalvationManager.instance.GetOnSavingThrow);
+        yield return new WaitForSeconds(1f);
+        if (enemy == null) yield break;
+        Node startNode = (enemy.currentNode != previousStep) ? enemy.currentNode : enemy.lastSafeNode;
+        Tower[] allTowers = FindObjectsOfType<Tower>();
+        List<Tower> candidateTowers = new List<Tower>();
+        foreach (Tower t in allTowers)
+            if (t.faction == Faction.Player && !t.isDestroyed)
+                candidateTowers.Add(t);
+        if (candidateTowers.Count == 0) yield break;
+        Tower randomTower = candidateTowers[Random.Range(0, candidateTowers.Count)];
+        List<Node> validNodes = new List<Node>();
+        foreach (var nodeKey in TowerManager.instance.GetAttackNodes(randomTower))
+        {
+            string[] parts = nodeKey.Split('_');
+            if (parts.Length != 3) continue;
+            if (!int.TryParse(parts[1], out int x)) continue;
+            if (!int.TryParse(parts[2], out int y)) continue;
+            Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
+            if (node != null && !IsNodeReserved(node) && node.IsEmpty())
+                validNodes.Add(node);
+        }
+        if (validNodes.Count == 0) yield break;
+        Node randomTargetNode = validNodes[Random.Range(0, validNodes.Count)];
+        List<Node> path = PathFinding.CalculateAstart(startNode, randomTargetNode);
+        int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+        if (path.Count > maxSteps)
+            path = path.GetRange(0, maxSteps);
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {
