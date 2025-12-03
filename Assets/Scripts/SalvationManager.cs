@@ -34,7 +34,6 @@ public class SalvationManager : MonoBehaviour
     IEnumerator UnitRollDiceSalvation(Units unit, int salvationTreshold)
     {
         Node safeNodeBeforeRoll = unit.lastSafeNode; // <-- nodo seguro antes de tirar
-
         diceRoll.PrepareForRoll();
         if (unit.isPlayerUnit)
         {
@@ -48,56 +47,47 @@ public class SalvationManager : MonoBehaviour
             CanvasManager.instance.TryShowCombatUI(playerCanRoll: true);
             yield return new WaitForSeconds(0.5f);
         }
-
         diceRoll.RollDice();
         yield return new WaitUntil(() => diceRoll.hasBeenCounted && diceRoll.hasBeenThrown && diceRoll.IsDiceStill());
         yield return new WaitForSeconds(0.5f);
-
         if (pendingSalvation >= salvationTreshold)
         {
             Debug.Log("Tirada de salvación exitosa");
-
-            Node forwardSafeNode = NodeManager.GetForwardSafeNode(safeNodeBeforeRoll, unit.currentNode);
-
-            if (forwardSafeNode != null)
+            Node safeBeforeRoll = unit.lastSafeNode; // nodo seguro antes de la tirada
+            Node forwardNode = NodeManager.GetForwardSafeNode(safeBeforeRoll, unit.currentNode);
+            print("Nodo seguro antes de la tirada: " + safeBeforeRoll);
+            print("Nodo siguiente antes de la tirada: " + forwardNode);
+            Node nodeToMove = null;
+            if (forwardNode != null)
             {
-                if (!forwardSafeNode.IsEmpty())
+                if (forwardNode.IsEmpty())
                 {
-                    List<Node> neighborNodes = NodeManager.GetNeighborsInRow(forwardSafeNode);
-                    Node freeNeighbor = neighborNodes.Find(n => n.IsEmpty());
-
-                    if (freeNeighbor != null)
-                    {
-                        forwardSafeNode = freeNeighbor;
-                        unit.lastSafeNode = forwardSafeNode; // actualizamos porque avanzó a un nodo libre
-                    }
-                    else
-                    {
-                        // No hay nodo libre adelante ni vecinos ? retrocede
-                        forwardSafeNode = safeNodeBeforeRoll;
-                        OnSalvingThrow = false;
-                        Debug.Log("No hay nodo libre adelante ni vecinos, retrocede al safeNodeBeforeRoll");
-                    }
+                    nodeToMove = forwardNode;
                 }
                 else
                 {
-                    // Nodo directo libre ? actualizamos lastSafeNode
-                    unit.lastSafeNode = forwardSafeNode;
+                    List<Node> neighbors = NodeManager.GetNeighborsInRow(forwardNode);
+                    Node freeNeighbor = neighbors.Find(n => n.IsEmpty());
+                    if (freeNeighbor != null)
+                    {
+                        nodeToMove = freeNeighbor;
+                    }
+                    else
+                    {
+                        nodeToMove = safeBeforeRoll;
+                        Debug.Log("No hay nodo libre adelante ni vecinos, retrocede al nodo seguro anterior");
+                    }
                 }
-
-                unit.SetCurrentNode(forwardSafeNode);
-                unit.transform.position = unit.GetSnappedPosition(forwardSafeNode);
             }
             else
             {
-                Debug.Log("No hay forwardSafeNode, retrocede al safeNodeBeforeRoll");
-                if (safeNodeBeforeRoll != null)
-                {
-                    unit.SetCurrentNode(safeNodeBeforeRoll);
-                    unit.transform.position = unit.GetSnappedPosition(safeNodeBeforeRoll);
-                    unit.TakeDamage(3);
-                }
+                nodeToMove = safeBeforeRoll;
+                Debug.Log("No hay forwardSafeNode, retrocede al nodo seguro anterior");
             }
+            unit.SetCurrentNode(nodeToMove);
+            unit.transform.position = unit.GetSnappedPosition(nodeToMove);
+            if (nodeToMove != safeBeforeRoll)
+                unit.lastSafeNode = nodeToMove;
         }
         else
         {
@@ -109,7 +99,6 @@ public class SalvationManager : MonoBehaviour
                 unit.TakeDamage(3);
             }
         }
-
         OnSalvingThrow = false;
         CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
         pendingSalvation = 0;
