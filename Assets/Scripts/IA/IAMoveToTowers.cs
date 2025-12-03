@@ -144,7 +144,7 @@ public class IAMoveToTowers : MonoBehaviour
                 candidateTowers.Add(t);
         if (candidateTowers.Count == 0) yield break;
         Tower randomTower = candidateTowers[Random.Range(0, candidateTowers.Count)];
-        List<Node> validNodes = new List<Node>();
+        List<Node> attackNodes = new List<Node>();
         foreach (var nodeKey in TowerManager.instance.GetAttackNodes(randomTower))
         {
             string[] parts = nodeKey.Split('_');
@@ -152,15 +152,24 @@ public class IAMoveToTowers : MonoBehaviour
             if (!int.TryParse(parts[1], out int x)) continue;
             if (!int.TryParse(parts[2], out int y)) continue;
             Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
-            if (node != null && !IsNodeReserved(node) && node.IsEmpty())
-                validNodes.Add(node);
+            if (node != null)
+                attackNodes.Add(node);
         }
-        if (validNodes.Count == 0) yield break;
-        Node randomTargetNode = validNodes[Random.Range(0, validNodes.Count)];
-        List<Node> path = PathFinding.CalculateAstart(startNode, randomTargetNode);
+        if (attackNodes.Count == 0) yield break;
+        Node mainNode = attackNodes[0];
+        Node alternativeNode = (attackNodes.Count > 1) ? attackNodes[1] : null;
+        Node chosenNode = null;
+        if (!IsNodeReserved(mainNode) && mainNode.IsEmpty())
+            chosenNode = mainNode;
+        else if (alternativeNode != null && !IsNodeReserved(alternativeNode) && alternativeNode.IsEmpty())
+            chosenNode = alternativeNode;
+        if (chosenNode == null) yield break;
+        List<Node> path = PathFinding.CalculateAstart(startNode, chosenNode);
         int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
         if (path.Count > maxSteps)
             path = path.GetRange(0, maxSteps);
+        enemy.SetPath(path);
+        yield break;
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {
