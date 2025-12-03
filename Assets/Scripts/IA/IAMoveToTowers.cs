@@ -77,6 +77,8 @@ public class IAMoveToTowers : MonoBehaviour
                     Node startNode = (enemy.currentNode != previousStep) ? enemy.currentNode : enemy.lastSafeNode;
                     path = PathFinding.CalculateAstart(startNode, targetNode);
                     maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+                    if (path.Count > maxSteps)
+                        path = path.GetRange(0, maxSteps);
                     i = (path.Count > 0 && path[0] == enemy.currentNode) ? 0 : -1;
                     continue;
                 }
