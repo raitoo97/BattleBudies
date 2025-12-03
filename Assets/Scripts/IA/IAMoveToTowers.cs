@@ -27,7 +27,6 @@ public class IAMoveToTowers : MonoBehaviour
             //CAMINO HACIA LA TORRE
             Node previousStep = enemy.currentNode;
             List<Node> path = PreparePath(enemy, targetNode, ref unitDidAction); //calcula path y limita pasos según energy
-                                                                                 //MOVIMIENTO PASO A PASO
             yield return StartCoroutine(ExecuteMovementPath(enemy, path, previousStep)); //mueve unidad paso a paso
             //ATAQUE A TORRE
             if (enemy != null && TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
