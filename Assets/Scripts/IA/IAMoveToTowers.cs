@@ -130,20 +130,36 @@ public class IAMoveToTowers : MonoBehaviour
     }
     IEnumerator HandleDangerAndRepath(Units enemy, Node previousStep)
     {
+        if (enemy == null) yield break;
+
+        // Guardar último nodo seguro antes del nodo peligroso
         if (previousStep != null)
             enemy.lastSafeNode = previousStep;
+
+        // Lanzar tirada de salvación
         SalvationManager.instance.StartSavingThrow(enemy);
+
+        // Esperar a que la salvación se resuelva y que la unidad esté efectivamente en lastSafeNode
         yield return new WaitUntil(() => enemy == null || !SalvationManager.instance.GetOnSavingThrow);
-        yield return new WaitForSeconds(1f);
+
+        yield return new WaitForSeconds(0.1f);
         if (enemy == null) yield break;
-        Node startNode = (enemy.currentNode != previousStep) ? enemy.currentNode : enemy.lastSafeNode;
+
+        // FORZAR inicio desde lastSafeNode
+        Node startNode = enemy.lastSafeNode;
+
+        // Seleccionar torre objetivo
         Tower[] allTowers = FindObjectsOfType<Tower>();
         List<Tower> candidateTowers = new List<Tower>();
         foreach (Tower t in allTowers)
             if (t.faction == Faction.Player && !t.isDestroyed)
                 candidateTowers.Add(t);
+
         if (candidateTowers.Count == 0) yield break;
+
         Tower randomTower = candidateTowers[Random.Range(0, candidateTowers.Count)];
+
+        // Obtener nodos de ataque disponibles
         List<Node> attackNodes = new List<Node>();
         foreach (var nodeKey in TowerManager.instance.GetAttackNodes(randomTower))
         {
@@ -155,7 +171,9 @@ public class IAMoveToTowers : MonoBehaviour
             if (node != null)
                 attackNodes.Add(node);
         }
+
         if (attackNodes.Count == 0) yield break;
+
         Node mainNode = attackNodes[0];
         Node alternativeNode = (attackNodes.Count > 1) ? attackNodes[1] : null;
         Node chosenNode = null;
@@ -163,13 +181,24 @@ public class IAMoveToTowers : MonoBehaviour
             chosenNode = mainNode;
         else if (alternativeNode != null && !IsNodeReserved(alternativeNode) && alternativeNode.IsEmpty())
             chosenNode = alternativeNode;
+
         if (chosenNode == null) yield break;
-        List<Node> path = PathFinding.CalculateAstart(startNode, chosenNode);
+
+        // CALCULAR PATH evitando nodos peligrosos
+        List<Node> fullPath = PathFinding.CalculateAstart(startNode, chosenNode);
+        List<Node> safePath = new List<Node>();
+        foreach (var n in fullPath)
+        {
+            if (n.IsDangerous)
+                break; // cortar path si encuentra nodo peligroso
+            safePath.Add(n);
+        }
+
         int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-        if (path.Count > maxSteps)
-            path = path.GetRange(0, maxSteps);
-        enemy.SetPath(path);
-        yield break;
+        if (safePath.Count > maxSteps)
+            safePath = safePath.GetRange(0, maxSteps);
+
+        enemy.SetPath(safePath);
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {
