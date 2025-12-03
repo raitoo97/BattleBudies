@@ -74,6 +74,25 @@ public class PathDrawer : MonoBehaviour
                     nodesToMark.Add(lastReachableNode);
             }
         }
+        Node firstSalvationNode = null;
+        foreach (var node in path)
+        {
+            if (node.IsDangerous)
+            {
+                firstSalvationNode = node;
+                if (!nodesToMark.Contains(node))
+                    nodesToMark.Add(node);
+                break;
+            }
+        }
+        if (firstSalvationNode != null)
+        {
+            int index = path.IndexOf(firstSalvationNode);
+            if (index <= energyAvailable)
+            {
+                danger = true;
+            }
+        }
         SetLineColor(danger ? dangerColor : safeColor);
         if (danger)
             GridVisualizer.instance.SetDangerNodes(nodesToMark);

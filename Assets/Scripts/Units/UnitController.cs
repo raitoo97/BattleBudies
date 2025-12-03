@@ -178,6 +178,12 @@ public class UnitController : MonoBehaviour
                 path = path.GetRange(0, index + 1);
             }
         }
+        Node firstSalvationNode = NodeManager.FindFirstDangerousNode(path);
+        if (firstSalvationNode != null)
+        {
+            int index = path.IndexOf(firstSalvationNode);
+            path = path.GetRange(0, index + 1);
+        }
         if (path.Count > 0)
         {
             selectedUnit.SetPath(path);
@@ -190,12 +196,18 @@ public class UnitController : MonoBehaviour
     {
         yield return new WaitUntil(() => unit.PathEmpty());
         if (unit.currentNode == null) yield break;
+        if (unit.currentNode.IsDangerous)
+        {
+            Debug.Log("Unidad terminó sobre un nodo peligroso tirada de salvación.");
+            SalvationManager.instance.StartSavingThrow(unit);
+            yield return new WaitUntil(() => !SalvationManager.instance.GetOnSavingThrow);
+        }
+        if (unit == null || unit.currentNode == null)
+            yield break;
         if (TryGetEnemyNeighbor(unit, out Units enemy))
         {
             CombatManager.instance.StartCombat(unit, enemy, true);
         }
-        if (!unit.isPlayerUnit) yield break;
-
         if (TowerManager.instance.TryGetTowerAtNode(unit.currentNode, out Tower tower))
         {
             if (unit.hasAttackedTowerThisTurn)

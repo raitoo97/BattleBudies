@@ -21,9 +21,15 @@ public class FaceDetector : MonoBehaviour
         if (!_diceRoll.hasBeenThrown) return;
         if (_diceRoll.IsDiceStill())
         {
-            if (!_diceRoll.hasBeenCounted)
+            if (!_diceRoll.hasBeenCounted && CombatManager.instance.GetCombatActive)
             {
                 CombatManager.instance.AddDamage(faceValueNumber);
+                hasBeenCounted = true;
+                _diceRoll.hasBeenCounted = true;
+            }
+            if(!_diceRoll.hasBeenCounted && SalvationManager.instance.GetOnSavingThrow)
+            {
+                SalvationManager.instance.ChangePendingSalvation(faceValueNumber);
                 hasBeenCounted = true;
                 _diceRoll.hasBeenCounted = true;
             }
