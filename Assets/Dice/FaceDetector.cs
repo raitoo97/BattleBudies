@@ -33,6 +33,18 @@ public class FaceDetector : MonoBehaviour
                 hasBeenCounted = true;
                 _diceRoll.hasBeenCounted = true;
             }
+            if (!_diceRoll.hasBeenCounted && ResourcesManager.instance.onColectedResources)
+            {
+                ResourcesManager.instance.ChangePendingResources(faceValueNumber);
+                hasBeenCounted = true;
+                _diceRoll.hasBeenCounted = true;
+            }
+            if (!_diceRoll.hasBeenCounted && HealthTowerManager.instance.onColectedHealth)
+            {
+                HealthTowerManager.instance.ChangePendingHealth(faceValueNumber);
+                hasBeenCounted = true;
+                _diceRoll.hasBeenCounted = true;
+            }
         }
     }
 }

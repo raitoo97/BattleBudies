@@ -19,10 +19,10 @@ public class IABrainManager : MonoBehaviour
         yield return null;
         yield return new WaitForSeconds(0.5f);
         if (EnergyManager.instance.enemyCurrentEnergy > 0f)
-            yield return StartCoroutine(IAMoveToResources.instance.MoveAllEnemyUnitsToResorces());
+            yield return StartCoroutine(IADefendTowers.instance.MoveAllEnemyUnitsToDefend());
         if (!IAMoveToTowers.instance.movedAnyUnit)
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
-        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive && !SalvationManager.instance.GetOnSavingThrow&&!ResourcesManager.instance.onColectedResources&&!HealthTowerManager.instance.onColectedHealth);
         GameManager.instance.StartPlayerTurn();
     }
     private void ClearAllPaths()

@@ -2063,6 +2063,7 @@ GameObject:
   - component: {fileID: 563951302}
   - component: {fileID: 563951303}
   - component: {fileID: 563951304}
+  - component: {fileID: 563951305}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -2372,6 +2373,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b08c04798550f7428f754a2d529dcd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resourcesEnemy: 0
+  resourcesPlayer: 0
+  onColectedResources: 0
+--- !u!114 &563951305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563951289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33238d33cab437c48b8d7ec76b4aa26d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthTowerEnemy: 0
+  healthTowerPlayer: 0
+  onColectedHealth: 0
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0
@@ -5000,6 +5019,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3655296514757864388}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1383275523
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1383275524}
+  m_Layer: 0
+  m_Name: pepe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1383275524
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383275523}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 73.783516, y: 77.338684, z: -37.369045}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1389248689
 GameObject:
   m_ObjectHideFlags: 0
@@ -6748,6 +6798,7 @@ GameObject:
   - component: {fileID: 1850951880}
   - component: {fileID: 1850951882}
   - component: {fileID: 1850951883}
+  - component: {fileID: 1850951884}
   m_Layer: 0
   m_Name: IA
   m_TagString: Untagged
@@ -6808,6 +6859,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movedAnyUnit: 0
+--- !u!114 &1850951884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850951879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62b91254ccde3564f824e3eea7224114, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movedAnyUnit: 0
+  ReferenceTower: {fileID: 523587279}
+  maxDistanceFromReference: 70
 --- !u!1001 &1869818202
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8105,3 +8171,4 @@ SceneRoots:
   - {fileID: 186942367}
   - {fileID: 1571885260}
   - {fileID: 1165260219}
+  - {fileID: 1383275524}

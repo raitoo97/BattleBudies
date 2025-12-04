@@ -1,5 +1,9 @@
+using UnityEngine;
+
 public abstract class Ranger : Units
 {
+    [Header("RangerAbility")]
+    public int resourcesDice;
     override protected void Start()
     {
         base.Start();
@@ -8,4 +12,5 @@ public abstract class Ranger : Units
     {
         base.Update();
     }
+
 }

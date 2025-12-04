@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class IAMoveToResources : MonoBehaviour
+public class IADefendTowers : MonoBehaviour
 {
-    public static IAMoveToResources instance;
-    [HideInInspector] public bool movedAnyUnit = false;
+    public static IADefendTowers instance;
+    [HideInInspector]public bool movedAnyUnit = false;
+    public Transform ReferenceTower;
+    public float maxDistanceFromReference = 10f;
     private void Awake()
     {
         if (instance == null)
@@ -12,32 +14,36 @@ public class IAMoveToResources : MonoBehaviour
         else
             Destroy(gameObject);
     }
-    public IEnumerator MoveAllEnemyUnitsToResorces()
+    public IEnumerator MoveAllEnemyUnitsToDefend()
     {
         movedAnyUnit = false;
         List<Units> enemyUnits = GetAllEnemyUnits();
-        List<Node> resourceNodes = GetResourcesNode();
+        List<Node> resourceNodes = GetHealtNodes();
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
             if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
-            if (resourceNodes.Contains(enemy.currentNode)) 
+            if (resourceNodes.Contains(enemy.currentNode))
             {
-                if(enemy is Ranger)
+                if (enemy is Defenders)
                 {
-                    Debug.Log("IA: Unidad enemiga es un ranger va a tirar.");
-                    ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
+                    Debug.Log("IA: Unidad enemiga es un Defensor va a tirar.");
+                    HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
                     yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
                     continue;
                 }
                 else
                 {
-                    Debug.Log("IA: Unidad enemiga NO es un ranger NO va a tirar.");
+                    Debug.Log("IA: Unidad enemiga NO es un Defensor NO va a tirar.");
                     continue;
                 }
-            } 
-            // Obtenemos el nodo más cercano libre y el path hacia él
-            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) continue; // No hay nodo alcanzable
+            }
+            bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
+            if (!foundPath)
+            {
+                MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
+            }
+            if (!foundPath) continue;
             // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
@@ -49,6 +55,29 @@ public class IAMoveToResources : MonoBehaviour
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
             yield return new WaitForSeconds(0.2f);
+        }
+    }
+    private void MoveToRandomNode(Units enemy, ref Node closestNode, ref List<Node> path, ref bool foundPath)
+    {
+        List<Node> allFreeNodes = GetAllNodes();
+        if(allFreeNodes.Count == 0) return;
+        List<Node> filteredNodes = new List<Node>();
+        foreach (Node node in allFreeNodes)
+        {
+            float distanceToReference = Vector3.Distance(node.transform.position, ReferenceTower.position);
+            if (distanceToReference <= maxDistanceFromReference)
+            {
+                filteredNodes.Add(node);
+            }
+        }
+        if (filteredNodes.Count == 0) return;
+        Node randomNode = filteredNodes[Random.Range(0, filteredNodes.Count)];
+        List<Node> randomPath = PathFinding.CalculateAstart(enemy.currentNode, randomNode);
+        if (randomPath != null && randomPath.Count > 0)
+        {
+            closestNode = randomNode;
+            path = randomPath;
+            foundPath = true;
         }
     }
     private bool GetClosestFreeResourceNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
@@ -102,13 +131,19 @@ public class IAMoveToResources : MonoBehaviour
         }
         return false;
     }
-    private List<Node> GetResourcesNode()
+    private List<Node> GetHealtNodes()
     {
-        return NodeManager.GetResourcesNode();
+        return NodeManager.GetHealthNodes();
     }
     private List<Node> GetValidNodes()
     {
-        return GetResourcesNode().FindAll(n => n.unitOnNode == null);
+        return GetHealtNodes().FindAll(n => n.IsEmpty());
+    }
+    private List<Node> GetAllNodes()
+    {
+        var nodes = NodeManager.GetAllNodes();
+        return nodes.FindAll(n => n.IsEmpty());
+
     }
     private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
@@ -131,5 +166,10 @@ public class IAMoveToResources : MonoBehaviour
                 yield break; // Detener movimiento al pelear
             }
         }
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(ReferenceTower.position, maxDistanceFromReference);
     }
 }

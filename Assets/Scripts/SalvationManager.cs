@@ -20,7 +20,6 @@ public class SalvationManager : MonoBehaviour
         if(unit == null) return;
         OnSalvingThrow = true;
         diceRoll = unit.diceInstance;
-        Debug.Log("Iniciando tirada de salvación");
         StartCoroutine(SavingThrowCoroutine(unit));
     }
     IEnumerator SavingThrowCoroutine(Units unit)

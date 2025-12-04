@@ -12,6 +12,7 @@ public class Node : MonoBehaviour
     [SerializeField]private bool _isDangerous;
     [SerializeField]public bool _isBlock;
     public bool _isResourceNode;
+    public bool _isDefendTowerNode;
     public void Initalize(Vector2Int xY)
     {
         gridIndex = xY;
@@ -19,6 +20,7 @@ public class Node : MonoBehaviour
         _isDangerous = false;
         _isBlock = false;
         _isResourceNode = false;
+        _isDefendTowerNode = false;
         NodeManager.RegisterNode(this);
     }
     private void OnDestroy()
@@ -88,6 +90,10 @@ public class Node : MonoBehaviour
         {
             _isBlock = true;
             _isResourceNode = true;
+        }
+        if (collision.gameObject.layer == 10)//resources
+        {
+            _isDefendTowerNode = true;
         }
     }
     public float Cost { get => _cost; }
