@@ -148,6 +148,10 @@ public class IAMoveToResources : MonoBehaviour
     }
     private bool isBusy()
     {
-        return !actionInProgress && !SalvationManager.instance.GetOnSavingThrow && !ResourcesManager.instance.onColectedResources && !CombatManager.instance.GetCombatActive;
+        return !actionInProgress
+        && !SalvationManager.instance.GetOnSavingThrow
+        && !ResourcesManager.instance.onColectedResources
+        && !CombatManager.instance.GetCombatActive
+        && !Units.anyUnitMoving;
     }
 }
