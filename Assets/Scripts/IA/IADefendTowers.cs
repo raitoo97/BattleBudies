@@ -47,7 +47,7 @@ public class IADefendTowers : MonoBehaviour
                     continue;
                 }
             }
-            bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
+            bool foundPath = GetClosestFreeHealthNode(enemy, validNodes, out Node closestNode, out List<Node> path);
             if (!foundPath)
             {
                 MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
@@ -94,7 +94,7 @@ public class IADefendTowers : MonoBehaviour
             foundPath = true;
         }
     }
-    private bool GetClosestFreeResourceNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
+    private bool GetClosestFreeHealthNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
     {
         closestNode = null;
         pathToNode = null;
