@@ -131,7 +131,7 @@ MonoBehaviour:
   moveSpeed: 25
   diceInstance: {fileID: 0}
   hasAttackedTowerThisTurn: 0
-  resourcesDice: 8
+  resourcesDice: 3
 --- !u!114 &411137073630691547
 MonoBehaviour:
   m_ObjectHideFlags: 0

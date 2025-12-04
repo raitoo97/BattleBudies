@@ -23,7 +23,7 @@ public class IADefendTowers : MonoBehaviour
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
-            yield return new WaitUntil(() => !actionInProgress && !SalvationManager.instance.GetOnSavingThrow && !ResourcesManager.instance.onColectedResources);
+            yield return new WaitUntil(() => isBusy());
             actionInProgress = true;
             if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) 
             {
@@ -185,5 +185,9 @@ public class IADefendTowers : MonoBehaviour
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(ReferenceTower.position, maxDistanceFromReference);
+    }
+    private bool isBusy()
+    {
+        return !actionInProgress && !SalvationManager.instance.GetOnSavingThrow && !ResourcesManager.instance.onColectedResources && !CombatManager.instance.GetCombatActive;
     }
 }
