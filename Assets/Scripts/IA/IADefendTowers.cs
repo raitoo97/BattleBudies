@@ -7,6 +7,7 @@ public class IADefendTowers : MonoBehaviour
     [HideInInspector]public bool movedAnyUnit = false;
     public Transform ReferenceTower;
     public float maxDistanceFromReference = 10f;
+    private bool actionInProgress = false;
     private void Awake()
     {
         if (instance == null)
