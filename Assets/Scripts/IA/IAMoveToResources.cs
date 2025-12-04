@@ -16,29 +16,45 @@ public class IAMoveToResources : MonoBehaviour
     {
         movedAnyUnit = false;
         List<Units> enemyUnits = GetAllEnemyUnits();
-        List<Node> resourceNodes = GetResourcesNode(); 
+        List<Node> resourceNodes = GetResourcesNode();
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
-                continue;
-            if (resourceNodes.Contains(enemy.currentNode))
-            {
-                print("Ya esta en un nodo de recursos");
-                continue;
-            }
-            if (validNodes.Count == 0) continue;
-            List<Node> path = GetPathToRandomNode(enemy, validNodes);
-            if (path == null || path.Count == 0) continue;
+            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)continue;
+            // Si ya está en un nodo de recurso, no mover
+            if (resourceNodes.Contains(enemy.currentNode)) continue;
+            // Obtenemos el nodo más cercano libre y el path hacia él
+            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path))continue; // No hay nodo alcanzable
+            // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
                 path = path.GetRange(0, maxSteps);
+            // Movemos la unidad con tiradas de salvación
             yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
             movedAnyUnit = true;
+            // Ataque a unidad jugador si hay vecino
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
             yield return new WaitForSeconds(0.2f);
         }
+    }
+    private bool GetClosestFreeResourceNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
+    {
+        closestNode = null;
+        pathToNode = null;
+        if (validNodes.Count == 0) return false;
+        validNodes.Sort((a, b) => Vector3.Distance(enemy.transform.position, a.transform.position).CompareTo(Vector3.Distance(enemy.transform.position, b.transform.position)));
+        foreach (Node node in validNodes)
+        {
+            List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, node);
+            if (path != null && path.Count > 0)
+            {
+                closestNode = node;
+                pathToNode = path;
+                return true;
+            }
+        }
+        return false;
     }
     private List<Units> GetAllEnemyUnits()
     {
@@ -47,23 +63,6 @@ public class IAMoveToResources : MonoBehaviour
         foreach (Units u in allUnits)
             if (!u.isPlayerUnit) enemies.Add(u);
         return enemies;
-    }
-    private List<Node> GetPathToRandomNode(Units enemy, List<Node> validNodes)
-    {
-        List<Node> path = null;
-        int attempts = 0;
-        int maxAttempts = 20;
-        while (attempts < maxAttempts)
-        {
-            attempts++;
-            Node targetNode = validNodes[Random.Range(0, validNodes.Count)];
-            if (targetNode == null) break;
-            path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
-            if (path == null || path.Count == 0) continue;
-            bool pathBlocked = path.Exists(n => n.unitOnNode != null);
-            if (!pathBlocked) break;
-        }
-        return path;
     }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {
