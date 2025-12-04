@@ -21,11 +21,20 @@ public class IAMoveToResources : MonoBehaviour
         foreach (Units enemy in enemyUnits)
         {
             if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
-            // Si ya está en un nodo de recurso, no mover
             if (resourceNodes.Contains(enemy.currentNode)) 
             {
-                Debug.Log("IA: Unidad enemiga ya en nodo de recurso, no se mueve.");
-                continue;
+                if(enemy is Ranger)
+                {
+                    Debug.Log("IA: Unidad enemiga es un ranger va a tirar.");
+                    ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
+                    yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+                    continue;
+                }
+                else
+                {
+                    Debug.Log("IA: Unidad enemiga NO es un ranger NO va a tirar.");
+                    continue;
+                }
             } 
             // Obtenemos el nodo más cercano libre y el path hacia él
             if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) continue; // No hay nodo alcanzable

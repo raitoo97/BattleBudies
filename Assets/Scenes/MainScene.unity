@@ -2372,6 +2372,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b08c04798550f7428f754a2d529dcd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resourcesEnemy: 0
+  resourcesPlayer: 0
+  onColectedResources: 0
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0
