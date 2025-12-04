@@ -197,4 +197,18 @@ public static class NodeManager
         }
         return neighbordsToResources;
     }
+    public static List<Node> GetHealthNodes()
+    {
+        var healthNodes = new List<Node>();
+        var allNodes = GetAllNodes();
+        foreach (var node in allNodes)
+        {
+            if (node == null) continue;
+            if (node._isDefendTowerNode)
+            {
+                healthNodes.Add(node);
+            }
+        }
+        return healthNodes;
+    }
 }

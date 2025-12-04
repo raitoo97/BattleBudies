@@ -13,6 +13,10 @@ public class IADefendTowers : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    private void Start()
+    {
+        StartCoroutine(xxx());
+    }
     public IEnumerator MoveAllEnemyUnitsToDefend()
     {
         movedAnyUnit = false;
@@ -131,6 +135,15 @@ public class IADefendTowers : MonoBehaviour
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
                 yield break; // Detener movimiento al pelear
             }
+        }
+    }
+    private IEnumerator xxx()
+    {
+        yield return new WaitForSeconds(1f);
+        var getHealthNode = NodeManager.GetHealthNodes();
+        foreach (var node in getHealthNode)
+        {
+            print("Nodo de salud: " + node.gameObject.name);
         }
     }
 }
