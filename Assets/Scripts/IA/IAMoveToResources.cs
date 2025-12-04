@@ -43,10 +43,6 @@ public class IAMoveToResources : MonoBehaviour
             if (!u.isPlayerUnit) enemies.Add(u);
         return enemies;
     }
-    private List<Node> GetValidNodes()
-    {
-        return NodeManager.GetNodeCount().FindAll(n => n.unitOnNode == null);
-    }
     private List<Node> GetPathToRandomNode(Units enemy, List<Node> validNodes)
     {
         List<Node> path = null;
@@ -124,5 +120,13 @@ public class IAMoveToResources : MonoBehaviour
             }
         }
         return false;
+    }
+    private List<Node> GetResourcesNode()
+    {
+        return NodeManager.GetResourcesNode();
+    }
+    private List<Node> GetValidNodes()
+    {
+        return GetResourcesNode().FindAll(n => n.unitOnNode == null);
     }
 }
