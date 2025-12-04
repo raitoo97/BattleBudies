@@ -114,15 +114,6 @@ public static class NodeManager
         }
         return null;
     }
-    public static Node FindFirstDangerStep(List<Node> path, List<Node> dangerNodes)
-    {
-        foreach (Node step in path)
-        {
-            if (dangerNodes.Contains(step))
-                return step;
-        }
-        return null;
-    }
     public static List<Node> GetNodeCount()
     {
         return _totalNodes;
@@ -184,6 +175,7 @@ public static class NodeManager
     public static List<Node> GetResourcesNode()
     {
         var resourcesNodes = new List<Node>();
+        var neighbordsToResources = new List<Node>();
         var allNodes = GetAllNodes();
         foreach (var node in allNodes)
         {
@@ -193,17 +185,16 @@ public static class NodeManager
                 resourcesNodes.Add(node);
             }
         }
-        var neighBoardResources = new List<Node>();
-        foreach (var resourceNode in resourcesNodes)
+        foreach(var currentResourceNode in resourcesNodes)
         {
-            foreach (var neigh in resourceNode.Neighbors)
+            foreach(var neigh in currentResourceNode.Neighbors)
             {
-                if (!neighBoardResources.Contains(neigh))
+                if(!neighbordsToResources.Contains(neigh) && neigh.IsEmpty()&& !neigh.IsDangerous)
                 {
-                    neighBoardResources.Add(neigh);
+                    neighbordsToResources.Add(neigh);
                 }
             }
         }
-        return neighBoardResources;
+        return neighbordsToResources;
     }
 }
