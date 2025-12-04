@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(GlowUnit))]
 public abstract class Units : MonoBehaviour
 {
+    public static bool anyUnitMoving = false;
     [Header("Stats")]
     public int currentHealth;
     public int diceCount = 1;
@@ -50,8 +51,10 @@ public abstract class Units : MonoBehaviour
             Node closest = NodeManager.GetClosetNode(transform.position);
             if (closest != null && closest != currentNode)
                 SetCurrentNode(closest);
+            anyUnitMoving = false;
             return;
         }
+        anyUnitMoving = true;
         Node nextNode = path[0];
         Vector3 targetPos = nextNode.transform.position;
         if (targetPos.y < originalY)
@@ -87,6 +90,7 @@ public abstract class Units : MonoBehaviour
                     Node closest = NodeManager.GetClosetNode(transform.position);
                     if (closest != null && closest != currentNode)
                         SetCurrentNode(closest);
+                    anyUnitMoving = false;
                 }
             }
             else
@@ -95,6 +99,7 @@ public abstract class Units : MonoBehaviour
                 Node closest = NodeManager.GetClosetNode(transform.position);
                 if (closest != null && closest != currentNode)
                     SetCurrentNode(closest);
+                anyUnitMoving = false;
             }
         }
     }
@@ -148,4 +153,5 @@ public abstract class Units : MonoBehaviour
         path.Clear();         
         targetNode = null;
     }
+    public static bool IsAnyUnitMoving() => anyUnitMoving;
 }

@@ -5,6 +5,9 @@ public class IAMoveToResources : MonoBehaviour
 {
     public static IAMoveToResources instance;
     [HideInInspector] public bool movedAnyUnit = false;
+    private bool actionInProgress = false;
+    public Transform ReferencePoint;
+    public float maxDistanceFromReference = 10f;
     private void Awake()
     {
         if (instance == null)
@@ -20,7 +23,13 @@ public class IAMoveToResources : MonoBehaviour
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
+            yield return new WaitUntil(() => isBusy());
+            actionInProgress = true;
+            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) 
+            {
+                actionInProgress = false;
+                continue;
+            }
             if (resourceNodes.Contains(enemy.currentNode)) 
             {
                 if(enemy is Ranger)
@@ -28,16 +37,24 @@ public class IAMoveToResources : MonoBehaviour
                     Debug.Log("IA: Unidad enemiga es un ranger va a tirar.");
                     ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
                     yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+                    actionInProgress = false;
                     continue;
                 }
                 else
                 {
                     Debug.Log("IA: Unidad enemiga NO es un ranger NO va a tirar.");
+                    actionInProgress = false;
                     continue;
                 }
-            } 
-            // Obtenemos el nodo más cercano libre y el path hacia él
-            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) continue; // No hay nodo alcanzable
+            }
+            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) // No hay nodo alcanzable
+            {
+                if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
+                {
+                    actionInProgress = false;
+                    continue;
+                }
+            }  
             // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
@@ -49,6 +66,7 @@ public class IAMoveToResources : MonoBehaviour
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
             yield return new WaitForSeconds(0.2f);
+            actionInProgress = false;
         }
     }
     private bool GetClosestFreeResourceNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
@@ -68,6 +86,26 @@ public class IAMoveToResources : MonoBehaviour
             }
         }
         return false;
+    }
+    private bool GetRandomNodeNearReference(Units enemy, out Node targetNode, out List<Node> path)
+    {
+        targetNode = null;
+        path = null;
+        List<Node> allValidNodes = GetAllValidNodes();
+        if (allValidNodes.Count == 0) return false;
+        List<Node> candidates = new List<Node>();
+        foreach (Node n in allValidNodes)
+        {
+            float dist = Vector3.Distance(n.transform.position, ReferencePoint.position);
+            if (dist <= maxDistanceFromReference)
+                candidates.Add(n);
+        }
+        if (candidates.Count == 0)
+            return false;
+        targetNode = candidates[Random.Range(0, candidates.Count)];
+        path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
+        if (path == null || path.Count == 0) return false;
+        return true;
     }
     private List<Units> GetAllEnemyUnits()
     {
@@ -110,6 +148,10 @@ public class IAMoveToResources : MonoBehaviour
     {
         return GetResourcesNode().FindAll(n => n.unitOnNode == null);
     }
+    private List<Node> GetAllValidNodes()
+    {
+        return NodeManager.GetAllNodes().FindAll(n => n.IsEmpty());
+    }
     private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
         foreach (Node step in path)
@@ -131,5 +173,18 @@ public class IAMoveToResources : MonoBehaviour
                 yield break; // Detener movimiento al pelear
             }
         }
+    }
+    private bool isBusy()
+    {
+        return !actionInProgress
+        && !SalvationManager.instance.GetOnSavingThrow
+        && !ResourcesManager.instance.onColectedResources
+        && !CombatManager.instance.GetCombatActive
+        && !Units.anyUnitMoving;
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);
     }
 }
