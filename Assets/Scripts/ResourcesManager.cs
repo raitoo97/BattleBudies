@@ -7,7 +7,7 @@ public class ResourcesManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        print("Hola soy la gordita blim blum");
     }
 
     // Update is called once per frame

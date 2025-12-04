@@ -4,7 +4,7 @@ using UnityEngine;
 public class IAMoveToResources : MonoBehaviour
 {
     public static IAMoveToResources instance;
-    [HideInInspector]public bool movedAnyUnit = false;
+    [HideInInspector] public bool movedAnyUnit = false;
     private void Awake()
     {
         if (instance == null)
@@ -20,11 +20,15 @@ public class IAMoveToResources : MonoBehaviour
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)continue;
+            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
             // Si ya está en un nodo de recurso, no mover
-            if (resourceNodes.Contains(enemy.currentNode)) continue;
+            if (resourceNodes.Contains(enemy.currentNode)) 
+            {
+                Debug.Log("IA: Unidad enemiga ya en nodo de recurso, no se mueve.");
+                continue;
+            } 
             // Obtenemos el nodo más cercano libre y el path hacia él
-            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path))continue; // No hay nodo alcanzable
+            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) continue; // No hay nodo alcanzable
             // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
@@ -112,6 +116,11 @@ public class IAMoveToResources : MonoBehaviour
                 if (enemy == null || enemy.currentNode != step) yield break;
             }
             enemy.lastSafeNode = step;
+            if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            {
+                yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+                yield break; // Detener movimiento al pelear
+            }
         }
     }
 }
