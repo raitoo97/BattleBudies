@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 public class ResourcesManager : MonoBehaviour
 {
     public static ResourcesManager instance;
@@ -36,19 +34,16 @@ public class ResourcesManager : MonoBehaviour
         if(ranger == null) return;
         onColectedResources = true;
         diceRoll = ranger.diceInstance;
-        StartCoroutine(ResourceThrowCoroutine(ranger));
-        Debug.Log("Iniciando tirada de recoleccion");
-    }
-    IEnumerator ResourceThrowCoroutine(Ranger ranger)
-    {
-        while (onColectedResources)
-        {
-            yield return StartCoroutine(RangerRollDiceResources(ranger));
-            if(!onColectedResources) yield break;
-        }
+        StartCoroutine(RangerRollDiceResources(ranger));
+        Debug.Log("Iniciando tirada de recolección");
     }
     IEnumerator RangerRollDiceResources(Ranger ranger)
     {
+        if(ranger == null)
+        {
+            onColectedResources = false;
+            yield break;
+        }
         int numberOfDiceToRoll = ranger.resourcesDice;
         for (int i = 0; i < numberOfDiceToRoll; i++)
         {
@@ -67,7 +62,6 @@ public class ResourcesManager : MonoBehaviour
             }
             diceRoll.RollDice();
             yield return new WaitUntil(() => diceRoll.hasBeenThrown && diceRoll.hasBeenCounted && diceRoll.IsDiceStill());
-            numberOfDiceToRoll--;
             print("Tirada de recurso " + (i + 1) + " de " + ranger.resourcesDice + ": " + pendingResources + " recursos pendientes.");
             if (pendingResources > 0)
             {
