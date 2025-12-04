@@ -13,31 +13,27 @@ public class IADefendTowers : MonoBehaviour
         else
             Destroy(gameObject);
     }
-    private void Start()
-    {
-        StartCoroutine(xxx());
-    }
     public IEnumerator MoveAllEnemyUnitsToDefend()
     {
         movedAnyUnit = false;
         List<Units> enemyUnits = GetAllEnemyUnits();
-        List<Node> resourceNodes = GetResourcesNode();
+        List<Node> resourceNodes = GetHealtNodes();
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
             if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
             if (resourceNodes.Contains(enemy.currentNode))
             {
-                if (enemy is Ranger)
+                if (enemy is Defenders)
                 {
-                    Debug.Log("IA: Unidad enemiga es un ranger va a tirar.");
-                    ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
+                    Debug.Log("IA: Unidad enemiga es un Defensor va a tirar.");
+                    HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
                     yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
                     continue;
                 }
                 else
                 {
-                    Debug.Log("IA: Unidad enemiga NO es un ranger NO va a tirar.");
+                    Debug.Log("IA: Unidad enemiga NO es un Defensor NO va a tirar.");
                     continue;
                 }
             }
@@ -107,13 +103,13 @@ public class IADefendTowers : MonoBehaviour
         }
         return false;
     }
-    private List<Node> GetResourcesNode()
+    private List<Node> GetHealtNodes()
     {
-        return NodeManager.GetResourcesNode();
+        return NodeManager.GetHealthNodes();
     }
     private List<Node> GetValidNodes()
     {
-        return GetResourcesNode().FindAll(n => n.unitOnNode == null);
+        return GetHealtNodes().FindAll(n => n.unitOnNode == null);
     }
     private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
@@ -135,15 +131,6 @@ public class IADefendTowers : MonoBehaviour
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
                 yield break; // Detener movimiento al pelear
             }
-        }
-    }
-    private IEnumerator xxx()
-    {
-        yield return new WaitForSeconds(1f);
-        var getHealthNode = NodeManager.GetHealthNodes();
-        foreach (var node in getHealthNode)
-        {
-            print("Nodo de salud: " + node.gameObject.name);
         }
     }
 }

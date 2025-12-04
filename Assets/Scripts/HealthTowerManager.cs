@@ -62,7 +62,7 @@ public class HealthTowerManager : MonoBehaviour
             }
             diceRoll.RollDice();
             yield return new WaitUntil(() => diceRoll.hasBeenThrown && diceRoll.hasBeenCounted && diceRoll.IsDiceStill());
-            print("Tirada de vida " + (i + 1) + " de " + defender.healthTowerDice + ": " + pendingHealth + " recursos pendientes.");
+            print("Tirada de vida " + (i + 1) + " de " + defender.healthTowerDice + ": " + pendingHealth + " vida pendientes.");
             if (pendingHealth > 0)
             {
                 if (defender.isPlayerUnit)
