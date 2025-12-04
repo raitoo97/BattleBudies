@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HealthTowerManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public static HealthTowerManager instance;
     void Start()
     {
         
