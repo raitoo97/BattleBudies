@@ -14,13 +14,18 @@ public class IAMoveToResources : MonoBehaviour
     }
     public IEnumerator MoveAllEnemyUnitsToResorces()
     {
-        //Agregar trrampas y torres despues
         movedAnyUnit = false;
         List<Units> enemyUnits = GetAllEnemyUnits();
+        List<Node> resourceNodes = GetResourcesNode(); // todos los nodos de recurso
+        List<Node> validNodes = GetValidNodes(); // nodos de recurso libres
         foreach (Units enemy in enemyUnits)
         {
             if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
-            List<Node> validNodes = GetValidNodes();
+            if (resourceNodes.Contains(enemy.currentNode))
+            {
+                print("Ya esta en un nodo de recursos no mover");
+                continue;
+            }
             if (validNodes.Count == 0) continue;
             List<Node> path = GetPathToRandomNode(enemy, validNodes);
             if (path == null || path.Count == 0) continue;
