@@ -6,6 +6,8 @@ public class IAMoveToResources : MonoBehaviour
     public static IAMoveToResources instance;
     [HideInInspector] public bool movedAnyUnit = false;
     private bool actionInProgress = false;
+    public Transform ReferencePoints;
+    public float maxDistanceFromReference = 10f;
     private void Awake()
     {
         if (instance == null)
@@ -123,6 +125,10 @@ public class IAMoveToResources : MonoBehaviour
     private List<Node> GetValidNodes()
     {
         return GetResourcesNode().FindAll(n => n.unitOnNode == null);
+    }
+    private List<Node> GetAllValidNodes()
+    {
+        return NodeManager.GetAllNodes().FindAll(n => n.IsEmpty());
     }
     private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
