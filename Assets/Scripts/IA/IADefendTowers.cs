@@ -38,7 +38,7 @@ public class IADefendTowers : MonoBehaviour
                 }
             }
             // Obtenemos el nodo más cercano libre y el path hacia él
-            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) continue; // No hay nodo alcanzable
+            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) continue;
             // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
