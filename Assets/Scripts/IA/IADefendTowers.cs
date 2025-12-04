@@ -109,7 +109,13 @@ public class IADefendTowers : MonoBehaviour
     }
     private List<Node> GetValidNodes()
     {
-        return GetHealtNodes().FindAll(n => n.unitOnNode == null);
+        return GetHealtNodes().FindAll(n => n.IsEmpty());
+    }
+    private List<Node> GetAllNodes()
+    {
+        var nodes = NodeManager.GetAllNodes();
+        return nodes.FindAll(n => n.IsEmpty());
+
     }
     private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
