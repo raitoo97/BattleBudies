@@ -114,15 +114,6 @@ public static class NodeManager
         }
         return null;
     }
-    public static Node FindFirstDangerStep(List<Node> path, List<Node> dangerNodes)
-    {
-        foreach (Node step in path)
-        {
-            if (dangerNodes.Contains(step))
-                return step;
-        }
-        return null;
-    }
     public static List<Node> GetNodeCount()
     {
         return _totalNodes;
@@ -150,14 +141,19 @@ public static class NodeManager
     }
     public static Node GetForwardSafeNode(Node safeNode, Node currentNode)
     {
-        if (safeNode == null || currentNode == null)
-            return null;
+        if (safeNode == null || currentNode == null) return null;
         int dirX = Mathf.Clamp(currentNode.gridIndex.x - safeNode.gridIndex.x, -1, 1);
         int dirY = Mathf.Clamp(currentNode.gridIndex.y - safeNode.gridIndex.y, -1, 1);
-        int targetX = currentNode.gridIndex.x + dirX;
-        int targetY = currentNode.gridIndex.y + dirY;
-        Node forwardNode = GetAllNodes().Find(node => node != null && node.gridIndex.x == targetX && node.gridIndex.y == targetY && !node.IsDangerous);
-        return forwardNode;
+
+        foreach (var neigh in currentNode.Neighbors)
+        {
+            if (neigh.gridIndex.x == currentNode.gridIndex.x + dirX && neigh.gridIndex.y == currentNode.gridIndex.y + dirY && !neigh.IsDangerous)
+            {
+                Debug.Log("Forward safe node found: " + neigh.gameObject.name);
+                return neigh;
+            }
+        }
+        return null;
     }
     public static List<Node> GetNeighborsInRow(Node node)
     {
@@ -175,5 +171,30 @@ public static class NodeManager
     public static List<Node> GetAllNodes()
     {
         return _totalNodes;
+    }
+    public static List<Node> GetResourcesNode()
+    {
+        var resourcesNodes = new List<Node>();
+        var neighbordsToResources = new List<Node>();
+        var allNodes = GetAllNodes();
+        foreach (var node in allNodes)
+        {
+            if (node == null) continue;
+            if (node._isResourceNode)
+            {
+                resourcesNodes.Add(node);
+            }
+        }
+        foreach(var currentResourceNode in resourcesNodes)
+        {
+            foreach(var neigh in currentResourceNode.Neighbors)
+            {
+                if(!neighbordsToResources.Contains(neigh))
+                {
+                    neighbordsToResources.Add(neigh);
+                }
+            }
+        }
+        return neighbordsToResources;
     }
 }
