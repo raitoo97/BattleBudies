@@ -12,78 +12,92 @@ public class IAMoveToResources : MonoBehaviour
         else
             Destroy(gameObject);
     }
-    private void Start()
-    {
-        var ressources = NodeManager.GetResourcesNode();
-        foreach (var res in ressources)
-        {
-            print(res.gameObject.name);
-        }
-    }
     public IEnumerator MoveAllEnemyUnitsToResorces()
     {
         //Agregar trrampas y torres despues
         movedAnyUnit = false;
-        Units[] allUnits = FindObjectsOfType<Units>();
-        List<Units> enemyUnits = new List<Units>();
-        foreach (Units u in allUnits)
-            if (!u.isPlayerUnit) enemyUnits.Add(u);
+        List<Units> enemyUnits = GetAllEnemyUnits();
         foreach (Units enemy in enemyUnits)
         {
-            if (enemy.currentNode == null) continue;
-            if (EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
-            List<Node> validNodes = NodeManager.GetNodeCount().FindAll(n => n.unitOnNode == null);
+            if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
+            List<Node> validNodes = GetValidNodes();
             if (validNodes.Count == 0) continue;
-            Node targetNode = null;
-            List<Node> path = null;
-            int attempts = 0;
-            int maxAttempts = 20;
-            while (attempts < maxAttempts)
-            {
-                attempts++;
-                targetNode = validNodes[Random.Range(0, validNodes.Count)];
-                if (targetNode == null) break;
-
-                path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
-                if (path == null || path.Count == 0) continue;
-
-                bool pathBlocked = path.Exists(n => n.unitOnNode != null);
-                if (!pathBlocked) break;
-            }
+            List<Node> path = GetPathToRandomNode(enemy, validNodes);
             if (path == null || path.Count == 0) continue;
-            if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
-            {
-                Node firstDangerNode = null;
-                foreach (Node node in path)
-                {
-                    if (dangerNodes.Contains(node))
-                    {
-                        firstDangerNode = node;
-                        break;
-                    }
-                }
-                if (firstDangerNode != null)
-                {
-                    int index = path.IndexOf(firstDangerNode);
-                    path = path.GetRange(0, index + 1);
-                }
-            }
-            int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-            if (path.Count > maxSteps)
-                path = path.GetRange(0, maxSteps);
+            path = TrimPathBeforeDanger(path);
+            path = LimitPathByEnergy(path);
             enemy.SetPath(path);
             movedAnyUnit = true;
             yield return new WaitUntil(() => enemy.PathEmpty());
-            if (path.Count > 0)
-            {
-                Node finalNode = path[path.Count - 1];
-                enemy.SetCurrentNode(finalNode);
-            }
+            UpdateEnemyFinalNode(enemy, path);
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
-            {
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
-            }
             yield return new WaitForSeconds(0.2f);
+        }
+    }
+    private List<Units> GetAllEnemyUnits()
+    {
+        Units[] allUnits = FindObjectsOfType<Units>();
+        List<Units> enemies = new List<Units>();
+        foreach (Units u in allUnits)
+            if (!u.isPlayerUnit) enemies.Add(u);
+        return enemies;
+    }
+    private List<Node> GetValidNodes()
+    {
+        return NodeManager.GetNodeCount().FindAll(n => n.unitOnNode == null);
+    }
+    private List<Node> GetPathToRandomNode(Units enemy, List<Node> validNodes)
+    {
+        List<Node> path = null;
+        int attempts = 0;
+        int maxAttempts = 20;
+        while (attempts < maxAttempts)
+        {
+            attempts++;
+            Node targetNode = validNodes[Random.Range(0, validNodes.Count)];
+            if (targetNode == null) break;
+            path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
+            if (path == null || path.Count == 0) continue;
+            bool pathBlocked = path.Exists(n => n.unitOnNode != null);
+            if (!pathBlocked) break;
+        }
+        return path;
+    }
+    private List<Node> TrimPathBeforeDanger(List<Node> path)
+    {
+        if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
+        {
+            Node firstDangerNode = null;
+            foreach (Node node in path)
+            {
+                if (dangerNodes.Contains(node))
+                {
+                    firstDangerNode = node;
+                    break;
+                }
+            }
+            if (firstDangerNode != null)
+            {
+                int index = path.IndexOf(firstDangerNode);
+                path = path.GetRange(0, index + 1);
+            }
+        }
+        return path;
+    }
+    private List<Node> LimitPathByEnergy(List<Node> path)
+    {
+        int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+        if (path.Count > maxSteps)
+            path = path.GetRange(0, maxSteps);
+        return path;
+    }
+    private void UpdateEnemyFinalNode(Units enemy, List<Node> path)
+    {
+        if (path.Count > 0)
+        {
+            Node finalNode = path[path.Count - 1];
+            enemy.SetCurrentNode(finalNode);
         }
     }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)

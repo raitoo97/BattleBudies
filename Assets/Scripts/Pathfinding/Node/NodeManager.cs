@@ -189,7 +189,7 @@ public static class NodeManager
         {
             foreach(var neigh in currentResourceNode.Neighbors)
             {
-                if(!neighbordsToResources.Contains(neigh) && neigh.IsEmpty()&& !neigh.IsDangerous)
+                if(!neighbordsToResources.Contains(neigh))
                 {
                     neighbordsToResources.Add(neigh);
                 }
