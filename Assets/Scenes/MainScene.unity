@@ -6846,6 +6846,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movedAnyUnit: 0
+  ReferencePoint: {fileID: 1901417052}
+  maxDistanceFromReference: 60
 --- !u!114 &1850951883
 MonoBehaviour:
   m_ObjectHideFlags: 0

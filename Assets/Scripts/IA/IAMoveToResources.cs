@@ -6,7 +6,7 @@ public class IAMoveToResources : MonoBehaviour
     public static IAMoveToResources instance;
     [HideInInspector] public bool movedAnyUnit = false;
     private bool actionInProgress = false;
-    public Transform ReferencePoints;
+    public Transform ReferencePoint;
     public float maxDistanceFromReference = 10f;
     private void Awake()
     {
@@ -47,11 +47,13 @@ public class IAMoveToResources : MonoBehaviour
                     continue;
                 }
             }
-            // Obtenemos el nodo más cercano libre y el path hacia él
             if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) // No hay nodo alcanzable
             {
-                actionInProgress = false;
-                continue;
+                if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
+                {
+                    actionInProgress = false;
+                    continue;
+                }
             }  
             // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
@@ -84,6 +86,26 @@ public class IAMoveToResources : MonoBehaviour
             }
         }
         return false;
+    }
+    private bool GetRandomNodeNearReference(Units enemy, out Node targetNode, out List<Node> path)
+    {
+        targetNode = null;
+        path = null;
+        List<Node> allValidNodes = GetAllValidNodes();
+        if (allValidNodes.Count == 0) return false;
+        List<Node> candidates = new List<Node>();
+        foreach (Node n in allValidNodes)
+        {
+            float dist = Vector3.Distance(n.transform.position, ReferencePoint.position);
+            if (dist <= maxDistanceFromReference)
+                candidates.Add(n);
+        }
+        if (candidates.Count == 0)
+            return false;
+        targetNode = candidates[Random.Range(0, candidates.Count)];
+        path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
+        if (path == null || path.Count == 0) return false;
+        return true;
     }
     private List<Units> GetAllEnemyUnits()
     {
@@ -159,5 +181,10 @@ public class IAMoveToResources : MonoBehaviour
         && !ResourcesManager.instance.onColectedResources
         && !CombatManager.instance.GetCombatActive
         && !Units.anyUnitMoving;
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);
     }
 }
