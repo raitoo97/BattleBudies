@@ -150,14 +150,19 @@ public static class NodeManager
     }
     public static Node GetForwardSafeNode(Node safeNode, Node currentNode)
     {
-        if (safeNode == null || currentNode == null)
-            return null;
+        if (safeNode == null || currentNode == null) return null;
         int dirX = Mathf.Clamp(currentNode.gridIndex.x - safeNode.gridIndex.x, -1, 1);
         int dirY = Mathf.Clamp(currentNode.gridIndex.y - safeNode.gridIndex.y, -1, 1);
-        int targetX = currentNode.gridIndex.x + dirX;
-        int targetY = currentNode.gridIndex.y + dirY;
-        Node forwardNode = GetAllNodes().Find(node => node != null && node.gridIndex.x == targetX && node.gridIndex.y == targetY && !node.IsDangerous);
-        return forwardNode;
+
+        foreach (var neigh in currentNode.Neighbors)
+        {
+            if (neigh.gridIndex.x == currentNode.gridIndex.x + dirX && neigh.gridIndex.y == currentNode.gridIndex.y + dirY && !neigh.IsDangerous)
+            {
+                Debug.Log("Forward safe node found: " + neigh.gameObject.name);
+                return neigh;
+            }
+        }
+        return null;
     }
     public static List<Node> GetNeighborsInRow(Node node)
     {
