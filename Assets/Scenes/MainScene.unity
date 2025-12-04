@@ -5019,6 +5019,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3655296514757864388}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1383275523
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1383275524}
+  m_Layer: 0
+  m_Name: pepe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1383275524
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383275523}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 73.783516, y: 77.338684, z: -37.369045}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1389248689
 GameObject:
   m_ObjectHideFlags: 0
@@ -8140,3 +8171,4 @@ SceneRoots:
   - {fileID: 186942367}
   - {fileID: 1571885260}
   - {fileID: 1165260219}
+  - {fileID: 1383275524}
