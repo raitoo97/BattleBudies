@@ -65,42 +65,6 @@ public class IAMoveToResources : MonoBehaviour
         }
         return path;
     }
-    private List<Node> TrimPathBeforeDanger(List<Node> path)
-    {
-        if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
-        {
-            Node firstDangerNode = null;
-            foreach (Node node in path)
-            {
-                if (dangerNodes.Contains(node))
-                {
-                    firstDangerNode = node;
-                    break;
-                }
-            }
-            if (firstDangerNode != null)
-            {
-                int index = path.IndexOf(firstDangerNode);
-                path = path.GetRange(0, index + 1);
-            }
-        }
-        return path;
-    }
-    private List<Node> LimitPathByEnergy(List<Node> path)
-    {
-        int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-        if (path.Count > maxSteps)
-            path = path.GetRange(0, maxSteps);
-        return path;
-    }
-    private void UpdateEnemyFinalNode(Units enemy, List<Node> path)
-    {
-        if (path.Count > 0)
-        {
-            Node finalNode = path[path.Count - 1];
-            enemy.SetCurrentNode(finalNode);
-        }
-    }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {
         yield return new WaitUntil(() => attacker.PathEmpty());
