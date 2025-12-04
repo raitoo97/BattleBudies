@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class IADefendTowers : MonoBehaviour
@@ -37,8 +38,12 @@ public class IADefendTowers : MonoBehaviour
                     continue;
                 }
             }
-            // Obtenemos el nodo más cercano libre y el path hacia él
-            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) continue;
+            bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
+            if (!foundPath)
+            {
+                MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
+            }
+            if (!foundPath) continue;
             // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
@@ -50,6 +55,21 @@ public class IADefendTowers : MonoBehaviour
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
             yield return new WaitForSeconds(0.2f);
+        }
+    }
+    private void MoveToRandomNode(Units enemy, ref Node closestNode, ref List<Node> path, ref bool foundPath)
+    {
+        List<Node> allFreeNodes = GetAllNodes();
+        if (allFreeNodes.Count > 0)
+        {
+            Node randomNode = allFreeNodes[Random.Range(0, allFreeNodes.Count)];
+            List<Node> randomPath = PathFinding.CalculateAstart(enemy.currentNode, randomNode);
+            if (randomPath != null && randomPath.Count > 0)
+            {
+                closestNode = randomNode;
+                path = randomPath;
+                foundPath = true;
+            }
         }
     }
     private bool GetClosestFreeResourceNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
