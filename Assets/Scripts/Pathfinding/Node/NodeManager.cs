@@ -181,4 +181,29 @@ public static class NodeManager
     {
         return _totalNodes;
     }
+    public static List<Node> GetResourcesNode()
+    {
+        var resourcesNodes = new List<Node>();
+        var allNodes = GetAllNodes();
+        foreach (var node in allNodes)
+        {
+            if (node == null) continue;
+            if (node._isResourceNode)
+            {
+                resourcesNodes.Add(node);
+            }
+        }
+        var neighBoardResources = new List<Node>();
+        foreach (var resourceNode in resourcesNodes)
+        {
+            foreach (var neigh in resourceNode.Neighbors)
+            {
+                if (!neighBoardResources.Contains(neigh))
+                {
+                    neighBoardResources.Add(neigh);
+                }
+            }
+        }
+        return neighBoardResources;
+    }
 }

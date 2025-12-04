@@ -12,6 +12,14 @@ public class IAMoveToResources : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    private void Start()
+    {
+        var ressources = NodeManager.GetResourcesNode();
+        foreach (var res in ressources)
+        {
+            print(res.gameObject.name);
+        }
+    }
     public IEnumerator MoveAllEnemyUnitsToResorces()
     {
         //Agregar trrampas y torres despues

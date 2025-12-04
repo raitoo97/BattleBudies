@@ -10,11 +10,15 @@ public class Node : MonoBehaviour
     public float maxStepDown = 1f;
     public GameObject unitOnNode;
     [SerializeField]private bool _isDangerous;
+    [SerializeField]public bool _isBlock;
+    public bool _isResourceNode;
     public void Initalize(Vector2Int xY)
     {
         gridIndex = xY;
         _cost = 1;
         _isDangerous = false;
+        _isBlock = false;
+        _isResourceNode = false;
         NodeManager.RegisterNode(this);
     }
     private void OnDestroy()
@@ -75,10 +79,15 @@ public class Node : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer == 8)
+        if (collision.gameObject.layer == 8)//trampas
         {
             _cost++;
             _isDangerous = true;
+        }
+        if (collision.gameObject.layer == 9)//resources
+        {
+            _isBlock = true;
+            _isResourceNode = true;
         }
     }
     public float Cost { get => _cost; }
