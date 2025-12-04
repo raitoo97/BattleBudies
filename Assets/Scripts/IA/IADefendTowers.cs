@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-
 public class IADefendTowers : MonoBehaviour
 {
     public static IADefendTowers instance;
-    [HideInInspector] public bool movedAnyUnit = false;
+    [HideInInspector]public bool movedAnyUnit = false;
+    public Transform ReferenceTower;
+    public float maxDistanceFromReference = 10f;
     private void Awake()
     {
         if (instance == null)
@@ -60,16 +60,24 @@ public class IADefendTowers : MonoBehaviour
     private void MoveToRandomNode(Units enemy, ref Node closestNode, ref List<Node> path, ref bool foundPath)
     {
         List<Node> allFreeNodes = GetAllNodes();
-        if (allFreeNodes.Count > 0)
+        if(allFreeNodes.Count == 0) return;
+        List<Node> filteredNodes = new List<Node>();
+        foreach (Node node in allFreeNodes)
         {
-            Node randomNode = allFreeNodes[Random.Range(0, allFreeNodes.Count)];
-            List<Node> randomPath = PathFinding.CalculateAstart(enemy.currentNode, randomNode);
-            if (randomPath != null && randomPath.Count > 0)
+            float distanceToReference = Vector3.Distance(node.transform.position, ReferenceTower.position);
+            if (distanceToReference <= maxDistanceFromReference)
             {
-                closestNode = randomNode;
-                path = randomPath;
-                foundPath = true;
+                filteredNodes.Add(node);
             }
+        }
+        if (filteredNodes.Count == 0) return;
+        Node randomNode = filteredNodes[Random.Range(0, filteredNodes.Count)];
+        List<Node> randomPath = PathFinding.CalculateAstart(enemy.currentNode, randomNode);
+        if (randomPath != null && randomPath.Count > 0)
+        {
+            closestNode = randomNode;
+            path = randomPath;
+            foundPath = true;
         }
     }
     private bool GetClosestFreeResourceNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
@@ -158,5 +166,10 @@ public class IADefendTowers : MonoBehaviour
                 yield break; // Detener movimiento al pelear
             }
         }
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(ReferenceTower.position, maxDistanceFromReference);
     }
 }

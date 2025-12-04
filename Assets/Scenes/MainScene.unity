@@ -6841,6 +6841,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movedAnyUnit: 0
+  ReferenceTower: {fileID: 523587279}
+  maxDistanceFromReference: 70
 --- !u!1001 &1869818202
 PrefabInstance:
   m_ObjectHideFlags: 0

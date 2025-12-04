@@ -22,7 +22,7 @@ public class IABrainManager : MonoBehaviour
             yield return StartCoroutine(IADefendTowers.instance.MoveAllEnemyUnitsToDefend());
         if (!IAMoveToTowers.instance.movedAnyUnit)
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
-        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive && !SalvationManager.instance.GetOnSavingThrow&&!ResourcesManager.instance.onColectedResources&&!HealthTowerManager.instance.onColectedHealth);
         GameManager.instance.StartPlayerTurn();
     }
     private void ClearAllPaths()
