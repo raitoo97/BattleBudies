@@ -13,7 +13,7 @@ public class IADefendTowers : MonoBehaviour
         else
             Destroy(gameObject);
     }
-    public IEnumerator MoveAllEnemyUnitsToResorces()
+    public IEnumerator MoveAllEnemyUnitsToDefend()
     {
         movedAnyUnit = false;
         List<Units> enemyUnits = GetAllEnemyUnits();
