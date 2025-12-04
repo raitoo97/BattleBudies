@@ -23,7 +23,13 @@ public class IADefendTowers : MonoBehaviour
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) continue;
+            yield return new WaitUntil(() => !actionInProgress && !SalvationManager.instance.GetOnSavingThrow && !ResourcesManager.instance.onColectedResources);
+            actionInProgress = true;
+            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) 
+            {
+                actionInProgress = false;
+                continue;
+            }
             if (resourceNodes.Contains(enemy.currentNode))
             {
                 if (enemy is Defenders)
@@ -31,11 +37,13 @@ public class IADefendTowers : MonoBehaviour
                     Debug.Log("IA: Unidad enemiga es un Defensor va a tirar.");
                     HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
                     yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+                    actionInProgress = false;
                     continue;
                 }
                 else
                 {
                     Debug.Log("IA: Unidad enemiga NO es un Defensor NO va a tirar.");
+                    actionInProgress = false;
                     continue;
                 }
             }
@@ -44,7 +52,11 @@ public class IADefendTowers : MonoBehaviour
             {
                 MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
             }
-            if (!foundPath) continue;
+            if (!foundPath)
+            {
+                actionInProgress = false;
+                continue;
+            }
             // Limitamos path por energía
             int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
             if (path.Count > maxSteps)
@@ -56,6 +68,7 @@ public class IADefendTowers : MonoBehaviour
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
             yield return new WaitForSeconds(0.2f);
+            actionInProgress = false;
         }
     }
     private void MoveToRandomNode(Units enemy, ref Node closestNode, ref List<Node> path, ref bool foundPath)

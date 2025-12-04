@@ -162,7 +162,7 @@ MonoBehaviour:
   moveSpeed: 20
   diceInstance: {fileID: 0}
   hasAttackedTowerThisTurn: 0
-  healthTowerDice: 8
+  healthTowerDice: 3
 --- !u!136 &5846122604723798370
 CapsuleCollider:
   m_ObjectHideFlags: 0
