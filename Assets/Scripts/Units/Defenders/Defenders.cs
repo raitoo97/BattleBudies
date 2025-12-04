@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 public abstract class Defenders : Units
 {
+    [Header("DefenderAbility")]
+    public int healthTowerDice;
     override protected void Start()
     {
         base.Start();
