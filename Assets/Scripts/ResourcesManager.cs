@@ -3,9 +3,9 @@ using UnityEngine;
 public class ResourcesManager : MonoBehaviour
 {
     public static ResourcesManager instance;
-    public int resourcesEnemy;
-    public int resourcesPlayer;
-    public bool onColectedResources;
+    [HideInInspector]public int resourcesEnemy;
+    [HideInInspector]public int resourcesPlayer;
+    [HideInInspector]public bool onColectedResources;
     private DiceRoll diceRoll;
     private int pendingResources;
     private void Awake()
