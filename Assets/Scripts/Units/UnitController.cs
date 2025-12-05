@@ -185,13 +185,13 @@ public class UnitController : MonoBehaviour
         if (unit.currentNode == null) yield break;
         if (unit.currentNode.IsDangerous)
         {
-            Debug.Log("Unidad terminó sobre un nodo peligroso tirada de salvación.");
             SalvationManager.instance.StartSavingThrow(unit);
             yield return new WaitUntil(() => !SalvationManager.instance.GetOnSavingThrow);
         }
         if (unit == null || unit.currentNode == null)
             yield break;
         yield return StartCoroutine(RecolectResources(unit));
+        yield return StartCoroutine(HealthTower(unit));
         if (TryGetEnemyNeighbor(unit, out Units enemy))
         {
             CombatManager.instance.StartCombat(unit, enemy, true);
@@ -200,7 +200,6 @@ public class UnitController : MonoBehaviour
         {
             if (unit.hasAttackedTowerThisTurn)
             {
-                Debug.Log($"Unidad {unit.name} ya atacó una torre este turno.");
                 yield break;
             }
             if (TowerManager.instance.CanUnitAttackTower(unit, tower))
@@ -217,6 +216,18 @@ public class UnitController : MonoBehaviour
             {
                 ResourcesManager.instance.StartRecolectedResources(unit as Ranger);
                 yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            }
+        }
+        yield return null;
+    }
+    private IEnumerator HealthTower(Units unit)
+    {
+        if (unit is Defenders && GetValidHealthNodes(unit).Contains(unit.currentNode))
+        {
+            if (!HealthTowerManager.instance.onColectedHealth)
+            {
+                HealthTowerManager.instance.StartRecolectedHealth(unit as Defenders);
+                yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
             }
         }
         yield return null;
@@ -252,6 +263,10 @@ public class UnitController : MonoBehaviour
     {
         return NodeManager.GetResourcesNode().FindAll(n =>n.IsEmpty() || n == unit.currentNode);
     }
+    private List<Node> GetValidHealthNodes(Units unit)
+    {
+        return NodeManager.GetHealthNodes().FindAll(n => n.IsEmpty() || n == unit.currentNode);
+    }
     private bool IsBusy()
     {
         if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
@@ -262,7 +277,9 @@ public class UnitController : MonoBehaviour
             return true;
         if (ResourcesManager.instance != null && ResourcesManager.instance.onColectedResources)
             return true;
-        if(Units.anyUnitMoving)
+        if (HealthTowerManager.instance != null && HealthTowerManager.instance.onColectedHealth)
+            return true;
+        if (Units.anyUnitMoving)
             return true;
         return false;
     }
