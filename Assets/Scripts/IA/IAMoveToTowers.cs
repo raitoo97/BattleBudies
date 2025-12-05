@@ -6,6 +6,7 @@ public class IAMoveToTowers : MonoBehaviour
     public static IAMoveToTowers instance;
     [HideInInspector] public bool movedAnyUnit = false;
     private Dictionary<Units, Node> unitReservedNodes = new Dictionary<Units, Node>();
+    private bool actionInProgress = false;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -18,12 +19,22 @@ public class IAMoveToTowers : MonoBehaviour
         List<Units> enemyUnits = GetEnemyUnits(allUnits); //obtiene solo unidades enemigas
         foreach (Units enemy in enemyUnits)
         {
-            if (!CanEnemyAct(enemy)) continue; //valida energía y nodo
+            yield return new WaitUntil(() => isBusy());
+            actionInProgress = true;
+            if (!CanEnemyAct(enemy)) //valida energía y nodo
+            {
+                actionInProgress = false;
+                continue;
+            } 
             bool unitDidAction = false;
             //SELECCIÓN DE TORRE Y NODO
             Tower targetTower;
             Node targetNode;
-            if (!GetClosestValidTowerNode(out targetTower, out targetNode)) continue; //busca torre y nodo libre
+            if (!GetClosestValidTowerNode(out targetTower, out targetNode)) 
+            {
+                actionInProgress = false;
+                continue;
+            } //busca torre y nodo libre
             //CAMINO HACIA LA TORRE
             Node previousStep = enemy.currentNode;
             List<Node> path = PreparePath(enemy, targetNode, ref unitDidAction); //calcula path y limita pasos según energy
@@ -40,6 +51,7 @@ public class IAMoveToTowers : MonoBehaviour
                 if (unitDidAction)
                     movedAnyUnit = true;
             }
+            actionInProgress = false;
         }
         unitReservedNodes.Clear();
     }//FUNCIONA MAIN
@@ -182,5 +194,12 @@ public class IAMoveToTowers : MonoBehaviour
     public void ReleaseNodeOnDeath(Units unit)
     {
         ReleaseReservedNode(unit);
+    }
+    private bool isBusy()
+    {
+        return !actionInProgress
+        && !SalvationManager.instance.GetOnSavingThrow
+        && !CombatManager.instance.GetCombatActive
+        && !Units.anyUnitMoving;
     }
 }

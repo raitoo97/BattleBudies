@@ -36,7 +36,7 @@ public class IADefendTowers : MonoBehaviour
                 {
                     Debug.Log("IA: Unidad enemiga es un Defensor va a tirar.");
                     HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
-                    yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+                    yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
                     actionInProgress = false;
                     continue;
                 }
@@ -190,7 +190,7 @@ public class IADefendTowers : MonoBehaviour
     {
         return !actionInProgress
         && !SalvationManager.instance.GetOnSavingThrow
-        && !ResourcesManager.instance.onColectedResources
+        && !HealthTowerManager.instance.onColectedHealth
         && !CombatManager.instance.GetCombatActive
         && !Units.anyUnitMoving;
     }
