@@ -127,6 +127,14 @@ public class CardPlayManager : MonoBehaviour
             unit.transform.position = snappedPos;
             unitScript.isPlayerUnit = isPlayerTurn;
             unitScript.diceInstance = isPlayerTurn ? playerDice : enemyDice;
+            if (isPlayerTurn)
+            {
+                unit.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            else
+            {
+                unit.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            }
         }
         Destroy(currentUIcard.gameObject);
         placingMode = false;
