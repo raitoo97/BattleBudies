@@ -15,6 +15,44 @@ public class IADefendTowers : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
+    {
+        if (enemy == null) yield break;
+        yield return new WaitUntil(() => isBusy());
+        movedAnyUnit = false;
+        actionInProgress = true;
+        if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> resourceNodes = GetHealtNodes();
+        if (resourceNodes.Contains(enemy.currentNode) && enemy is Defenders)
+        {
+            HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
+            yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> validNodes = GetValidNodes();
+        bool foundPath = GetClosestFreeHealthNode(enemy, validNodes, out Node closestNode, out List<Node> path);
+        if (!foundPath)
+            MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
+        if (!foundPath)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        int maxSteps = maxEnergy;
+        if (path.Count > maxSteps)
+            path = path.GetRange(0, maxSteps);
+        yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
+        movedAnyUnit = true;
+        if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+        yield return new WaitForSeconds(0.2f);
+        actionInProgress = false;
+    }
     public IEnumerator MoveAllEnemyUnitsToDefend()
     {
         movedAnyUnit = false;

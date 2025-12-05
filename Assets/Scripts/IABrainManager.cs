@@ -19,15 +19,54 @@ public class IABrainManager : MonoBehaviour
         CanvasManager.instance.UpdateEnergyUI();
         yield return null;
         yield return new WaitForSeconds(0.5f);
+        int enemyUnits = CountEnemyUnits();
+        int playerUnits = CountPlayerUnits();
+        if (enemyUnits <= playerUnits)
+        {
+            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+        }
         List<Attackers> attackers = new List<Attackers>();
         List<Defenders> defenders = new List<Defenders>();
         List<Ranger> rangers = new List<Ranger>();
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        if (EnergyManager.instance.enemyCurrentEnergy > 0f)
-            yield return StartCoroutine(IAMoveToResources.instance.MoveAllEnemyUnitsToResorces());
-        if (!IAMoveToTowers.instance.movedAnyUnit)
-            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
-        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive && !SalvationManager.instance.GetOnSavingThrow&&!ResourcesManager.instance.onColectedResources&&!HealthTowerManager.instance.onColectedHealth);
+        int totalEnergy = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+        int energyForAttackers = Mathf.FloorToInt(totalEnergy * 0.5f);
+        int energyForDefenders = Mathf.FloorToInt(totalEnergy * 0.3f);
+        int energyForRangers = Mathf.FloorToInt(totalEnergy * 0.2f);
+        // ----------------- MOVIMIENTO DE ATTACKERS -----------------
+        if (attackers.Count > 0)
+        {
+            int energyPerUnit = Mathf.Max(1, Mathf.FloorToInt((float)energyForAttackers / attackers.Count));
+            foreach (Units u in attackers)
+            {
+                if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
+                int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
+                yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u, moveEnergy));
+            }
+        }
+        // ----------------- MOVIMIENTO DE DEFENDERS -----------------
+        if (defenders.Count > 0)
+        {
+            int energyPerUnit = Mathf.Max(1, Mathf.FloorToInt((float)energyForDefenders / defenders.Count));
+            foreach (Units u in defenders)
+            {
+                if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
+                int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
+                yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
+            }
+        }
+        // ----------------- MOVIMIENTO DE RANGERS -----------------
+        if (rangers.Count > 0)
+        {
+            int energyPerUnit = Mathf.Max(1, Mathf.FloorToInt((float)energyForRangers / rangers.Count));
+            foreach (Units u in rangers)
+            {
+                if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
+                int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
+                yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
+            }
+        }
+        yield return new WaitUntil(() => isBusy());
         GameManager.instance.StartPlayerTurn();
     }
     private int CountEnemyUnits()
@@ -61,5 +100,13 @@ public class IABrainManager : MonoBehaviour
     {
         foreach (Units u in FindObjectsOfType<Units>())
             u.ClearPath();
+    }
+    public bool isBusy()
+    {
+        return !CombatManager.instance.GetCombatActive
+               && !SalvationManager.instance.GetOnSavingThrow
+               && !ResourcesManager.instance.onColectedResources
+               && !HealthTowerManager.instance.onColectedHealth
+               && !Units.anyUnitMoving;
     }
 }

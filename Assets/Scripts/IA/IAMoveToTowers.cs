@@ -12,6 +12,42 @@ public class IAMoveToTowers : MonoBehaviour
         if (instance == null) instance = this;
         else Destroy(gameObject);
     }
+    public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
+    {
+        if (enemy == null) yield break;
+        yield return new WaitUntil(() => isBusy());
+        movedAnyUnit = false;
+        actionInProgress = true;
+        if (!CanEnemyAct(enemy))
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        bool unitDidAction = false;
+        Tower targetTower;
+        Node targetNode;
+        if (!GetClosestValidTowerNode(out targetTower, out targetNode))
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        Node previousStep = enemy.currentNode;
+        List<Node> path = PreparePathPerUnit(enemy, targetNode, ref unitDidAction, maxEnergy);
+        yield return StartCoroutine(ExecuteMovementPath(enemy, path, previousStep));
+        if (enemy != null && TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
+        {
+            unitDidAction = true;
+            yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
+        }
+        if (enemy != null)
+        {
+            enemy.hasAttackedTowerThisTurn = true;
+            if (unitDidAction)
+                movedAnyUnit = true;
+        }
+        actionInProgress = false;
+        unitReservedNodes.Clear();
+    }
     public IEnumerator MoveAllEnemyUnitsToTowers()
     {
         movedAnyUnit = false;
@@ -102,6 +138,15 @@ public class IAMoveToTowers : MonoBehaviour
         if (path.Count > maxStep)
             path = path.GetRange(0, maxStep);
         if(path.Count > 0)
+            unitDidAction = true;
+        return path;
+    }
+    private List<Node> PreparePathPerUnit(Units enemy, Node targetNode, ref bool unitDidAction, int maxSteps)// calcula path y lo limita por energía
+    {
+        List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
+        if (path.Count > maxSteps)
+            path = path.GetRange(0, maxSteps);
+        if (path.Count > 0)
             unitDidAction = true;
         return path;
     }

@@ -15,6 +15,43 @@ public class IAMoveToResources : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
+    {
+        if (enemy == null) yield break;
+        yield return new WaitUntil(() => isBusy());
+        movedAnyUnit = false;
+        actionInProgress = true;
+        if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> resourceNodes = GetResourcesNode();
+        if (resourceNodes.Contains(enemy.currentNode) && enemy is Ranger)
+        {
+            ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
+            yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> validNodes = GetValidNodes();
+        bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
+        if (!foundPath)
+            if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
+            {
+                actionInProgress = false;
+                yield break;
+            }
+        int maxSteps = maxEnergy;
+        if (path.Count > maxSteps)
+            path = path.GetRange(0, maxSteps);
+        yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
+        movedAnyUnit = true;
+        if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+        yield return new WaitForSeconds(0.2f);
+        actionInProgress = false;
+    }
     public IEnumerator MoveAllEnemyUnitsToResorces()
     {
         movedAnyUnit = false;
