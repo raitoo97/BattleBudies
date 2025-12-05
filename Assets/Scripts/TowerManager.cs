@@ -22,7 +22,6 @@ public class TowerManager : MonoBehaviour
     {
         yield return null;
         InitializeAttackNodes();
-        //DebugAttackNodes();
     }
     public void InitializeAttackNodes()
     {
@@ -104,13 +103,5 @@ public class TowerManager : MonoBehaviour
         if (attackNodes.ContainsKey(tower))
             return attackNodes[tower];
         return new List<string>();
-    }
-    private void DebugAttackNodes()
-    {
-        foreach (var kv in attackNodes)
-        {
-            string nodes = string.Join(", ", kv.Value);
-            Debug.Log($"Torre {kv.Key.name} ({kv.Key.faction}) tiene nodos de ataque: {nodes}");
-        }
     }
 }
