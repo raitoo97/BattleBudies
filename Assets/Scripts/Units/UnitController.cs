@@ -215,7 +215,6 @@ public class UnitController : MonoBehaviour
         {
             if (!ResourcesManager.instance.onColectedResources)
             {
-                Debug.Log("PLAYER: Ranger está sobre un recurso  recoge.");
                 ResourcesManager.instance.StartRecolectedResources(unit as Ranger);
                 yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
             }
