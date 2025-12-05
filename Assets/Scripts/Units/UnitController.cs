@@ -24,22 +24,7 @@ public class UnitController : MonoBehaviour
             ResetPlayerUnitsTurnFlags();
         }
         previousIsPlayerTurn = GameManager.instance.isPlayerTurn;
-        if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
-        {
-            DeselectUnit();
-            pathDrawer.ClearPath();
-            selectedEndNode = null;
-            return;
-        }
-        if (!GameManager.instance.isPlayerTurn)
-        {
-            DeselectUnit();
-            pathDrawer.ClearPath();
-            selectedEndNode = null;
-            HandleMouseHover();
-            return;
-        }
-        if (CombatManager.instance != null && CombatManager.instance.GetCombatActive)
+        if (IsBusy())
         {
             DeselectUnit();
             pathDrawer.ClearPath();
@@ -206,6 +191,7 @@ public class UnitController : MonoBehaviour
         }
         if (unit == null || unit.currentNode == null)
             yield break;
+        yield return StartCoroutine(RecolectResources(unit));
         if (TryGetEnemyNeighbor(unit, out Units enemy))
         {
             CombatManager.instance.StartCombat(unit, enemy, true);
@@ -222,6 +208,19 @@ public class UnitController : MonoBehaviour
                 CombatManager.instance.StartCombatWithTower(unit, tower);
             }
         }
+    }
+    private IEnumerator RecolectResources(Units unit)
+    {
+        if (unit is Ranger && GetValidResourcesNodes(unit).Contains(unit.currentNode))
+        {
+            if (!ResourcesManager.instance.onColectedResources)
+            {
+                Debug.Log("PLAYER: Ranger está sobre un recurso  recoge.");
+                ResourcesManager.instance.StartRecolectedResources(unit as Ranger);
+                yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            }
+        }
+        yield return null;
     }
     private bool TryGetEnemyNeighbor(Units unit, out Units enemy)
     {
@@ -249,5 +248,23 @@ public class UnitController : MonoBehaviour
             if (u.isPlayerUnit)
                 u.ResetTurnFlags();
         }
+    }
+    private List<Node> GetValidResourcesNodes(Units unit)
+    {
+        return NodeManager.GetResourcesNode().FindAll(n =>n.IsEmpty() || n == unit.currentNode);
+    }
+    private bool IsBusy()
+    {
+        if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
+            return true;
+        if (GameManager.instance != null && !GameManager.instance.isPlayerTurn)
+            return true;
+        if (CombatManager.instance != null && CombatManager.instance.GetCombatActive)
+            return true;
+        if (ResourcesManager.instance != null && ResourcesManager.instance.onColectedResources)
+            return true;
+        if(Units.anyUnitMoving)
+            return true;
+        return false;
     }
 }
