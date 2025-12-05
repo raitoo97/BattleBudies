@@ -222,12 +222,14 @@ public class UnitController : MonoBehaviour
     }
     private IEnumerator HealthTower(Units unit)
     {
+        if (unit.hasHealthedTowerThisTurn)yield break;
         if (unit is Defenders && GetValidHealthNodes(unit).Contains(unit.currentNode))
         {
             if (!HealthTowerManager.instance.onColectedHealth)
             {
                 HealthTowerManager.instance.StartRecolectedHealth(unit as Defenders);
                 yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+                unit.hasHealthedTowerThisTurn = true;
             }
         }
         yield return null;
