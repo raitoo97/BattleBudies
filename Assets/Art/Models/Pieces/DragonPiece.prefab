@@ -26,17 +26,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 09a4852fc7569284099cb3b1ec7908cd,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.29
+      value: 0.02218628
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 09a4852fc7569284099cb3b1ec7908cd,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10
+      value: 21.422844
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 09a4852fc7569284099cb3b1ec7908cd,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -72.019905
+      value: -16.05712
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 09a4852fc7569284099cb3b1ec7908cd,
         type: 3}
@@ -148,8 +148,10 @@ MonoBehaviour:
   diceCount: 8
   isPlayerUnit: 1
   currentNode: {fileID: 0}
+  lastSafeNode: {fileID: 0}
   moveSpeed: 20
   diceInstance: {fileID: 0}
+  hasAttackedTowerThisTurn: 0
 --- !u!136 &1158937541066549441
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -172,4 +174,4 @@ CapsuleCollider:
   m_Radius: 0.0073268614
   m_Height: 0.012524592
   m_Direction: 1
-  m_Center: {x: 0, y: 0.006262296, z: 0}
+  m_Center: {x: 0, y: 0.01, z: 0}

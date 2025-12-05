@@ -144,14 +144,25 @@ public static class NodeManager
         if (safeNode == null || currentNode == null) return null;
         int dirX = Mathf.Clamp(currentNode.gridIndex.x - safeNode.gridIndex.x, -1, 1);
         int dirY = Mathf.Clamp(currentNode.gridIndex.y - safeNode.gridIndex.y, -1, 1);
-
+        Node bestNeighbor = null;
+        float bestScore = -Mathf.Infinity;
         foreach (var neigh in currentNode.Neighbors)
         {
-            if (neigh.gridIndex.x == currentNode.gridIndex.x + dirX && neigh.gridIndex.y == currentNode.gridIndex.y + dirY && !neigh.IsDangerous)
+            if (neigh.IsDangerous) continue;
+            int deltaX = neigh.gridIndex.x - currentNode.gridIndex.x;
+            int deltaY = neigh.gridIndex.y - currentNode.gridIndex.y;
+            float score = Vector2.Dot(new Vector2(deltaX, deltaY), new Vector2(dirX, dirY));
+
+            if (score > bestScore && neigh.IsEmpty())
             {
-                Debug.Log("Forward safe node found: " + neigh.gameObject.name);
-                return neigh;
+                bestScore = score;
+                bestNeighbor = neigh;
             }
+        }
+        if (bestNeighbor != null)
+        {
+            Debug.Log("Forward safe node found: " + bestNeighbor.gameObject.name);
+            return bestNeighbor;
         }
         return null;
     }
