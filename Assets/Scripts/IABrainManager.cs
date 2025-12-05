@@ -67,6 +67,10 @@ public class IABrainManager : MonoBehaviour
             }
         }
         yield return new WaitUntil(() => isBusy());
+        if (EnergyManager.instance.enemyCurrentEnergy >= 1)
+        {
+            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+        }
         GameManager.instance.StartPlayerTurn();
     }
     private int CountEnemyUnits()
