@@ -11,6 +11,11 @@ public class DiceRoll : MonoBehaviour
     private float stillTimer = 0f;
     public bool hasBeenCounted = false;
     public bool hasBeenThrown = false;
+    [Header("Roll Settings")]
+    public float upwardForce;          // Fuerza vertical para lanzar
+    public Vector2 torqueRange;// Torques aleatorios para giro
+    public Vector2 horizontalForceRange;// Impulso horizontal
+    public float extraGravity;     // Gravedad extra para simular caída rápida
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -18,6 +23,13 @@ public class DiceRoll : MonoBehaviour
     void Update()
     {
         CheckIfDiceIsStill();
+    }
+    void FixedUpdate()
+    {
+        if (hasBeenThrown)
+        {
+            rb.AddForce(Vector3.down * extraGravity, ForceMode.Acceleration);
+        }
     }
     private void CheckIfDiceIsStill()
     {
@@ -46,11 +58,13 @@ public class DiceRoll : MonoBehaviour
         stillTimer = 0f;
         foreach (FaceDetector fd in GetComponentsInChildren<FaceDetector>())
             fd.ResetFaceDetector();
-        rb.AddForce(new Vector3(0, 12f, 0), ForceMode.Impulse);
-        float torqueX = Random.Range(30f, 80f);
-        float torqueY = Random.Range(30f, 80f);
-        float torqueZ = Random.Range(30f, 80f);
-        Vector3 randomTorque = new Vector3(torqueX, torqueY, torqueZ);
+        Vector3 force = new Vector3(Random.Range(horizontalForceRange.x, horizontalForceRange.y), upwardForce, Random.Range(horizontalForceRange.x, horizontalForceRange.y));
+        rb.AddForce(force, ForceMode.Impulse);
+        Vector3 randomTorque = new Vector3(
+            Random.Range(torqueRange.x, torqueRange.y),
+            Random.Range(torqueRange.x, torqueRange.y),
+            Random.Range(torqueRange.x, torqueRange.y)
+        );
         rb.AddTorque(randomTorque, ForceMode.Impulse);
     }
     private void OnCollisionEnter(Collision collision)

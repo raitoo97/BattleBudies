@@ -16,3 +16,4 @@ MonoBehaviour:
   cost: 3
   unitPrefab: {fileID: 4684953630393334421, guid: b5a5a18a608239747bfac116f5966613,
     type: 3}
+  unitType: 1
