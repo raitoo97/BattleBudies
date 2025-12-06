@@ -21,6 +21,7 @@ public abstract class Units : MonoBehaviour
     [Header("Dice")]
     public DiceRoll diceInstance;
     [HideInInspector]public bool hasAttackedTowerThisTurn = false;
+    [HideInInspector] public bool hasHealthedTowerThisTurn = false;
     protected virtual void Start()
     {
         currentNode = NodeManager.GetClosetNode(transform.position);
@@ -76,7 +77,7 @@ public abstract class Units : MonoBehaviour
         Vector2 targetXZ = new Vector2(targetPos.x, targetPos.z);
         if (Vector2.Distance(posXZ, targetXZ) <= arriveThreshold)
         {
-            float requiredEnergy = 1f;
+            int requiredEnergy = 1;
             bool isPlayerTurn = GameManager.instance.isPlayerTurn;
             if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
@@ -138,15 +139,12 @@ public abstract class Units : MonoBehaviour
         Debug.Log($"{gameObject.name} ha muerto.");
         if (currentNode != null && currentNode.unitOnNode == this.gameObject)
             currentNode.unitOnNode = null;
-        if (!isPlayerUnit && IAMoveToTowers.instance != null)
-        {
-            IAMoveToTowers.instance.ReleaseNodeOnDeath(this);
-        }
         Destroy(gameObject);
     }
     public void ResetTurnFlags()
     {
         hasAttackedTowerThisTurn = false;
+        hasHealthedTowerThisTurn = false;
     }
     public void ClearPath()
     {

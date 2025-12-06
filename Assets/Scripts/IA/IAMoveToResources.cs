@@ -15,6 +15,52 @@ public class IAMoveToResources : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
+    {
+        if (enemy == null) yield break;
+        yield return new WaitUntil(() => isBusy());
+        movedAnyUnit = false;
+        actionInProgress = true;
+        if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> resourceNodes = GetResourcesNode();
+        if (resourceNodes.Contains(enemy.currentNode) && enemy is Ranger)
+        {
+            Debug.Log($"IA: Unidad enemiga es un Ranger va a tirar de nombre {enemy.gameObject.name}.");
+            ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
+            yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> validNodes = GetValidNodes();
+        bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
+        if (!foundPath)
+        {
+            if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
+            {
+                actionInProgress = false;
+                yield break;
+            }
+        }
+        int pathOffset = (path.Count > 0 && path[0] == enemy.currentNode) ? 1 : 0;
+        int stepsToMove = Mathf.Min(maxEnergy, path.Count - pathOffset);
+        if (stepsToMove <= 0)
+        {
+            Debug.Log($"Ranger {enemy.gameObject.name} no puede moverse con la energía restante.");
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
+        yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
+        movedAnyUnit = true;
+        if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+        yield return new WaitForSeconds(0.2f);
+        actionInProgress = false;
+    }
     public IEnumerator MoveAllEnemyUnitsToResorces()
     {
         movedAnyUnit = false;

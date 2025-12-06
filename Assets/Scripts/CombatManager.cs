@@ -163,7 +163,12 @@ public class CombatManager : MonoBehaviour
     }
     #endregion
     #region//TowersAI
-    public void StartCombatWithTowerAI(Units attacker, Tower tower)
+    public IEnumerator StartCombatWithTowerAI_Coroutine(Units attacker, Tower tower)
+    {
+        StartCombatWithTowerAI(attacker, tower);
+        yield return new WaitUntil(() => !combatActive);
+    }
+    private void StartCombatWithTowerAI(Units attacker, Tower tower)
     {
         if (combatActive) return;
         if (SalvationManager.instance.GetOnSavingThrow) return;
@@ -181,21 +186,6 @@ public class CombatManager : MonoBehaviour
         CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
         StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
     }
-    public IEnumerator StartCombatWithTowerAI_Coroutine(Units attacker, Tower tower)
-    {
-        StartCombatWithTowerAI(attacker, tower);  // inicia combate
-        yield return new WaitUntil(() => !combatActive);  // espera a que termine
-    }
-    public IEnumerator StartCombatWithUnit_Coroutine(Units attacker, Units defender)
-    {
-        if (attacker == null || defender == null)
-        {
-            Debug.LogError("StartCombatWithUnit_Coroutine: alguna unidad es null.");
-            yield break;
-        }
-        StartCombat(attacker, defender, true);
-        yield return new WaitUntil(() => !combatActive);
-    }
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
     {
         int remainingDice = attacker.diceCount;
@@ -210,10 +200,8 @@ public class CombatManager : MonoBehaviour
             {
                 tower.TakeDamage(pendingDamage);
                 CanvasManager.instance.AddDamageToUI(attacker, pendingDamage);
-                Debug.Log($"{attacker.name} inflige {pendingDamage} a torre {tower.name}. Vida restante: {tower.currentHealth}");
                 if (tower.currentHealth <= 0)
                 {
-                    Debug.Log($"Torre {tower.name} destruida por IA.");
                     TowerManager.instance.NotifyTowerDestroyed(tower);
                     break;
                 }

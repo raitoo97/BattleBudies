@@ -5,165 +5,189 @@ public class IAMoveToTowers : MonoBehaviour
 {
     public static IAMoveToTowers instance;
     [HideInInspector] public bool movedAnyUnit = false;
-    private Dictionary<Units, Node> unitReservedNodes = new Dictionary<Units, Node>();
     private bool actionInProgress = false;
+    public Transform ReferencePoint;
+    public float maxDistanceFromReference = 10f;
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+    }
+    public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
+    {
+        if (enemy == null) yield break;
+        yield return new WaitUntil(() => isBusy());
+        movedAnyUnit = false;
+        actionInProgress = true;
+        if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> attackNodes = GetAttackNodes();
+        if (attackNodes.Contains(enemy.currentNode))
+        {
+            Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
+            if (targetTower != null)
+            {
+                Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} atacará torre {targetTower.name}.");
+                yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
+            }
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> validNodes = GetValidNodes();
+        bool foundPath = GetClosestTowerPlayer(enemy, validNodes, out Node closestNode, out List<Node> path);
+        if (!foundPath)
+        {
+            if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
+            {
+                actionInProgress = false;
+                yield break;
+            }
+        }
+        int pathOffset = (path.Count > 0 && path[0] == enemy.currentNode) ? 1 : 0;
+        int stepsToMove = Mathf.Min(maxEnergy, path.Count - pathOffset);
+        if (stepsToMove <= 0)
+        {
+            Debug.Log($"Atacker {enemy.gameObject.name} no puede moverse con la energía restante.");
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
+        yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
+        movedAnyUnit = true;
+        if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+        yield return new WaitForSeconds(0.2f);
+        actionInProgress = false;
     }
     public IEnumerator MoveAllEnemyUnitsToTowers()
     {
         movedAnyUnit = false;
-        Units[] allUnits = FindObjectsOfType<Units>();
-        List<Units> enemyUnits = GetEnemyUnits(allUnits); //obtiene solo unidades enemigas
+        List<Units> enemyUnits = GetAllEnemyUnits();
+        List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
             yield return new WaitUntil(() => isBusy());
             actionInProgress = true;
-            if (!CanEnemyAct(enemy)) //valida energía y nodo
+            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
             {
                 actionInProgress = false;
                 continue;
-            } 
-            bool unitDidAction = false;
-            //SELECCIÓN DE TORRE Y NODO
-            Tower targetTower;
-            Node targetNode;
-            if (!GetClosestValidTowerNode(out targetTower, out targetNode)) 
+            }
+            List<Node> attackNodes = GetAttackNodes();
+            if (attackNodes.Contains(enemy.currentNode))
             {
+                Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
+                if (targetTower != null)
+                {
+                    Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} atacará torre {targetTower.name}.");
+                    yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
+                }
                 actionInProgress = false;
                 continue;
-            } //busca torre y nodo libre
-            //CAMINO HACIA LA TORRE
-            Node previousStep = enemy.currentNode;
-            List<Node> path = PreparePath(enemy, targetNode, ref unitDidAction); //calcula path y limita pasos según energy
-            yield return StartCoroutine(ExecuteMovementPath(enemy, path, previousStep)); //mueve unidad paso a paso
-            //ATAQUE A TORRE
-            if (enemy != null && TowerManager.instance.CanUnitAttackTower(enemy, targetTower))
-            {
-                unitDidAction = true;
-                yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
             }
-            if (enemy != null)
+            bool foundPath = GetClosestTowerPlayer(enemy, validNodes, out Node closestNode, out List<Node> path);
+            if (!foundPath)
             {
-                enemy.hasAttackedTowerThisTurn = true;
-                if (unitDidAction)
-                    movedAnyUnit = true;
+                // Si no hay nodo alcanzable, moverse a un nodo random cerca del punto de referencia
+                if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
+                {
+                    actionInProgress = false;
+                    continue;
+                }
             }
+            // Limitamos path por energía
+            int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+            if (path.Count > maxSteps)
+                path = path.GetRange(0, maxSteps);
+            // Movemos la unidad con tiradas de salvación
+            yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
+            movedAnyUnit = true;
+            // Ataque a unidad jugador si hay vecino
+            if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+                yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+            yield return new WaitForSeconds(0.2f);
             actionInProgress = false;
         }
-        unitReservedNodes.Clear();
-    }//FUNCIONA MAIN
-    private List<Units> GetEnemyUnits(Units[] allUnits)// devuelve lista de unidades enemigas
-    {
-        List<Units> enemyUnits = new List<Units>();
-        foreach (Units u in allUnits)
-            if (!u.isPlayerUnit) enemyUnits.Add(u);
-        return enemyUnits;
     }
-    private bool CanEnemyAct(Units enemy) // valida energía + referencias
+    private Tower GetClosestTowerToNode(Node node)
     {
-        return !(enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f);
-    }
-    private bool GetClosestValidTowerNode(out Tower targetTower, out Node targetNode)// busca torre objetivo y nodo de ataque
-    {
-        targetTower = null;
-        targetNode = null;
-        Tower[] allTowers = FindObjectsOfType<Tower>();
-        List<Tower> candidateTowers = new List<Tower>();
-        foreach (Tower t in allTowers)
-            if (t.faction == Faction.Player && !t.isDestroyed)
-                candidateTowers.Add(t);
-        candidateTowers.Sort((a, b) => a.currentHealth.CompareTo(b.currentHealth));
-        foreach (Tower tower in candidateTowers)
+        Tower closestTower = null;
+        float minDistance = Mathf.Infinity;
+        foreach (Tower t in TowerManager.instance.playerTowers)
         {
-            foreach (var nodeKey in TowerManager.instance.GetAttackNodes(tower))
+            if (t == null || t.isDestroyed) continue;
+
+            float dist = Vector3.Distance(node.transform.position, t.transform.position);
+            if (dist < minDistance)
             {
-                string[] parts = nodeKey.Split('_');
-                if (parts.Length != 3) continue;
-                if (!int.TryParse(parts[1], out int x)) continue;
-                if (!int.TryParse(parts[2], out int y)) continue;
-                Node node = NodeManager.GetAllNodes().Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
-                if (node != null && !IsNodeReserved(node) && node.IsEmpty())
-                {
-                    targetTower = tower;
-                    targetNode = node;
-                    return true;
-                }
+                minDistance = dist;
+                closestTower = t;
+            }
+        }
+        return closestTower;
+    }
+    private bool GetClosestTowerPlayer(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
+    {
+        closestNode = null;
+        pathToNode = null;
+        if (validNodes.Count == 0) return false;
+        validNodes.Sort((a, b) => Vector3.Distance(enemy.transform.position, a.transform.position).CompareTo(Vector3.Distance(enemy.transform.position, b.transform.position)));
+        foreach (Node node in validNodes)
+        {
+            List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, node);
+            if (path != null && path.Count > 0)
+            {
+                closestNode = node;
+                pathToNode = path;
+                return true;
             }
         }
         return false;
     }
-    private List<Node> PreparePath(Units enemy, Node targetNode, ref bool unitDidAction)// calcula path y lo limita por energía
+    private bool GetRandomNodeNearReference(Units enemy, out Node targetNode, out List<Node> path)
     {
-        List<Node> path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
-        int maxStep = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-        if (path.Count > maxStep)
-            path = path.GetRange(0, maxStep);
-        if(path.Count > 0)
-            unitDidAction = true;
-        return path;
-    }
-    IEnumerator ExecuteMovementPath(Units enemy, List<Node> path, Node previousStep)
-    {
-        for (int i = 0; i < path.Count; i++)
+        targetNode = null;
+        path = null;
+        List<Node> allValidNodes = GetAllValidNodes();
+        if (allValidNodes.Count == 0) return false;
+        List<Node> candidates = new List<Node>();
+        foreach (Node n in allValidNodes)
         {
-            Node step = path[i];
-            if (enemy == null) yield break;
-            ReleaseReservedNode(enemy);
-            enemy.SetPath(new List<Node> { step });
-            yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
-            if (enemy == null) yield break;
-            if (IsDangerousNode(step))
-            {
-                Node lastSafe = previousStep != null ? previousStep : enemy.lastSafeNode;
-                yield return StartCoroutine(HandleDangerAndRepath(enemy, lastSafe));
-                yield break;
-            }
-            enemy.lastSafeNode = step;
-            previousStep = step;
-            Units playerUnit;
-            if (TryGetPlayerNeighbor(enemy, out playerUnit))
-            {
-                yield return StartCoroutine(CombatManager.instance.StartCombatWithUnit_Coroutine(enemy, playerUnit));
-                if (enemy == null) yield break;
-            }
-            if (i == path.Count - 1)
-                ReserveNode(enemy, step);
+            float dist = Vector3.Distance(n.transform.position, ReferencePoint.position);
+            if (dist <= maxDistanceFromReference)
+                candidates.Add(n);
         }
+        if (candidates.Count == 0)
+            return false;
+        targetNode = candidates[Random.Range(0, candidates.Count)];
+        path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
+        if (path == null || path.Count == 0) return false;
+        return true;
     }
-    private bool IsDangerousNode(Node step)
+    private List<Units> GetAllEnemyUnits()
     {
-        return step.IsDangerous;
+        Units[] allUnits = FindObjectsOfType<Units>();
+        List<Units> enemies = new List<Units>();
+        foreach (Units u in allUnits)
+            if (!u.isPlayerUnit) enemies.Add(u);
+        return enemies;
     }
-    IEnumerator HandleDangerAndRepath(Units enemy, Node lastSafeNode)
+    private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {
-        if (enemy == null) yield break;
-        enemy.lastSafeNode = lastSafeNode;
-        SalvationManager.instance.StartSavingThrow(enemy);
-        yield return new WaitUntil(() => enemy == null || !SalvationManager.instance.GetOnSavingThrow);
-        if (enemy == null) yield break;
-        Node startNode = enemy.lastSafeNode;
-        if (startNode == null) yield break;
-        Tower targetTower;
-        Node targetNode;
-        if (!GetClosestValidTowerNode(out targetTower, out targetNode))
-            yield break;
-        List<Node> fullPath = PathFinding.CalculateAstart(startNode, targetNode);
-        if (fullPath.Count == 0) yield break;
-        int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-        if (fullPath.Count > maxSteps)
-            fullPath = fullPath.GetRange(0, maxSteps);
-        enemy.SetPath(fullPath);
-        if (fullPath.Count > 0)
-            ReserveNode(enemy, fullPath[fullPath.Count - 1]);
-        yield return StartCoroutine(ExecuteMovementPath(enemy, fullPath, enemy.lastSafeNode));
+        yield return new WaitUntil(() => attacker.PathEmpty());
+        CombatManager.instance.StartCombat(attacker, defender, true);
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive);
     }
     private bool TryGetPlayerNeighbor(Units enemy, out Units player)
     {
         player = null;
         if (enemy.currentNode == null) return false;
+
         foreach (Node neighbor in enemy.currentNode.Neighbors)
         {
             if (neighbor.unitOnNode != null)
@@ -178,22 +202,39 @@ public class IAMoveToTowers : MonoBehaviour
         }
         return false;
     }
-    private void ReserveNode(Units unit, Node node)
+    private List<Node> GetAttackNodes()
     {
-        unitReservedNodes[unit] = node;
+        return NodeManager.GetAllPlayerTowersNodes();
     }
-    private void ReleaseReservedNode(Units unit)
+    private List<Node> GetValidNodes()
     {
-        if (unitReservedNodes.ContainsKey(unit))
-            unitReservedNodes.Remove(unit);
+        return GetAttackNodes().FindAll(n => n.unitOnNode == null);
     }
-    public bool IsNodeReserved(Node node)
+    private List<Node> GetAllValidNodes()
     {
-        return unitReservedNodes.ContainsValue(node);
+        return NodeManager.GetAllNodes().FindAll(n => n.IsEmpty());
     }
-    public void ReleaseNodeOnDeath(Units unit)
+    private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
-        ReleaseReservedNode(unit);
+        foreach (Node step in path)
+        {
+            if (enemy == null) yield break;
+            enemy.SetPath(new List<Node> { step });
+            yield return new WaitUntil(() => enemy != null && enemy.PathEmpty());
+            if (enemy == null) yield break;
+            if (step.IsDangerous)
+            {
+                SalvationManager.instance.StartSavingThrow(enemy);
+                yield return new WaitUntil(() => enemy == null || !SalvationManager.instance.GetOnSavingThrow);
+                if (enemy == null || enemy.currentNode != step) yield break;
+            }
+            enemy.lastSafeNode = step;
+            if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            {
+                yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+                yield break; // Detener movimiento al pelear
+            }
+        }
     }
     private bool isBusy()
     {
@@ -201,5 +242,10 @@ public class IAMoveToTowers : MonoBehaviour
         && !SalvationManager.instance.GetOnSavingThrow
         && !CombatManager.instance.GetCombatActive
         && !Units.anyUnitMoving;
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);
     }
 }

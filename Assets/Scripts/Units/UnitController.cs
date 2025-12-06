@@ -24,22 +24,7 @@ public class UnitController : MonoBehaviour
             ResetPlayerUnitsTurnFlags();
         }
         previousIsPlayerTurn = GameManager.instance.isPlayerTurn;
-        if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
-        {
-            DeselectUnit();
-            pathDrawer.ClearPath();
-            selectedEndNode = null;
-            return;
-        }
-        if (!GameManager.instance.isPlayerTurn)
-        {
-            DeselectUnit();
-            pathDrawer.ClearPath();
-            selectedEndNode = null;
-            HandleMouseHover();
-            return;
-        }
-        if (CombatManager.instance != null && CombatManager.instance.GetCombatActive)
+        if (IsBusy())
         {
             DeselectUnit();
             pathDrawer.ClearPath();
@@ -200,12 +185,13 @@ public class UnitController : MonoBehaviour
         if (unit.currentNode == null) yield break;
         if (unit.currentNode.IsDangerous)
         {
-            Debug.Log("Unidad terminó sobre un nodo peligroso tirada de salvación.");
             SalvationManager.instance.StartSavingThrow(unit);
             yield return new WaitUntil(() => !SalvationManager.instance.GetOnSavingThrow);
         }
         if (unit == null || unit.currentNode == null)
             yield break;
+        yield return StartCoroutine(RecolectResources(unit));
+        yield return StartCoroutine(HealthTower(unit));
         if (TryGetEnemyNeighbor(unit, out Units enemy))
         {
             CombatManager.instance.StartCombat(unit, enemy, true);
@@ -214,7 +200,6 @@ public class UnitController : MonoBehaviour
         {
             if (unit.hasAttackedTowerThisTurn)
             {
-                Debug.Log($"Unidad {unit.name} ya atacó una torre este turno.");
                 yield break;
             }
             if (TowerManager.instance.CanUnitAttackTower(unit, tower))
@@ -222,6 +207,32 @@ public class UnitController : MonoBehaviour
                 CombatManager.instance.StartCombatWithTower(unit, tower);
             }
         }
+    }
+    private IEnumerator RecolectResources(Units unit)
+    {
+        if (unit is Ranger && GetValidResourcesNodes(unit).Contains(unit.currentNode))
+        {
+            if (!ResourcesManager.instance.onColectedResources)
+            {
+                ResourcesManager.instance.StartRecolectedResources(unit as Ranger);
+                yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            }
+        }
+        yield return null;
+    }
+    private IEnumerator HealthTower(Units unit)
+    {
+        if (unit.hasHealthedTowerThisTurn)yield break;
+        if (unit is Defenders && GetValidHealthNodes(unit).Contains(unit.currentNode))
+        {
+            if (!HealthTowerManager.instance.onColectedHealth)
+            {
+                HealthTowerManager.instance.StartRecolectedHealth(unit as Defenders);
+                yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+                unit.hasHealthedTowerThisTurn = true;
+            }
+        }
+        yield return null;
     }
     private bool TryGetEnemyNeighbor(Units unit, out Units enemy)
     {
@@ -249,5 +260,29 @@ public class UnitController : MonoBehaviour
             if (u.isPlayerUnit)
                 u.ResetTurnFlags();
         }
+    }
+    private List<Node> GetValidResourcesNodes(Units unit)
+    {
+        return NodeManager.GetResourcesNode().FindAll(n =>n.IsEmpty() || n == unit.currentNode);
+    }
+    private List<Node> GetValidHealthNodes(Units unit)
+    {
+        return NodeManager.GetHealthNodes().FindAll(n => n.IsEmpty() || n == unit.currentNode);
+    }
+    private bool IsBusy()
+    {
+        if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
+            return true;
+        if (GameManager.instance != null && !GameManager.instance.isPlayerTurn)
+            return true;
+        if (CombatManager.instance != null && CombatManager.instance.GetCombatActive)
+            return true;
+        if (ResourcesManager.instance != null && ResourcesManager.instance.onColectedResources)
+            return true;
+        if (HealthTowerManager.instance != null && HealthTowerManager.instance.onColectedHealth)
+            return true;
+        if (Units.anyUnitMoving)
+            return true;
+        return false;
     }
 }

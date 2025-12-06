@@ -15,6 +15,54 @@ public class IADefendTowers : MonoBehaviour
         else
             Destroy(gameObject);
     }
+    public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
+    {
+        if (enemy == null) yield break;
+        yield return new WaitUntil(() => isBusy());
+        movedAnyUnit = false;
+        actionInProgress = true;
+        if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> resourceNodes = GetHealtNodes();
+        if (resourceNodes.Contains(enemy.currentNode) && enemy is Defenders)
+        {
+            Debug.Log($"IA: Unidad enemiga es un Defensor va a tirar de nombre {enemy.gameObject.name}.");
+            HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
+            yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> validNodes = GetValidNodes();
+        bool foundPath = GetClosestFreeHealthNode(enemy, validNodes, out Node closestNode, out List<Node> path);
+        if (!foundPath)
+        {
+            MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
+            if (!foundPath) // Si todavía no encontró path, salimos
+            {
+                actionInProgress = false;
+                yield break;
+            }
+            // Si encontró path, continuamos con el movimiento
+        }
+        int pathOffset = (path.Count > 0 && path[0] == enemy.currentNode) ? 1 : 0;
+        int stepsToMove = Mathf.Min(maxEnergy, path.Count - pathOffset);
+        if (stepsToMove <= 0)
+        {
+            Debug.Log($"Defender {enemy.gameObject.name} no puede moverse con la energía restante.");
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
+        yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
+        movedAnyUnit = true;
+        if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
+            yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
+        yield return new WaitForSeconds(0.2f);
+        actionInProgress = false;
+    }
     public IEnumerator MoveAllEnemyUnitsToDefend()
     {
         movedAnyUnit = false;
