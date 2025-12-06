@@ -38,11 +38,13 @@ public class IAMoveToResources : MonoBehaviour
         List<Node> validNodes = GetValidNodes();
         bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
         if (!foundPath)
+        {
             if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
             {
                 actionInProgress = false;
                 yield break;
             }
+        }
         int maxSteps = maxEnergy;
         if (path.Count > maxSteps)
             path = path.GetRange(0, maxSteps);

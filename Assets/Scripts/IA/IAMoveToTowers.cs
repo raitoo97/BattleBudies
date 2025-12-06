@@ -26,23 +26,28 @@ public class IAMoveToTowers : MonoBehaviour
             actionInProgress = false;
             yield break;
         }
-        List<Node> resourceNodes = GetAttackNodes();
-        if (resourceNodes.Contains(enemy.currentNode) && enemy is Ranger)
+        List<Node> attackNodes = GetAttackNodes();
+        if (attackNodes.Contains(enemy.currentNode))
         {
-            Debug.Log($"IA: Unidad enemiga es un Ranger va a tirar de nombre {enemy.gameObject.name}.");
-            ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
-            yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
+            if (targetTower != null)
+            {
+                Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} atacará torre {targetTower.name}.");
+                yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
+            }
             actionInProgress = false;
             yield break;
         }
         List<Node> validNodes = GetValidNodes();
         bool foundPath = GetClosestTowerPlayer(enemy, validNodes, out Node closestNode, out List<Node> path);
         if (!foundPath)
+        {
             if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
             {
                 actionInProgress = false;
                 yield break;
             }
+        }
         int maxSteps = maxEnergy;
         if (path.Count > maxSteps)
             path = path.GetRange(0, maxSteps);
@@ -57,7 +62,6 @@ public class IAMoveToTowers : MonoBehaviour
     {
         movedAnyUnit = false;
         List<Units> enemyUnits = GetAllEnemyUnits();
-        List<Node> resourceNodes = GetAttackNodes();
         List<Node> validNodes = GetValidNodes();
         foreach (Units enemy in enemyUnits)
         {
@@ -68,25 +72,22 @@ public class IAMoveToTowers : MonoBehaviour
                 actionInProgress = false;
                 continue;
             }
-            if (resourceNodes.Contains(enemy.currentNode))
+            List<Node> attackNodes = GetAttackNodes();
+            if (attackNodes.Contains(enemy.currentNode))
             {
-                if (enemy is Ranger)
+                Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
+                if (targetTower != null)
                 {
-                    Debug.Log("IA: Unidad enemiga es un ranger va a tirar.");
-                    ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
-                    yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
-                    actionInProgress = false;
-                    continue;
+                    Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} atacará torre {targetTower.name}.");
+                    yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
                 }
-                else
-                {
-                    Debug.Log("IA: Unidad enemiga NO es un ranger NO va a tirar.");
-                    actionInProgress = false;
-                    continue;
-                }
+                actionInProgress = false;
+                continue;
             }
-            if (!GetClosestTowerPlayer(enemy, validNodes, out Node closestNode, out List<Node> path)) // No hay nodo alcanzable
+            bool foundPath = GetClosestTowerPlayer(enemy, validNodes, out Node closestNode, out List<Node> path);
+            if (!foundPath)
             {
+                // Si no hay nodo alcanzable, moverse a un nodo random cerca del punto de referencia
                 if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
                 {
                     actionInProgress = false;
@@ -106,6 +107,23 @@ public class IAMoveToTowers : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             actionInProgress = false;
         }
+    }
+    private Tower GetClosestTowerToNode(Node node)
+    {
+        Tower closestTower = null;
+        float minDistance = Mathf.Infinity;
+        foreach (Tower t in TowerManager.instance.playerTowers)
+        {
+            if (t == null || t.isDestroyed) continue;
+
+            float dist = Vector3.Distance(node.transform.position, t.transform.position);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                closestTower = t;
+            }
+        }
+        return closestTower;
     }
     private bool GetClosestTowerPlayer(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
     {

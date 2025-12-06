@@ -163,7 +163,12 @@ public class CombatManager : MonoBehaviour
     }
     #endregion
     #region//TowersAI
-    public void StartCombatWithTowerAI(Units attacker, Tower tower)
+    public IEnumerator StartCombatWithTowerAI_Coroutine(Units attacker, Tower tower)
+    {
+        StartCombatWithTowerAI(attacker, tower);
+        yield return new WaitUntil(() => !combatActive);
+    }
+    private void StartCombatWithTowerAI(Units attacker, Tower tower)
     {
         if (combatActive) return;
         if (SalvationManager.instance.GetOnSavingThrow) return;
@@ -180,21 +185,6 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"StartCombatWithTowerAI: {attackerUnit.name} ataca torre {tower.name}");
         CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
         StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
-    }
-    public IEnumerator StartCombatWithTowerAI_Coroutine(Units attacker, Tower tower)
-    {
-        StartCombatWithTowerAI(attacker, tower);  // inicia combate
-        yield return new WaitUntil(() => !combatActive);  // espera a que termine
-    }
-    public IEnumerator StartCombatWithUnit_Coroutine(Units attacker, Units defender)
-    {
-        if (attacker == null || defender == null)
-        {
-            Debug.LogError("StartCombatWithUnit_Coroutine: alguna unidad es null.");
-            yield break;
-        }
-        StartCombat(attacker, defender, true);
-        yield return new WaitUntil(() => !combatActive);
     }
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
     {
