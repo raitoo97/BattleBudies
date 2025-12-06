@@ -47,10 +47,16 @@ public class IADefendTowers : MonoBehaviour
             }
             // Si encontró path, continuamos con el movimiento
         }
-        int maxSteps = maxEnergy;
-        if (path.Count > maxSteps)
-            path = path.GetRange(0, maxSteps);
-        yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
+        int pathOffset = (path.Count > 0 && path[0] == enemy.currentNode) ? 1 : 0;
+        int stepsToMove = Mathf.Min(maxEnergy, path.Count - pathOffset);
+        if (stepsToMove <= 0)
+        {
+            Debug.Log($"Defender {enemy.gameObject.name} no puede moverse con la energía restante.");
+            actionInProgress = false;
+            yield break;
+        }
+        List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
+        yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
         movedAnyUnit = true;
         if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
             yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
