@@ -61,9 +61,13 @@ public class IABrainManager : MonoBehaviour
         {
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Attackers {u.gameObject.name}");
+            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u, moveEnergy));
+            yield return new WaitForSeconds(0.2f);
+            Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
+
         if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             Debug.Log("IA decide jugar carta tras mover Attackers");
@@ -80,6 +84,7 @@ public class IABrainManager : MonoBehaviour
         {
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
+            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             if (NodeManager.GetHealthNodes().Contains(u.currentNode))
             {
                 yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, 0));
@@ -89,6 +94,7 @@ public class IABrainManager : MonoBehaviour
             yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
             yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
             yield return new WaitForSeconds(0.2f);
+            Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
         if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
@@ -105,6 +111,7 @@ public class IABrainManager : MonoBehaviour
         {
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
+            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             if (NodeManager.GetResourcesNode().Contains(u.currentNode))
             {
                 yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, 0));
@@ -114,6 +121,7 @@ public class IABrainManager : MonoBehaviour
             yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
             yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
             yield return new WaitForSeconds(0.2f);
+            Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
         if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
