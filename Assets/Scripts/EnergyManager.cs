@@ -3,11 +3,11 @@ public class EnergyManager : MonoBehaviour
 {
     public static EnergyManager instance;
     [Header("Player Energy")]
-    public float maxEnergy = 10f;
-    public float currentEnergy;
+    public int maxEnergy = 10;
+    public int currentEnergy;
     [Header("Enemy Energy")]
-    public float enemyMaxEnergy = 10f;
-    public float enemyCurrentEnergy;
+    public int enemyMaxEnergy = 10;
+    public int enemyCurrentEnergy;
     private void Awake()
     {
         if (instance == null)
@@ -20,7 +20,7 @@ public class EnergyManager : MonoBehaviour
         currentEnergy = maxEnergy;
         enemyCurrentEnergy = enemyMaxEnergy;
     }
-    public bool TryConsumeEnergy(float amount, bool isPlayer)
+    public bool TryConsumeEnergy(int amount, bool isPlayer)
     {
         if (isPlayer)
         {

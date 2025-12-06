@@ -77,7 +77,7 @@ public abstract class Units : MonoBehaviour
         Vector2 targetXZ = new Vector2(targetPos.x, targetPos.z);
         if (Vector2.Distance(posXZ, targetXZ) <= arriveThreshold)
         {
-            float requiredEnergy = 1f;
+            int requiredEnergy = 1;
             bool isPlayerTurn = GameManager.instance.isPlayerTurn;
             if (EnergyManager.instance.TryConsumeEnergy(requiredEnergy, isPlayerTurn))
             {
