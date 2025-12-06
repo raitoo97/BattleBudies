@@ -210,10 +210,8 @@ public class CombatManager : MonoBehaviour
             {
                 tower.TakeDamage(pendingDamage);
                 CanvasManager.instance.AddDamageToUI(attacker, pendingDamage);
-                Debug.Log($"{attacker.name} inflige {pendingDamage} a torre {tower.name}. Vida restante: {tower.currentHealth}");
                 if (tower.currentHealth <= 0)
                 {
-                    Debug.Log($"Torre {tower.name} destruida por IA.");
                     TowerManager.instance.NotifyTowerDestroyed(tower);
                     break;
                 }
