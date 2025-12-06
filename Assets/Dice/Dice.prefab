@@ -323,7 +323,7 @@ Rigidbody:
   m_GameObject: {fileID: 6048372251452510850}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 0.1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -338,7 +338,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &508019700719267285
@@ -353,12 +353,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3f2d8245c16574d936264f4713a198, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxRandomForceValue: 2000
-  _startRollingForce: 1000
-  forceX: 0
-  forceY: 0
-  forceZ: 0
-  diceFaceNumber: 0
+  thresholdStill: 0.05
+  resetTime: 1
+  resetPoint: {fileID: 0}
+  hasBeenCounted: 0
+  hasBeenThrown: 0
+  upwardForce: 5
+  torqueRange: {x: 150, y: 200}
+  horizontalForceRange: {x: -1, y: 1}
+  extraGravity: 40
 --- !u!1 &6940138185212781241
 GameObject:
   m_ObjectHideFlags: 0
