@@ -139,10 +139,6 @@ public abstract class Units : MonoBehaviour
         Debug.Log($"{gameObject.name} ha muerto.");
         if (currentNode != null && currentNode.unitOnNode == this.gameObject)
             currentNode.unitOnNode = null;
-        if (!isPlayerUnit && IAMoveToTowers.instance != null)
-        {
-            IAMoveToTowers.instance.ReleaseNodeOnDeath(this);
-        }
         Destroy(gameObject);
     }
     public void ResetTurnFlags()

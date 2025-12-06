@@ -222,4 +222,28 @@ public static class NodeManager
         }
         return healthNodes;
     }
+    public static List<Node> GetAllPlayerTowersNodes()
+    {
+        List<Node> attackNodesList = new List<Node>();
+        foreach (Tower tower in TowerManager.instance.playerTowers)
+        {
+            if (tower == null || tower.isDestroyed)
+                continue;
+            foreach (var key in TowerManager.instance.GetAttackNodes(tower))
+            {
+                // Parse "_x_y"
+                string[] parts = key.Split('_');
+                if (parts.Length != 3) continue;
+                if (!int.TryParse(parts[1], out int x)) continue;
+                if (!int.TryParse(parts[2], out int y)) continue;
+
+                Node node = _totalNodes.Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
+                if (node != null && !attackNodesList.Contains(node))
+                {
+                    attackNodesList.Add(node);
+                }
+            }
+        }
+        return attackNodesList;
+    }
 }
