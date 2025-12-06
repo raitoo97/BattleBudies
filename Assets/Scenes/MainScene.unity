@@ -123,37 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &3561931
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3561932}
-  m_Layer: 0
-  m_Name: GORDITAZAPALLOOOOOESGORDOLFA
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3561932
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3561931}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 70.5, y: 7.632784, z: 38.4}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &115920103
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -220,7 +189,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 100
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
@@ -1083,7 +1052,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 100
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
@@ -1904,7 +1873,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
@@ -4988,7 +4957,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
@@ -5457,7 +5426,7 @@ PrefabInstance:
     - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: maxHealth
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
@@ -7374,6 +7343,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2505801546205863459, guid: 0f5c8b2f99256b245a30d649b8f0c633,
+        type: 3}
+      propertyPath: maxHealth
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 6290818119665115951, guid: 0f5c8b2f99256b245a30d649b8f0c633,
         type: 3}
       propertyPath: m_Name
@@ -8176,4 +8150,3 @@ SceneRoots:
   - {fileID: 186942367}
   - {fileID: 1571885260}
   - {fileID: 1165260219}
-  - {fileID: 3561932}

@@ -145,11 +145,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 40
-  diceCount: 5
+  diceCount: 4
   isPlayerUnit: 1
   currentNode: {fileID: 0}
+  lastSafeNode: {fileID: 0}
   moveSpeed: 20
   diceInstance: {fileID: 0}
+  hasAttackedTowerThisTurn: 0
+  hasHealthedTowerThisTurn: 0
 --- !u!136 &8707866418439025331
 CapsuleCollider:
   m_ObjectHideFlags: 0
