@@ -38,11 +38,14 @@ public class IADefendTowers : MonoBehaviour
         List<Node> validNodes = GetValidNodes();
         bool foundPath = GetClosestFreeHealthNode(enemy, validNodes, out Node closestNode, out List<Node> path);
         if (!foundPath)
-            MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
-        if (!foundPath)
         {
-            actionInProgress = false;
-            yield break;
+            MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
+            if (!foundPath) // Si todavía no encontró path, salimos
+            {
+                actionInProgress = false;
+                yield break;
+            }
+            // Si encontró path, continuamos con el movimiento
         }
         int maxSteps = maxEnergy;
         if (path.Count > maxSteps)
