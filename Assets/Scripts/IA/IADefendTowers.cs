@@ -29,6 +29,7 @@ public class IADefendTowers : MonoBehaviour
         List<Node> resourceNodes = GetHealtNodes();
         if (resourceNodes.Contains(enemy.currentNode) && enemy is Defenders)
         {
+            Debug.Log($"IA: Unidad enemiga es un Defensor va a tirar de nombre {enemy.gameObject.name}.");
             HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
             yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
             actionInProgress = false;

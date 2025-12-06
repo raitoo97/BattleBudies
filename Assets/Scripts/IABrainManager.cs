@@ -35,11 +35,16 @@ public class IABrainManager : MonoBehaviour
             foreach (Units u in attackers)
             {
                 if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
+                Debug.Log($"IA moviendo Attackers {u.gameObject.name}");
                 int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
                 yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u, moveEnergy));
             }
-            if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+            if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1) 
+            {
+                Debug.Log("IA decide jugar carta tras mover Attackers");
                 yield return StartCoroutine(IAPlayCards.instance.PlayOneCard());
+            }
+
         }
         // Defenders
         if (defenders.Count > 0)
@@ -51,7 +56,7 @@ public class IABrainManager : MonoBehaviour
             foreach (Units u in defenders)
             {
                 if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
-                // Si ya está sobre nodo de curación, curar y no gastar energía
+                Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
                 if (NodeManager.GetHealthNodes().Contains(u.currentNode))
                 {
                     yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, 0));
@@ -63,7 +68,10 @@ public class IABrainManager : MonoBehaviour
                 yield return new WaitForSeconds(0.2f);
             }
             if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+            {
+                Debug.Log("IA decide jugar carta tras mover Defender");
                 yield return StartCoroutine(IAPlayCards.instance.PlayOneCard());
+            }
         }
         // Rangers
         if (rangers.Count > 0)
@@ -73,14 +81,24 @@ public class IABrainManager : MonoBehaviour
             int energyPerUnit = Mathf.Max(1, Mathf.Min(rangersFairShare, maxStepsPerUnit));
             foreach (Units u in rangers)
             {
+                Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
                 if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
+                if (NodeManager.GetResourcesNode().Contains(u.currentNode))
+                {
+                    yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, 0));
+                    continue;
+                }
                 int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
                 yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
                 yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+                yield return new WaitForSeconds(0.2f);
             }
 
             if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+            {
+                Debug.Log("IA decide jugar carta tras mover Ranger");
                 yield return StartCoroutine(IAPlayCards.instance.PlayOneCard());
+            }
         }
         yield return new WaitForSeconds(1f);
         Debug.Log("Energía RESIDUAL restante al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
@@ -114,6 +132,8 @@ public class IABrainManager : MonoBehaviour
                     if (u == null) continue;
                     // Saltar Defenders que ya están sobre nodos de curación
                     if (u is Defenders && NodeManager.GetHealthNodes().Contains(u.currentNode))
+                        continue;
+                    if (u is Ranger && NodeManager.GetResourcesNode().Contains(u.currentNode))
                         continue;
                     if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
 
