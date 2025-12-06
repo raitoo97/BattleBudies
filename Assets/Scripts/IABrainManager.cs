@@ -29,9 +29,7 @@ public class IABrainManager : MonoBehaviour
         rangers.RemoveAll(u => u == null || !u);
         int totalUnits = attackers.Count + defenders.Count + rangers.Count;
         // ----------------- MOVIMIENTO POR TIPOS -----------------
-        yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
-        yield return StartCoroutine(MoveDefenders(defenders, rangers));
-        yield return StartCoroutine(MoveRangers(rangers));
+        yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
         yield return new WaitForSeconds(1f);
         Debug.Log("Energía RESIDUAL restante al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
         // ----------------- ENERGÍA RESIDUAL -----------------
@@ -64,6 +62,22 @@ public class IABrainManager : MonoBehaviour
         CanvasManager.instance?.UpdateEnergyUI();
         yield return null;
         yield return new WaitForSeconds(0.5f);
+    }
+    private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
+    {
+        float globalChance = Random.value;
+        if (globalChance < 0.50f)
+        {
+            Debug.Log("IA impredecible: ATAQUE GLOBAL  TODOS los tipos van a las torres del player");
+            yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
+            yield break;
+        }
+        //MOVIMIENTOS INDIVIDUALES NORMALES
+        Debug.Log("IA: movimientos individuales normales por tipo");
+        yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
+        yield return StartCoroutine(MoveDefenders(defenders, rangers));
+        yield return StartCoroutine(MoveRangers(rangers));
+        yield return new WaitForSeconds(1f);
     }
     private IEnumerator MoveAttackers(List<Attackers> attackers, int totalUnits)
     {
