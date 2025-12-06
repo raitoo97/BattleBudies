@@ -41,7 +41,9 @@ public class IAPlayCards : MonoBehaviour
             CardPlayManager.instance.GetcurrentUIcard = cardToPlay;
             CardPlayManager.instance.GetcurrentCardData = cardToPlay.GetComponent<UICard>().cardData;
             CardPlayManager.instance.GetselectedNode = spawnNode;
+            CardPlayManager.instance.placingMode = true;
             CardPlayManager.instance.PlaceUnitAtNode();
+            yield return new WaitUntil(() => !CardPlayManager.instance.placingMode);
             yield return new WaitForSeconds(2f);
         }
     }

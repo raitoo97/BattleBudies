@@ -43,6 +43,10 @@ public class IABrainManager : MonoBehaviour
                 int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
                 yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u, moveEnergy));
             }
+            if (Random.value < 0.3f && EnergyManager.instance.enemyCurrentEnergy >= 1)
+            {
+                yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            }
         }
         // ----------------- MOVIMIENTO DE DEFENDERS -----------------
         if (defenders.Count > 0)
@@ -53,6 +57,10 @@ public class IABrainManager : MonoBehaviour
                 if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
                 int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
                 yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
+            }
+            if (Random.value < 0.3f && EnergyManager.instance.enemyCurrentEnergy >= 1)
+            {
+                yield return StartCoroutine(IAPlayCards.instance.PlayCards());
             }
         }
         // ----------------- MOVIMIENTO DE RANGERS -----------------
@@ -65,12 +73,16 @@ public class IABrainManager : MonoBehaviour
                 int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
                 yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
             }
+            if (Random.value < 0.3f && EnergyManager.instance.enemyCurrentEnergy >= 1)
+            {
+                yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            }
         }
-        yield return new WaitUntil(() => isBusy());
-        if (EnergyManager.instance.enemyCurrentEnergy >= 1)
+        if (attackers.Count + defenders.Count + rangers.Count == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
         }
+        yield return new WaitUntil(() => isBusy());
         GameManager.instance.StartPlayerTurn();
     }
     private int CountEnemyUnits()
