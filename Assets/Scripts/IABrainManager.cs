@@ -24,6 +24,9 @@ public class IABrainManager : MonoBehaviour
         List<Defenders> defenders = new List<Defenders>();
         List<Ranger> rangers = new List<Ranger>();
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+        attackers.RemoveAll(u => u == null || !u);
+        defenders.RemoveAll(u => u == null || !u);
+        rangers.RemoveAll(u => u == null || !u);
         int totalUnits = attackers.Count + defenders.Count + rangers.Count;
         // ----------------- MOVIMIENTO POR TIPOS -----------------
         yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
@@ -37,9 +40,13 @@ public class IABrainManager : MonoBehaviour
         allUnits.AddRange(attackers);
         allUnits.AddRange(defenders);
         allUnits.AddRange(rangers);
+        allUnits.RemoveAll(u => u == null || !u);
         yield return StartCoroutine(UseResidualEnergy(allUnits));
         // ----------------- JUEGO DE CARTAS FINAL -----------------
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+        attackers.RemoveAll(u => u == null || !u);
+        defenders.RemoveAll(u => u == null || !u);
+        rangers.RemoveAll(u => u == null || !u);
         totalUnits = attackers.Count + defenders.Count + rangers.Count;
         if (EnergyManager.instance.enemyCurrentEnergy >= 1 && (totalUnits == 0 || Random.value < 0.7f))
             yield return StartCoroutine(IAPlayCards.instance?.PlayCards());
