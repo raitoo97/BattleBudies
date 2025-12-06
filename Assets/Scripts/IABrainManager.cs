@@ -19,24 +19,16 @@ public class IABrainManager : MonoBehaviour
         CanvasManager.instance.UpdateEnergyUI();
         yield return null;
         yield return new WaitForSeconds(0.5f);
-        int enemyUnits = CountEnemyUnits();
-        int playerUnits = CountPlayerUnits();
-        if (enemyUnits <= playerUnits)
-        {
-            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
-        }
         List<Attackers> attackers = new List<Attackers>();
         List<Defenders> defenders = new List<Defenders>();
         List<Ranger> rangers = new List<Ranger>();
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        int totalEnergy = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-        int energyForAttackers = Mathf.FloorToInt(totalEnergy * 0.5f);
-        int energyForDefenders = Mathf.FloorToInt(totalEnergy * 0.3f);
-        int energyForRangers = Mathf.FloorToInt(totalEnergy * 0.2f);
+        int totalUnits = attackers.Count + defenders.Count + rangers.Count;
+        int energyPerUnit = (totalUnits > 0) ? Mathf.Max(1, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy / (float)totalUnits)) : 0;
         // ----------------- MOVIMIENTO DE ATTACKERS -----------------
         if (attackers.Count > 0)
         {
-            int energyPerUnit = Mathf.Max(1, Mathf.FloorToInt((float)energyForAttackers / attackers.Count));
+            // Usamos energyPerUnit calculada sobre el total para priorizar Attackers pero reservar un poco para el resto.
             foreach (Units u in attackers)
             {
                 if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
@@ -51,13 +43,19 @@ public class IABrainManager : MonoBehaviour
         // ----------------- MOVIMIENTO DE DEFENDERS -----------------
         if (defenders.Count > 0)
         {
-            int energyPerUnit = Mathf.Max(1, Mathf.FloorToInt((float)energyForDefenders / defenders.Count));
+            // Recalcula la energía promedio para las unidades restantes
+            int remainingUnits = defenders.Count + rangers.Count;
+            int currentEnergy = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+            // El cálculo ahora es más justo: energía restante dividida entre las unidades restantes.
+            energyPerUnit = (remainingUnits > 0) ? Mathf.Max(1, Mathf.FloorToInt((float)currentEnergy / remainingUnits)) : 1;
             foreach (Units u in defenders)
             {
                 if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
+
                 int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
                 yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
             }
+            // Pequeña chance de jugar cartas
             if (Random.value < 0.3f && EnergyManager.instance.enemyCurrentEnergy >= 1)
             {
                 yield return StartCoroutine(IAPlayCards.instance.PlayCards());
@@ -66,10 +64,13 @@ public class IABrainManager : MonoBehaviour
         // ----------------- MOVIMIENTO DE RANGERS -----------------
         if (rangers.Count > 0)
         {
-            int energyPerUnit = Mathf.Max(1, Mathf.FloorToInt((float)energyForRangers / rangers.Count));
+            //Recalcula la energía promedio para las unidades restantes(solo Rangers)
+            int currentEnergy = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
+            energyPerUnit = (rangers.Count > 0) ? Mathf.Max(1, Mathf.FloorToInt((float)currentEnergy / rangers.Count)) : 1;
             foreach (Units u in rangers)
             {
                 if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
+
                 int moveEnergy = Mathf.Min(energyPerUnit, Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy));
                 yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
             }
@@ -78,28 +79,15 @@ public class IABrainManager : MonoBehaviour
                 yield return StartCoroutine(IAPlayCards.instance.PlayCards());
             }
         }
-        if (attackers.Count + defenders.Count + rangers.Count == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        if (EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
-            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            if (totalUnits == 0 || Random.value < 0.7f)
+            {
+                yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            }
         }
         yield return new WaitUntil(() => isBusy());
         GameManager.instance.StartPlayerTurn();
-    }
-    private int CountEnemyUnits()
-    {
-        int count = 0;
-        foreach (Units u in FindObjectsOfType<Units>())
-            if (!u.isPlayerUnit)
-                count++;
-        return count;
-    }
-    private int CountPlayerUnits()
-    {
-        int count = 0;
-        foreach (Units u in FindObjectsOfType<Units>())
-            if (u.isPlayerUnit)
-                count++;
-        return count;
     }
     private void GetEnemyUnitsByType(ref List<Attackers> atk,ref List<Defenders> def,ref List<Ranger> rng)
     {
