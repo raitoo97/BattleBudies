@@ -4,7 +4,7 @@ using UnityEngine;
 public class IABrainManager : MonoBehaviour
 {
     public static IABrainManager instance;
-    private float chanceToPlayCards = 0.5f;
+    private float chanceToPlayCards = 0.65f;
     [SerializeField] private int maxStepsPerUnit = 3;
     private void Awake()
     {
@@ -66,7 +66,7 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
         float globalChance = Random.value;
-        if (globalChance < 0.50f)
+        if (globalChance < 0.30f)
         {
             Debug.Log("IA impredecible: ATAQUE GLOBAL  TODOS los tipos van a las torres del player");
             yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());

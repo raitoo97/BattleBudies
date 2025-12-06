@@ -246,6 +246,6 @@ public class IAMoveToTowers : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);
+        Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);//ERROR
     }
 }
