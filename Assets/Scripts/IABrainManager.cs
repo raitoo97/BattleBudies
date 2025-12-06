@@ -13,33 +13,47 @@ public class IABrainManager : MonoBehaviour
     }
     public IEnumerator ExecuteTurn()
     {
-        yield return StartCoroutine(InitializedTurn());
-        List<Attackers> attackers = new List<Attackers>();
-        List<Defenders> defenders = new List<Defenders>();
-        List<Ranger> rangers = new List<Ranger>();
-        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        int totalUnits = attackers.Count + defenders.Count + rangers.Count;
-        // ----------------- MOVIMIENTO POR TIPOS -----------------
-        yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
-        yield return StartCoroutine(MoveDefenders(defenders, rangers));
-        yield return StartCoroutine(MoveRangers(rangers));
-        yield return new WaitForSeconds(1f);
-        Debug.Log("Energía RESIDUAL restante al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
-        // ----------------- ENERGÍA RESIDUAL -----------------
-        List<Units> allUnits = new List<Units>();
-        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        allUnits.AddRange(attackers);
-        allUnits.AddRange(defenders);
-        allUnits.AddRange(rangers);
-        yield return StartCoroutine(UseResidualEnergy(allUnits));
-        // ----------------- JUEGO DE CARTAS FINAL -----------------
-        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        totalUnits = attackers.Count + defenders.Count + rangers.Count;
-        if (EnergyManager.instance.enemyCurrentEnergy >= 1 && (totalUnits == 0 || Random.value < 0.7f))
+        ClearAllPaths();
+        CardPlayManager.instance.HideAllHandsAtAITurn();
+        EnergyManager.instance.RefillEnemyEnergy();
+        DeckManager.instance.DrawEnemyCard();
+        CardPlayManager.instance.HideAllHandsAtAITurn();
+        CanvasManager.instance.UpdateEnergyUI();
+        yield return null;
+        yield return new WaitForSeconds(0.5f);
+        if (EnergyManager.instance.enemyCurrentEnergy > 0f)
+            yield return StartCoroutine(IAMoveToResources.instance.MoveAllEnemyUnitsToResorces());
+        if (!IAMoveToTowers.instance.movedAnyUnit)
             yield return StartCoroutine(IAPlayCards.instance.PlayCards());
-        yield return new WaitUntil(() => isBusy());
-        Debug.Log("Energía al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
+        yield return new WaitUntil(() => !CombatManager.instance.GetCombatActive && !SalvationManager.instance.GetOnSavingThrow && !ResourcesManager.instance.onColectedResources && !HealthTowerManager.instance.onColectedHealth);
         GameManager.instance.StartPlayerTurn();
+        //yield return StartCoroutine(InitializedTurn());
+        //List<Attackers> attackers = new List<Attackers>();
+        //List<Defenders> defenders = new List<Defenders>();
+        //List<Ranger> rangers = new List<Ranger>();
+        //GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+        //int totalUnits = attackers.Count + defenders.Count + rangers.Count;
+        //// ----------------- MOVIMIENTO POR TIPOS -----------------
+        //yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
+        //yield return StartCoroutine(MoveDefenders(defenders, rangers));
+        //yield return StartCoroutine(MoveRangers(rangers));
+        //yield return new WaitForSeconds(1f);
+        //Debug.Log("Energía RESIDUAL restante al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
+        //// ----------------- ENERGÍA RESIDUAL -----------------
+        //List<Units> allUnits = new List<Units>();
+        //GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+        //allUnits.AddRange(attackers);
+        //allUnits.AddRange(defenders);
+        //allUnits.AddRange(rangers);
+        //yield return StartCoroutine(UseResidualEnergy(allUnits));
+        //// ----------------- JUEGO DE CARTAS FINAL -----------------
+        //GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+        //totalUnits = attackers.Count + defenders.Count + rangers.Count;
+        //if (EnergyManager.instance.enemyCurrentEnergy >= 1 && (totalUnits == 0 || Random.value < 0.7f))
+        //    yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+        //yield return new WaitUntil(() => isBusy());
+        //Debug.Log("Energía al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
+        //GameManager.instance.StartPlayerTurn();
     }
     IEnumerator InitializedTurn()
     {
