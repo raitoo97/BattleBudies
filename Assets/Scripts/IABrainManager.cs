@@ -83,13 +83,13 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in defenders)
         {
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
-            Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
-            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             if (NodeManager.GetHealthNodes().Contains(u.currentNode))
             {
                 yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, 0));
                 continue;
             }
+            Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
+            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
             yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
@@ -110,13 +110,13 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in rangers)
         {
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
-            Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
-            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             if (NodeManager.GetResourcesNode().Contains(u.currentNode))
             {
                 yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, 0));
                 continue;
             }
+            Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
+            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
             yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
