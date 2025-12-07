@@ -246,4 +246,33 @@ public static class NodeManager
         }
         return attackNodesList;
     }
+    public static List<Node> GetEnemyTowerNodes()
+    {
+        List<Node> towerNodes = new List<Node>();
+
+        // Lista de claves de nodos que representan las torres enemigas
+        string[] enemyTowerKeys = new string[]
+        {
+        "_14_6",
+        "_14_7",
+        "_14_8",
+        "_14_14",
+        "_14_0"
+        };
+
+        foreach (var key in enemyTowerKeys)
+        {
+            string[] parts = key.Split('_');
+            if (parts.Length != 3) continue;
+
+            if (!int.TryParse(parts[1], out int x)) continue;
+            if (!int.TryParse(parts[2], out int y)) continue;
+
+            Node node = _totalNodes.Find(n => n.gridIndex.x == x && n.gridIndex.y == y);
+            if (node != null)
+                towerNodes.Add(node);
+        }
+
+        return towerNodes;
+    }
 }
