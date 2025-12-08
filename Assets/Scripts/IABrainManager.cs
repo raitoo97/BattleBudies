@@ -98,7 +98,7 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator MoveAllUnitsToThreat(Units threat)
     {
-        if (threat == null)
+        if (threat == null || !threat)
         {
             Debug.LogWarning("MoveAllUnitsToThreat: La amenaza es null");
             yield break;
@@ -164,7 +164,6 @@ public class IABrainManager : MonoBehaviour
             yield break;
         }
         Debug.Log($"IA: Moviendo {candidateUnits.Count} unidades hacia {threat.name}");
-
         Node playerNode = threat.currentNode;
         Node safeNeighbor = null;
         if (playerNode != null && playerNode.Neighbors != null)
