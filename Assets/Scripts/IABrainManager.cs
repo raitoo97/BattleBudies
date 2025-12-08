@@ -41,7 +41,6 @@ public class IABrainManager : MonoBehaviour
             yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
         }
         yield return new WaitForSeconds(1f);
-
         // ----------------- ENERGÍA RESIDUAL -----------------
         List<Units> allUnits = new List<Units>();
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
