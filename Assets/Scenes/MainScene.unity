@@ -2302,6 +2302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxStepsPerUnit: 3
+  defendTriggerDistance: 50
 --- !u!114 &563951300
 MonoBehaviour:
   m_ObjectHideFlags: 0

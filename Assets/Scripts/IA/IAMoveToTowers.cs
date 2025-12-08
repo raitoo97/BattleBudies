@@ -187,7 +187,6 @@ public class IAMoveToTowers : MonoBehaviour
     {
         player = null;
         if (enemy.currentNode == null) return false;
-
         foreach (Node neighbor in enemy.currentNode.Neighbors)
         {
             if (neighbor.unitOnNode != null)
@@ -214,7 +213,7 @@ public class IAMoveToTowers : MonoBehaviour
     {
         return NodeManager.GetAllNodes().FindAll(n => n.IsEmpty());
     }
-    private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
+    public IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
         foreach (Node step in path)
         {
