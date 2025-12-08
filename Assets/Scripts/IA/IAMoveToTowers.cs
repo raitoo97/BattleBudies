@@ -135,7 +135,7 @@ public class IAMoveToTowers : MonoBehaviour
     {
         closestNode = null;
         pathToNode = null;
-        if (validNodes.Count == 0) return false;
+        if (enemy == null || validNodes.Count == 0) return false;
         validNodes.Sort((a, b) => Vector3.Distance(enemy.transform.position, a.transform.position).CompareTo(Vector3.Distance(enemy.transform.position, b.transform.position)));
         foreach (Node node in validNodes)
         {
@@ -153,6 +153,7 @@ public class IAMoveToTowers : MonoBehaviour
     {
         targetNode = null;
         path = null;
+        if (ReferencePoint == null) return false;
         List<Node> allValidNodes = GetAllValidNodes();
         if (allValidNodes.Count == 0) return false;
         List<Node> candidates = new List<Node>();
@@ -187,7 +188,6 @@ public class IAMoveToTowers : MonoBehaviour
     {
         player = null;
         if (enemy.currentNode == null) return false;
-
         foreach (Node neighbor in enemy.currentNode.Neighbors)
         {
             if (neighbor.unitOnNode != null)
@@ -214,7 +214,7 @@ public class IAMoveToTowers : MonoBehaviour
     {
         return NodeManager.GetAllNodes().FindAll(n => n.IsEmpty());
     }
-    private IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
+    public IEnumerator ExecuteMovementPathWithSavingThrows(Units enemy, List<Node> path)
     {
         foreach (Node step in path)
         {
@@ -245,7 +245,8 @@ public class IAMoveToTowers : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
+        if (ReferencePoint == null) return;
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);
+        Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);//ERROR
     }
 }
