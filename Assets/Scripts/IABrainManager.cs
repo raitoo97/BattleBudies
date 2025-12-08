@@ -4,9 +4,9 @@ using UnityEngine;
 public class IABrainManager : MonoBehaviour
 {
     public static IABrainManager instance;
-    private float chanceToPlayCards = 0.65f;
+    private float chanceToPlayCards = 0.85f;
     private int maxStepsPerUnit = 3;
-    [SerializeField] private float defendTriggerDistance = 50f;
+    [SerializeField] private float defendTriggerDistance = 80f;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -33,6 +33,16 @@ public class IABrainManager : MonoBehaviour
         Units threat = null;
         if (IsPlayerThreateningTower(out threat))
         {
+            float random = Random.value;
+            if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+            {
+                Debug.Log("IA decide jugar carta tras enviar defensa");
+                yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
+            }
+            else
+            {
+                Debug.Log("IA no juega carta tras enviar defensa" + random);
+            }
             yield return StartCoroutine(MoveAllUnitsToThreat(threat));
         }
         else
@@ -101,140 +111,65 @@ public class IABrainManager : MonoBehaviour
             Debug.LogWarning("MoveAllUnitsToThreat: La amenaza es null");
             yield break;
         }
+        // Obtiene TODAS las unidades del mapa
         Units[] allUnits = FindObjectsOfType<Units>();
-        if(allUnits == null || allUnits.Length == 0) yield break;
-        List<Units> candidateUnits = new List<Units>();
-        int maxUnitsToSend = 2;
-        // ----------------- RANGERS -----------------
-        List<Ranger> rangers = new List<Ranger>();
-        foreach (Units unit in allUnits)
-            if (unit != null && !unit.isPlayerUnit && unit is Ranger)
-                rangers.Add(unit as Ranger);
-        if(threat != null)
-        {
-            rangers.Sort((a, b) => Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
-        }
-        foreach (Ranger ranger in rangers)
-        {
-            if(ranger == null || !ranger) continue;
-            candidateUnits.Add(ranger);
-            if (candidateUnits.Count >= maxUnitsToSend) break;
-        }
-        // ----------------- DEFENDERS -----------------
-        if (candidateUnits.Count < maxUnitsToSend)
-        {
-            List<Defenders> defenders = new List<Defenders>();
-            foreach (Units unit in allUnits)
-                if (unit != null && !unit.isPlayerUnit && unit is Defenders && !candidateUnits.Contains(unit))
-                    defenders.Add(unit as Defenders);
-            if(threat != null)
-            {
-                defenders.Sort((a, b) => Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
-            }
-            foreach (Defenders defender in defenders)
-            {
-                if (defender == null || !defender) continue;
-                candidateUnits.Add(defender);
-                if (candidateUnits.Count >= maxUnitsToSend) break;
-            }
-        }
-        // ----------------- ATTACKERS -----------------
-        if (candidateUnits.Count < maxUnitsToSend)
-        {
-            List<Attackers> attackers = new List<Attackers>();
-            foreach (Units unit in allUnits)
-                if (unit != null && !unit.isPlayerUnit && unit is Attackers && !candidateUnits.Contains(unit))
-                    attackers.Add(unit as Attackers);
-            if (threat != null) 
-            {
-                attackers.Sort((a, b) => Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
-            }
-            foreach (Attackers attacker in attackers)
-            {
-                if (attacker == null || !attacker) continue;
-                candidateUnits.Add(attacker);
-                if (candidateUnits.Count >= maxUnitsToSend) break;
-            }
-        }
-        if (candidateUnits.Count == 0)
-        {
-            Debug.Log("MoveAllUnitsToThreat: No hay unidades para mover.");
-            yield break;
-        }
-        Debug.Log($"IA: Moviendo {candidateUnits.Count} unidades hacia {threat.name}");
+        if (allUnits == null || allUnits.Length == 0) yield break;
+        // Filtra solo unidades de la IA
+        List<Units> enemyUnits = new List<Units>();
+        foreach (Units u in allUnits)
+            if (u != null && !u.isPlayerUnit)
+                enemyUnits.Add(u);
+        if (enemyUnits.Count == 0) yield break;
+        // Ordena TODAS las unidades enemigas por distancia a la amenaza
+        enemyUnits.Sort((a, b) =>Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
+        Units chosen = enemyUnits[0];
+        Debug.Log($"IA: Unidad más cercana seleccionada -> {chosen.name}");
         Node playerNode = threat.currentNode;
-        Node safeNeighbor = null;
-        if (playerNode != null && playerNode.Neighbors != null)
+        Node finalTarget = null;
+        // Intentar vecinos libres
+        if (playerNode != null)
         {
-            foreach (Node node in playerNode.Neighbors)
+            foreach (Node n in playerNode.Neighbors)
             {
-                if (node != null && node.IsEmpty())
+                if (n != null && n.IsEmpty())
                 {
-                    safeNeighbor = node;
+                    finalTarget = n;
                     break;
                 }
             }
         }
-        if (safeNeighbor == null)
+        // Si no hay vecinos, ir al nodo más cercano
+        if (finalTarget == null)
         {
-            safeNeighbor = NodeManager.GetClosetNode(threat.transform.position);
-            if(safeNeighbor == null) 
+            finalTarget = NodeManager.GetClosetNode(threat.transform.position);
+
+            if (finalTarget == null)
             {
-                Debug.LogError("MoveAllUnitsToThreat: No hay nodo seguro ni nodo más cercano. CANCELADO.");
+                Debug.LogError("No existe ningún nodo libre para aproximarse.");
                 yield break;
             }
-            Debug.LogWarning("MoveAllUnitsToThreat: Ningún vecino libre. Usando nodo más cercano.");
         }
-        foreach (Units unit in candidateUnits)
+        List<Node> path = PathFinding.CalculateAstart(chosen.currentNode, finalTarget);
+        if (path == null || path.Count == 0)
         {
-            if (unit == null || unit.currentNode == null)continue;
-            if (EnergyManager.instance.enemyCurrentEnergy < 1)
-            {
-                Debug.Log("IA sin energía para mover más defensores.");
-                break;
-            }
-            Node finalTarget = null;
-            // Si el safeNeighbor aún está libre, usarlo
-            if (safeNeighbor != null && safeNeighbor.IsEmpty())
-            {
-                finalTarget = safeNeighbor;
-            }
-            else
-            {
-                // Buscar otro vecino libre
-                foreach (Node node in threat.currentNode.Neighbors)
-                {
-                    if (node != null && node.IsEmpty())
-                    {
-                        finalTarget = node;
-                        break;
-                    }
-                }
-            }
-            // Fallback al más cercano si sigue sin haber
-            if (finalTarget == null) 
-            {
-                finalTarget = NodeManager.GetClosetNode(threat.transform.position);
-            }
-            List<Node> path = PathFinding.CalculateAstart(unit.currentNode, finalTarget);
-            if (path == null || path.Count == 0)
-            {
-                Debug.LogWarning($"IA: {unit.name} no encontró camino hacia el objetivo.");
-                continue;
-            }
-            int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count - 1);
-            if (stepsToMove <= 0) continue;
-            List<Node> nodesToMove = path.GetRange(0, stepsToMove);
-            Debug.Log($"IA: Moviendo {unit.name} hacia zona de defensa ({stepsToMove} pasos).");
-            yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
-            yield return new WaitForSeconds(0.15f);
+            Debug.LogWarning($"IA: {chosen.name} no encontró camino.");
+            yield break;
         }
-        Debug.Log("IA: Defensa completada.");
+        int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count - 1);
+        if (stepsToMove <= 0)
+        {
+            Debug.Log("IA sin energía para moverse.");
+            yield break;
+        }
+        List<Node> nodesToMove = path.GetRange(0, stepsToMove);
+        Debug.Log($"IA: Moviendo {chosen.name} hacia la amenaza ({stepsToMove} pasos)");
+        yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(chosen, nodesToMove));
+        Debug.Log("IA: Acción contra amenaza completada.");
     }
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
         float globalChance = Random.value;
-        if (globalChance < 0.10f)
+        if (globalChance < 0.25f)
         {
             Debug.Log("IA impredecible: ATAQUE GLOBAL  TODOS los tipos van a las torres del player");
             yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
@@ -263,10 +198,15 @@ public class IABrainManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
-        if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        float random = Random.value;
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             Debug.Log("IA decide jugar carta tras mover Attackers");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
+        }
+        else
+        {
+            Debug.Log("IA decide jugar NO carta tras mover Attackers" + random);
         }
     }
     private IEnumerator MoveDefenders(List<Defenders> defenders, List<Ranger> rangers)
@@ -292,10 +232,15 @@ public class IABrainManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
-        if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        float random = Random.value;
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             Debug.Log("IA decide jugar carta tras mover Defender");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
+        }
+        else
+        {
+            Debug.Log("IA decide jugar NO carta tras mover Defender" + random);
         }
     }
     private IEnumerator MoveRangers(List<Ranger> rangers)
@@ -320,10 +265,15 @@ public class IABrainManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
-        if (Random.value < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        float random = Random.value;
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             Debug.Log("IA decide jugar carta tras mover Ranger");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
+        }
+        else
+        {
+            Debug.Log("IA decide jugar NO carta tras mover ranger" + random);
         }
     }
     private IEnumerator UseResidualEnergy(List<Units> allUnits)
