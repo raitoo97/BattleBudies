@@ -6,7 +6,7 @@ public class IABrainManager : MonoBehaviour
     public static IABrainManager instance;
     private float chanceToPlayCards = 0.85f;
     private int maxStepsPerUnit = 3;
-    [SerializeField] private float defendTriggerDistance = 80f;
+    [SerializeField]private float defendTriggerDistance;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -162,7 +162,7 @@ public class IABrainManager : MonoBehaviour
             yield break;
         }
         List<Node> nodesToMove = path.GetRange(0, stepsToMove);
-        Debug.Log($"IA: Moviendo {chosen.name} hacia la amenaza ({stepsToMove} pasos)");
+        Debug.Log($"IA: Moviendo {chosen.name} hacia la amenaza de nombre {threat.name} a {stepsToMove} pasos)");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(chosen, nodesToMove));
         Debug.Log("IA: Acción contra amenaza completada.");
     }
