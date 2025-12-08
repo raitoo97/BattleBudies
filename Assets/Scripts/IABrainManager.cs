@@ -196,7 +196,7 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
         float globalChance = Random.value;
-        if (globalChance < 0.30f)
+        if (globalChance < 0.10f)
         {
             Debug.Log("IA impredecible: ATAQUE GLOBAL  TODOS los tipos van a las torres del player");
             yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
