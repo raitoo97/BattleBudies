@@ -164,15 +164,16 @@ public class IABrainManager : MonoBehaviour
             yield break;
         }
         Debug.Log($"IA: Moviendo {candidateUnits.Count} unidades hacia {threat.name}");
+
         Node playerNode = threat.currentNode;
         Node safeNeighbor = null;
         if (playerNode != null && playerNode.Neighbors != null)
         {
-            foreach (Node n in playerNode.Neighbors)
+            foreach (Node node in playerNode.Neighbors)
             {
-                if (n != null && n.IsEmpty())
+                if (node != null && node.IsEmpty())
                 {
-                    safeNeighbor = n;
+                    safeNeighbor = node;
                     break;
                 }
             }
@@ -195,7 +196,29 @@ public class IABrainManager : MonoBehaviour
                 Debug.Log("IA sin energía para mover más defensores.");
                 break;
             }
-            Node finalTarget = safeNeighbor;
+            Node finalTarget = null;
+            // Si el safeNeighbor aún está libre, usarlo
+            if (safeNeighbor != null && safeNeighbor.IsEmpty())
+            {
+                finalTarget = safeNeighbor;
+            }
+            else
+            {
+                // Buscar otro vecino libre
+                foreach (Node node in threat.currentNode.Neighbors)
+                {
+                    if (node != null && node.IsEmpty())
+                    {
+                        finalTarget = node;
+                        break;
+                    }
+                }
+            }
+            // Fallback al más cercano si sigue sin haber
+            if (finalTarget == null) 
+            {
+                finalTarget = NodeManager.GetClosetNode(threat.transform.position);
+            }
             List<Node> path = PathFinding.CalculateAstart(unit.currentNode, finalTarget);
             if (path == null || path.Count == 0)
             {
