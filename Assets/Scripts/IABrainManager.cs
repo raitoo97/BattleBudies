@@ -33,7 +33,6 @@ public class IABrainManager : MonoBehaviour
         Units threat = null;
         if (IsPlayerThreateningTower(out threat))
         {
-            Debug.Log("IA: Amenaza detectada, activando defensa");
             yield return StartCoroutine(MoveAllUnitsToThreat(threat));
         }
         else

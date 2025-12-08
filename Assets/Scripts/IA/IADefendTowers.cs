@@ -121,6 +121,7 @@ public class IADefendTowers : MonoBehaviour
     }
     private void MoveToRandomNode(Units enemy, ref Node closestNode, ref List<Node> path, ref bool foundPath)
     {
+        if (ReferenceTower == null) return;
         List<Node> allFreeNodes = GetAllNodes();
         if(allFreeNodes.Count == 0) return;
         List<Node> filteredNodes = new List<Node>();
@@ -146,7 +147,7 @@ public class IADefendTowers : MonoBehaviour
     {
         closestNode = null;
         pathToNode = null;
-        if (validNodes.Count == 0) return false;
+        if (validNodes.Count == 0 || enemy == null) return false;
         validNodes.Sort((a, b) => Vector3.Distance(enemy.transform.position, a.transform.position).CompareTo(Vector3.Distance(enemy.transform.position, b.transform.position)));
         foreach (Node node in validNodes)
         {
@@ -231,6 +232,7 @@ public class IADefendTowers : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
+        if (ReferenceTower == null) return;
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(ReferenceTower.position, maxDistanceFromReference);
     }

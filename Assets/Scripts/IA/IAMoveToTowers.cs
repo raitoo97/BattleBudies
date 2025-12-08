@@ -135,7 +135,7 @@ public class IAMoveToTowers : MonoBehaviour
     {
         closestNode = null;
         pathToNode = null;
-        if (validNodes.Count == 0) return false;
+        if (enemy == null || validNodes.Count == 0) return false;
         validNodes.Sort((a, b) => Vector3.Distance(enemy.transform.position, a.transform.position).CompareTo(Vector3.Distance(enemy.transform.position, b.transform.position)));
         foreach (Node node in validNodes)
         {
@@ -153,6 +153,7 @@ public class IAMoveToTowers : MonoBehaviour
     {
         targetNode = null;
         path = null;
+        if (ReferencePoint == null) return false;
         List<Node> allValidNodes = GetAllValidNodes();
         if (allValidNodes.Count == 0) return false;
         List<Node> candidates = new List<Node>();
@@ -244,6 +245,7 @@ public class IAMoveToTowers : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
+        if (ReferencePoint == null) return;
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);//ERROR
     }
