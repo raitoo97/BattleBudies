@@ -104,30 +104,39 @@ public class IABrainManager : MonoBehaviour
             yield break;
         }
         Units[] allUnits = FindObjectsOfType<Units>();
+        if(allUnits == null || allUnits.Length == 0) yield break;
         List<Units> candidateUnits = new List<Units>();
         int maxUnitsToSend = 2;
         // ----------------- RANGERS -----------------
         List<Ranger> rangers = new List<Ranger>();
-        foreach (Units u in allUnits)
-            if (u != null && !u.isPlayerUnit && u is Ranger)
-                rangers.Add(u as Ranger);
-        rangers.Sort((a, b) =>Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
-        foreach (Ranger r in rangers)
+        foreach (Units unit in allUnits)
+            if (unit != null && !unit.isPlayerUnit && unit is Ranger)
+                rangers.Add(unit as Ranger);
+        if(threat != null)
         {
-            candidateUnits.Add(r);
+            rangers.Sort((a, b) => Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
+        }
+        foreach (Ranger ranger in rangers)
+        {
+            if(ranger == null || !ranger) continue;
+            candidateUnits.Add(ranger);
             if (candidateUnits.Count >= maxUnitsToSend) break;
         }
         // ----------------- DEFENDERS -----------------
         if (candidateUnits.Count < maxUnitsToSend)
         {
             List<Defenders> defenders = new List<Defenders>();
-            foreach (Units u in allUnits)
-                if (u != null && !u.isPlayerUnit && u is Defenders && !candidateUnits.Contains(u))
-                    defenders.Add(u as Defenders);
-            defenders.Sort((a, b) =>Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
-            foreach (Defenders d in defenders)
+            foreach (Units unit in allUnits)
+                if (unit != null && !unit.isPlayerUnit && unit is Defenders && !candidateUnits.Contains(unit))
+                    defenders.Add(unit as Defenders);
+            if(threat != null)
             {
-                candidateUnits.Add(d);
+                defenders.Sort((a, b) => Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
+            }
+            foreach (Defenders defender in defenders)
+            {
+                if (defender == null || !defender) continue;
+                candidateUnits.Add(defender);
                 if (candidateUnits.Count >= maxUnitsToSend) break;
             }
         }
@@ -135,13 +144,17 @@ public class IABrainManager : MonoBehaviour
         if (candidateUnits.Count < maxUnitsToSend)
         {
             List<Attackers> attackers = new List<Attackers>();
-            foreach (Units u in allUnits)
-                if (u != null && !u.isPlayerUnit && u is Attackers && !candidateUnits.Contains(u))
-                    attackers.Add(u as Attackers);
-            attackers.Sort((a, b) =>Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
-            foreach (Attackers a in attackers)
+            foreach (Units unit in allUnits)
+                if (unit != null && !unit.isPlayerUnit && unit is Attackers && !candidateUnits.Contains(unit))
+                    attackers.Add(unit as Attackers);
+            if (threat != null) 
             {
-                candidateUnits.Add(a);
+                attackers.Sort((a, b) => Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
+            }
+            foreach (Attackers attacker in attackers)
+            {
+                if (attacker == null || !attacker) continue;
+                candidateUnits.Add(attacker);
                 if (candidateUnits.Count >= maxUnitsToSend) break;
             }
         }
@@ -167,6 +180,11 @@ public class IABrainManager : MonoBehaviour
         if (safeNeighbor == null)
         {
             safeNeighbor = NodeManager.GetClosetNode(threat.transform.position);
+            if(safeNeighbor == null) 
+            {
+                Debug.LogError("MoveAllUnitsToThreat: No hay nodo seguro ni nodo más cercano. CANCELADO.");
+                yield break;
+            }
             Debug.LogWarning("MoveAllUnitsToThreat: Ningún vecino libre. Usando nodo más cercano.");
         }
         foreach (Units unit in candidateUnits)
@@ -184,7 +202,7 @@ public class IABrainManager : MonoBehaviour
                 Debug.LogWarning($"IA: {unit.name} no encontró camino hacia el objetivo.");
                 continue;
             }
-            int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count);
+            int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count - 1);
             if (stepsToMove <= 0) continue;
             List<Node> nodesToMove = path.GetRange(0, stepsToMove);
             Debug.Log($"IA: Moviendo {unit.name} hacia zona de defensa ({stepsToMove} pasos).");
