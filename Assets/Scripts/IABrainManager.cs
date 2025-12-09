@@ -256,22 +256,29 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator MoveRangers(List<Ranger> rangers)
     {
         if (rangers == null || rangers.Count == 0) yield break;
+        List<Node> resourceNodes = NodeManager.GetResourcesNode();
         int currentEnergy = EnergyManager.instance.enemyCurrentEnergy;
         int energyPerUnit = Mathf.Max(1, Mathf.Min((rangers.Count > 0 ? currentEnergy / rangers.Count : 1), maxStepsPerUnit));
         foreach (Units u in rangers)
         {
             if (u == null || !u) continue;
-            if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
-            if (NodeManager.GetResourcesNode().Contains(u.currentNode))
+            if (resourceNodes.Contains(u.currentNode))
             {
-                yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, 0));
-                continue;
+                Debug.Log($"IA: Ranger {u.gameObject.name} empieza sobre nodo de recurso. Recolecta inmediatamente.");
+                ResourcesManager.instance.StartRecolectedResources(u as Ranger);
+                yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
             }
+            if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
             Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
-            yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            if (resourceNodes.Contains(u.currentNode))
+            {
+                Debug.Log($"IA: Ranger {u.gameObject.name} terminó movimiento sobre nodo de recurso. Recolecta inmediatamente.");
+                ResourcesManager.instance.StartRecolectedResources(u as Ranger);
+                yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            }
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }

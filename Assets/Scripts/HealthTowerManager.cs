@@ -47,20 +47,21 @@ public class HealthTowerManager : MonoBehaviour
         for(int i = 0; i < numberOfDiceToRoll; i++)
         {
             diceRoll.PrepareForRoll();
+            int dicesLeft = numberOfDiceToRoll - i;
             if (defender.isPlayerUnit)
             {
                 CanvasManager.instance.rollClicked = false;
-                CanvasManager.instance.TryShowCombatUI(playerCanRoll: true);
+                CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: true, result: -1, dicesLeft: dicesLeft);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
-                CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
             }
             else
             {
-                CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
+                CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: false, result: -1, dicesLeft: dicesLeft);
                 yield return new WaitForSeconds(0.5f);
             }
             diceRoll.RollDice();
             yield return new WaitUntil(() => diceRoll.hasBeenThrown && diceRoll.hasBeenCounted && diceRoll.IsDiceStill());
+            CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: false, result: pendingHealth, dicesLeft: dicesLeft);
             print("Tirada de vida " + (i + 1) + " de " + defender.healthTowerDice + ": " + pendingHealth + " vida pendientes.");
             if (pendingHealth > 0)
             {
@@ -74,6 +75,7 @@ public class HealthTowerManager : MonoBehaviour
                             Debug.Log("Curaste la torre: " + selectedTower.name + " con " + pendingHealth + " de vida.");
                         }
                     }));
+                    pendingHealth = 0;
                 }
                 else
                 {
@@ -85,6 +87,7 @@ public class HealthTowerManager : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
         onColectedHealth = false;
+        CanvasManager.instance.HealingTowerUI(false, defender);
     }
     public void ChangePendingHealth(int amount)
     {

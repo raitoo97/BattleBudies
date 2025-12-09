@@ -50,14 +50,15 @@ public class ResourcesManager : MonoBehaviour
             diceRoll.PrepareForRoll();
             if (ranger.isPlayerUnit)
             {
+                yield return new WaitForSeconds(.5f);
                 CanvasManager.instance.rollClicked = false;
-                CanvasManager.instance.TryShowCombatUI(playerCanRoll: true);
+                CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: true, dicesLeft: numberOfDiceToRoll - i);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
-                CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
+                CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: false, dicesLeft: numberOfDiceToRoll - i);
             }
             else
             {
-                CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
+                CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: false, dicesLeft: numberOfDiceToRoll - i);
                 yield return new WaitForSeconds(0.5f);
             }
             diceRoll.RollDice();
@@ -71,10 +72,12 @@ public class ResourcesManager : MonoBehaviour
                     AddResources(false, pendingResources);
             }
             pendingResources = 0;
+            CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: false, dicesLeft: numberOfDiceToRoll - (i + 1));
             diceRoll.ResetDicePosition();
             yield return new WaitForSeconds(0.3f);
         }
         onColectedResources = false;
+        CanvasManager.instance.RecolectResourcesUI(false, ranger);
     }
     public void ChangePendingResources(int changeAmount)
     {
