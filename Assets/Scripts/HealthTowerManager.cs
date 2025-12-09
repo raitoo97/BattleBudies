@@ -3,8 +3,6 @@ using UnityEngine;
 public class HealthTowerManager : MonoBehaviour
 {
     public static HealthTowerManager instance;
-    [HideInInspector]public int healthTowerEnemy;
-    [HideInInspector]public int healthTowerPlayer;
     [HideInInspector]public bool onColectedHealth;
     private DiceRoll diceRoll;
     private int pendingHealth;
@@ -20,12 +18,13 @@ public class HealthTowerManager : MonoBehaviour
         if (isPlayer)
         {
             Debug.Log("Se han añadido " + amount + " de salud a la torre del jugador");
-            healthTowerPlayer += amount;
         }
         else
         {
             Debug.Log("Se han añadido " + amount + " de salud a la torre del enemigo");
-            healthTowerEnemy += amount;
+            var GetLowestHealthTower = TowerManager.instance.GetEnemyTower();
+            if(GetLowestHealthTower == null)return;
+            GetLowestHealthTower.Healt(amount);
         }
     }
     public void StartRecolectedHealth(Defenders defender)
@@ -83,5 +82,26 @@ public class HealthTowerManager : MonoBehaviour
     public void ChangePendingHealth(int amount)
     {
         pendingHealth += amount;
+    }
+    public IEnumerator WaitForPlayerSelectTower(System.Action<Tower> callback)
+    {
+        Tower selected = null;
+        while (selected == null)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    Tower t = hit.collider.GetComponent<Tower>();
+                    if (t != null && t.faction == Faction.Player)
+                    {
+                        selected = t;
+                    }
+                }
+            }
+            yield return null;
+        }
+        callback?.Invoke(selected);
     }
 }

@@ -41,7 +41,10 @@ public class Tower : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    //hacerfunciondevid
+    public void Healt(int amount)
+    {
+        currentHealth += amount;
+    }
     private void HandleHover()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
