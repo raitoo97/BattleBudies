@@ -118,6 +118,17 @@ public class IAMoveToTowers : MonoBehaviour
             // Movemos la unidad con tiradas de salvación
             yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
             movedAnyUnit = true;
+            if (attackNodes.Contains(enemy.currentNode))
+            {
+                Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
+                if (targetTower != null)
+                {
+                    Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} atacará torre {targetTower.name} (después de moverse).");
+                    yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
+                }
+                actionInProgress = false;
+                continue;
+            }
             // Ataque a unidad jugador si hay vecino
             if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
                 yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
