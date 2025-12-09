@@ -119,18 +119,4 @@ public class TowerManager : MonoBehaviour
         EnemyTowers.Sort((a, b) => a.currentHealth.CompareTo(b.currentHealth));
         return EnemyTowers[0];
     }
-    public List<Tower> GetPlayerTowers()
-    {
-        var allTowers = FindObjectsOfType<Tower>();
-        List<Tower> playerTowers = new List<Tower>();
-        foreach (Tower t in allTowers)
-        {
-            if (!playerTowers.Contains(t) && t.faction == Faction.Player)
-            {
-                playerTowers.Add(t);
-            }
-        }
-        if (playerTowers.Count == 0) return null;
-        return playerTowers;
-    }
 }
