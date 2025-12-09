@@ -127,9 +127,9 @@ public class IABrainManager : MonoBehaviour
         if (allUnits == null || allUnits.Length == 0) yield break;
         // Filtra solo unidades de la IA
         List<Units> enemyUnits = new List<Units>();
-        foreach (Units u in allUnits)
-            if (u != null && !u.isPlayerUnit)
-                enemyUnits.Add(u);
+        foreach (Units unit in allUnits)
+            if (unit != null && !unit.isPlayerUnit)
+                enemyUnits.Add(unit);
         if (enemyUnits.Count == 0) yield break;
         // Ordena TODAS las unidades enemigas por distancia a la amenaza
         enemyUnits.Sort((a, b) =>Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
