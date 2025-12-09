@@ -59,6 +59,17 @@ public class IAMoveToTowers : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
         yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
         movedAnyUnit = true;
+        if (attackNodes.Contains(enemy.currentNode))
+        {
+            Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
+            if (targetTower != null)
+            {
+                Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} terminó movimiento frente a torre {targetTower.name}. ATACA automáticamente.");
+                yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
+            }
+            actionInProgress = false;
+            yield break;
+        }
         if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
             yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
         yield return new WaitForSeconds(0.2f);
