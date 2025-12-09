@@ -65,8 +65,19 @@ public class IABrainManager : MonoBehaviour
         defenders.RemoveAll(u => u == null || !u);
         rangers.RemoveAll(u => u == null || !u);
         totalUnits = attackers.Count + defenders.Count + rangers.Count;
-        if (EnergyManager.instance.enemyCurrentEnergy >= 1 && (totalUnits == 0 || Random.value < 0.7f))
+        if (EnergyManager.instance.enemyCurrentEnergy >= 1 && totalUnits == 0)
             yield return StartCoroutine(IAPlayCards.instance?.PlayCards());
+        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+        List<Units> allUnitsRemaining = new List<Units>();
+        allUnitsRemaining.AddRange(attackers);
+        allUnitsRemaining.AddRange(defenders);
+        allUnitsRemaining.AddRange(rangers);
+        allUnitsRemaining.RemoveAll(u => u == null || !u);
+        // Si todavía hay energía y unidades, usarla
+        if (EnergyManager.instance.enemyCurrentEnergy >= 1 && allUnitsRemaining.Count > 0)
+        {
+            yield return StartCoroutine(UseResidualEnergy(allUnitsRemaining));
+        }
         yield return new WaitUntil(() => isBusy());
         Debug.Log("Energía al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
         GameManager.instance.StartPlayerTurn();
