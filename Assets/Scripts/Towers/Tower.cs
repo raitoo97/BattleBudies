@@ -41,7 +41,7 @@ public class Tower : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    //hacerfunciondevida
+    //hacerfunciondevid
     private void HandleHover()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
