@@ -203,9 +203,37 @@ public class CanvasManager : MonoBehaviour
     }
     #endregion
     #region Salvations
-    public void ShowSalvationUI(bool show, bool playerCanRoll = false)
+    public void ShowSalvationUI(bool show, Units unit, bool playerCanRoll = false)
     {
+        if (!show || unit == null)
+        {
+            panelEnemy.SetActive(false);
+            panelPlayer.SetActive(false);
+            playerDamageText.gameObject.SetActive(false);
+            enemyDamageText.gameObject.SetActive(false);
+            rollButton.gameObject.SetActive(false);
+            playerDiceRemainingText.gameObject.SetActive(false);
+            enemyDiceRemainingText.gameObject.SetActive(false);
+            return;
+        }
+        panelPlayer.SetActive(unit.isPlayerUnit);
+        panelEnemy.SetActive(!unit.isPlayerUnit);
+        rollButton.gameObject.SetActive(playerCanRoll);
+        if (unit.isPlayerUnit)
+        {
+            playerDamageText.text = $"Saving Throw: 3";
+            playerDamageText.gameObject.SetActive(true);
+            playerDiceRemainingText.gameObject.SetActive(true);
+            playerDiceRemainingText.text = $"Remaining Dices: 1"; // solo un intento
+        }
+        else
+        {
+            enemyDamageText.text = $"Saving Throw: 3";
+            enemyDamageText.gameObject.SetActive(true);
 
+            enemyDiceRemainingText.gameObject.SetActive(true);
+            enemyDiceRemainingText.text = $"Remaining Dices: 1";
+        }
     }
     #endregion
 }
