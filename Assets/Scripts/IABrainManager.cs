@@ -215,10 +215,6 @@ public class IABrainManager : MonoBehaviour
             Debug.Log("IA decide jugar carta tras mover Attackers");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
-        else
-        {
-            Debug.Log("IA decide jugar NO carta tras mover Attackers" + random);
-        }
     }
     private IEnumerator MoveDefenders(List<Defenders> defenders, List<Ranger> rangers)
     {
@@ -249,10 +245,6 @@ public class IABrainManager : MonoBehaviour
             Debug.Log("IA decide jugar carta tras mover Defender");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
-        else
-        {
-            Debug.Log("IA decide jugar NO carta tras mover Defender" + random);
-        }
     }
     private IEnumerator MoveRangers(List<Ranger> rangers)
     {
@@ -281,10 +273,6 @@ public class IABrainManager : MonoBehaviour
         {
             Debug.Log("IA decide jugar carta tras mover Ranger");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
-        }
-        else
-        {
-            Debug.Log("IA decide jugar NO carta tras mover ranger" + random);
         }
     }
     private IEnumerator UseResidualEnergy(List<Units> allUnits)
