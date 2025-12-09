@@ -166,7 +166,7 @@ public class IABrainManager : MonoBehaviour
             Debug.LogWarning($"IA: {chosen.name} no encontró camino.");
             yield break;
         }
-        int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count - 1);
+        int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count);
         if (stepsToMove <= 0)
         {
             Debug.Log("IA sin energía para moverse.");
