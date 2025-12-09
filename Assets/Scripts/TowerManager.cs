@@ -104,4 +104,19 @@ public class TowerManager : MonoBehaviour
             return attackNodes[tower];
         return new List<string>();
     }
+    public Tower GetEnemyTower()
+    {
+        var allTowers = FindObjectsOfType<Tower>();
+        List<Tower> EnemyTowers = new List<Tower>();
+        foreach (Tower t in allTowers)
+        {
+            if (!EnemyTowers.Contains(t) && t.faction == Faction.Enemy)
+            {
+                EnemyTowers.Add(t);
+            }
+        }
+        if (EnemyTowers.Count == 0) return null;
+        EnemyTowers.Sort((a, b) => a.currentHealth.CompareTo(b.currentHealth));
+        return EnemyTowers[0];
+    }
 }

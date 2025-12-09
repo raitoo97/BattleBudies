@@ -127,9 +127,9 @@ public class IABrainManager : MonoBehaviour
         if (allUnits == null || allUnits.Length == 0) yield break;
         // Filtra solo unidades de la IA
         List<Units> enemyUnits = new List<Units>();
-        foreach (Units u in allUnits)
-            if (u != null && !u.isPlayerUnit)
-                enemyUnits.Add(u);
+        foreach (Units unit in allUnits)
+            if (unit != null && !unit.isPlayerUnit)
+                enemyUnits.Add(unit);
         if (enemyUnits.Count == 0) yield break;
         // Ordena TODAS las unidades enemigas por distancia a la amenaza
         enemyUnits.Sort((a, b) =>Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
@@ -166,7 +166,7 @@ public class IABrainManager : MonoBehaviour
             Debug.LogWarning($"IA: {chosen.name} no encontró camino.");
             yield break;
         }
-        int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count - 1);
+        int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count);
         if (stepsToMove <= 0)
         {
             Debug.Log("IA sin energía para moverse.");
@@ -215,10 +215,6 @@ public class IABrainManager : MonoBehaviour
             Debug.Log("IA decide jugar carta tras mover Attackers");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
-        else
-        {
-            Debug.Log("IA decide jugar NO carta tras mover Attackers" + random);
-        }
     }
     private IEnumerator MoveDefenders(List<Defenders> defenders, List<Ranger> rangers)
     {
@@ -229,17 +225,24 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in defenders)
         {
             if (u == null || !u) continue;
-            if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             if (NodeManager.GetHealthNodes().Contains(u.currentNode))
             {
+                Debug.Log($"IA: Defender {u.gameObject.name} está sobre nodo de curación. Cura sin gastar energía.");
                 yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, 0));
                 continue;
             }
+            // Si no hay energía no intento mover
+            if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
             Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
-            yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            if (NodeManager.GetHealthNodes().Contains(u.currentNode))
+            {
+                Debug.Log($"IA: Defender {u.gameObject.name} terminó movimiento sobre nodo de curación. Cura inmediatamente.");
+                HealthTowerManager.instance.StartRecolectedHealth(u as Defenders);
+                yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            }
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
@@ -248,10 +251,6 @@ public class IABrainManager : MonoBehaviour
         {
             Debug.Log("IA decide jugar carta tras mover Defender");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
-        }
-        else
-        {
-            Debug.Log("IA decide jugar NO carta tras mover Defender" + random);
         }
     }
     private IEnumerator MoveRangers(List<Ranger> rangers)
@@ -281,10 +280,6 @@ public class IABrainManager : MonoBehaviour
         {
             Debug.Log("IA decide jugar carta tras mover Ranger");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
-        }
-        else
-        {
-            Debug.Log("IA decide jugar NO carta tras mover ranger" + random);
         }
     }
     private IEnumerator UseResidualEnergy(List<Units> allUnits)
