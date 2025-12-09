@@ -237,9 +237,36 @@ public class CanvasManager : MonoBehaviour
     }
     #endregion
     #region HealingTower
-    public void HealingTowerUI()
+    public void HealingTowerUI(bool show, Defenders defender, bool playerCanRoll = false, int result = -1, int dicesLeft = -1)
     {
-
+        if (!show || defender == null)
+        {
+            panelPlayer.SetActive(false);
+            panelEnemy.SetActive(false);
+            playerDamageText.gameObject.SetActive(false);
+            enemyDamageText.gameObject.SetActive(false);
+            rollButton.gameObject.SetActive(false);
+            playerDiceRemainingText.gameObject.SetActive(false);
+            enemyDiceRemainingText.gameObject.SetActive(false);
+            return;
+        }
+        panelPlayer.SetActive(defender.isPlayerUnit);
+        panelEnemy.SetActive(!defender.isPlayerUnit);
+        rollButton.gameObject.SetActive(playerCanRoll);
+        if (defender.isPlayerUnit)
+        {
+            playerDamageText.text = result >= 0 ? $"Healing Tower: + {result}" : "Healing Tower:";
+            playerDamageText.gameObject.SetActive(true);
+            playerDiceRemainingText.gameObject.SetActive(true);
+            playerDiceRemainingText.text = dicesLeft >= 0 ? $"Remaining Dices: {dicesLeft}" : $"Remaining Dices: {defender.healthTowerDice}";
+        }
+        else
+        {
+            enemyDamageText.text = result >= 0 ? $"Healing Tower + {result}:" : "Healing Tower:";
+            enemyDamageText.gameObject.SetActive(true);
+            enemyDiceRemainingText.gameObject.SetActive(true);
+            enemyDiceRemainingText.text = dicesLeft >= 0 ? $"Remaining Dices: {dicesLeft}" : $"Remaining Dices: {defender.healthTowerDice}";
+        }
     }
     #endregion
 }
