@@ -66,7 +66,14 @@ public class HealthTowerManager : MonoBehaviour
             {
                 if (defender.isPlayerUnit)
                 {
-                    AddHealthTower(isPlayer: true, pendingHealth);
+                    yield return StartCoroutine(WaitForPlayerSelectTower((Tower selectedTower) =>
+                    {
+                        if (selectedTower != null)
+                        {
+                            selectedTower.Healt(pendingHealth);
+                            Debug.Log("Curaste la torre: " + selectedTower.name + " con " + pendingHealth + " de vida.");
+                        }
+                    }));
                 }
                 else
                 {
