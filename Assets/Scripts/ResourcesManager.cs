@@ -54,6 +54,7 @@ public class ResourcesManager : MonoBehaviour
                 CanvasManager.instance.rollClicked = false;
                 CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: true, dicesLeft: numberOfDiceToRoll - i);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
+                CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: false, dicesLeft: numberOfDiceToRoll - i);
             }
             else
             {
