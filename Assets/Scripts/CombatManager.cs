@@ -87,10 +87,8 @@ public class CombatManager : MonoBehaviour
             {
                 target.TakeDamage(pendingDamage);
                 CanvasManager.instance.AddDamageToUI(unit, pendingDamage);
-                Debug.Log($"{unit.name} inflige {pendingDamage} a {target.name}. Vida restante: {target.currentHealth}");
                 if (target.currentHealth <= 0)
                 {
-                    Debug.Log($"{target.name} ha muerto. Terminando combate.");
                     combatActive = false;
                     CanvasManager.instance.ResetUI();
                     yield break;
@@ -109,7 +107,6 @@ public class CombatManager : MonoBehaviour
         if (attacker == null || tower == null) return;
         if (attacker.isPlayerUnit && tower.faction == Faction.Player)
         {
-            Debug.Log("No puedes atacar tu propia torre.");
             return;
         }
         combatActive = true;
@@ -175,7 +172,6 @@ public class CombatManager : MonoBehaviour
         if (attacker == null || tower == null) return;
         if (!attacker.isPlayerUnit && tower.faction == Faction.Enemy)
         {
-            Debug.Log("IA no puede atacar su propia torre.");
             return;
         }
         combatActive = true;
