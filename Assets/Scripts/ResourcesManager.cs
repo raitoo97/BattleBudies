@@ -50,11 +50,10 @@ public class ResourcesManager : MonoBehaviour
             diceRoll.PrepareForRoll();
             if (ranger.isPlayerUnit)
             {
-                CanvasManager.instance.rollButton.gameObject.SetActive(true);
+                yield return new WaitForSeconds(.5f);
                 CanvasManager.instance.rollClicked = false;
                 CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: true, dicesLeft: numberOfDiceToRoll - i);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
-                CanvasManager.instance.rollButton.gameObject.SetActive(false);
             }
             else
             {

@@ -274,30 +274,31 @@ public class CanvasManager : MonoBehaviour
     #endregion
     public void RecolectResourcesUI(bool show, Ranger ranger, bool playerCanRoll = false, int result = -1, int dicesLeft = -1)
     {
+        // Si no hay nada que mostrar, desactivar todo
         if (!show || ranger == null)
         {
             panelPlayer.SetActive(false);
             panelEnemy.SetActive(false);
-            playerResources.gameObject.SetActive(false);
-            enemyResources.gameObject.SetActive(false);
             rollButton.gameObject.SetActive(false);
             playerDiceRemainingText.gameObject.SetActive(false);
             enemyDiceRemainingText.gameObject.SetActive(false);
             return;
         }
-        panelPlayer.SetActive(ranger.isPlayerUnit);
-        panelEnemy.SetActive(!ranger.isPlayerUnit);
         if (ranger.isPlayerUnit)
         {
-            playerResources.gameObject.SetActive(true);
-            playerResources.text = (ResourcesManager.instance.resourcesPlayer).ToString();
+            panelPlayer.SetActive(true);
+            panelEnemy.SetActive(false);
+            rollButton.gameObject.SetActive(playerCanRoll);
+            playerResources.text = ResourcesManager.instance.resourcesPlayer.ToString();
             playerDiceRemainingText.gameObject.SetActive(true);
             playerDiceRemainingText.text = dicesLeft >= 0 ? $"Remaining Dices: {dicesLeft}" : $"Remaining Dices: {ranger.resourcesDice}";
         }
         else
         {
-            enemyResources.gameObject.SetActive(true);
-            enemyResources.text = (ResourcesManager.instance.resourcesEnemy).ToString();
+            panelPlayer.SetActive(false);
+            panelEnemy.SetActive(true);
+            rollButton.gameObject.SetActive(false);
+            enemyResources.text = ResourcesManager.instance.resourcesEnemy.ToString();
             enemyDiceRemainingText.gameObject.SetActive(true);
             enemyDiceRemainingText.text = dicesLeft >= 0 ? $"Remaining Dices: {dicesLeft}" : $"Remaining Dices: {ranger.resourcesDice}";
         }
