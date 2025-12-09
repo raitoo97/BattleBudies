@@ -945,20 +945,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62b179446eb315349af4956f9e93df50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rollButton: {fileID: 1220242531}
-  playerDamageText: {fileID: 220682204}
-  playerSalvationText: {fileID: 0}
-  enemyDamageText: {fileID: 1009201776}
-  enemySalvationText: {fileID: 0}
-  panelEnemy: {fileID: 531066663}
-  panelPlayer: {fileID: 861494148}
-  playerDiceRemainingText: {fileID: 1468854110}
-  enemyDiceRemainingText: {fileID: 193543492}
-  rollClicked: 0
-  playerDamageUI: 0
-  enemyDamageUI: 0
-  playerDiceRemaining: 0
-  enemyDiceRemaining: 0
   energyPlayer:
   - {fileID: 1805492956}
   - {fileID: 767185830}
@@ -981,6 +967,18 @@ MonoBehaviour:
   - {fileID: 1433695907}
   - {fileID: 578098579}
   - {fileID: 531340021}
+  panelEnemy: {fileID: 531066663}
+  panelPlayer: {fileID: 861494148}
+  playerDiceRemainingText: {fileID: 1468854110}
+  enemyDiceRemainingText: {fileID: 193543492}
+  rollButton: {fileID: 1220242531}
+  playerDamageText: {fileID: 220682204}
+  enemyDamageText: {fileID: 1009201776}
+  rollClicked: 0
+  playerDamageUI: 0
+  enemyDamageUI: 0
+  playerDiceRemaining: 0
+  enemyDiceRemaining: 0
   unitStatsPanel: {fileID: 667921969}
   unitHealthText: {fileID: 1104443068}
   unitDiceText: {fileID: 1509737410}
@@ -1081,7 +1079,7 @@ GameObject:
   - component: {fileID: 303950769}
   - component: {fileID: 303950770}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: DamageEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

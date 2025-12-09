@@ -90,7 +90,7 @@ public class CombatManager : MonoBehaviour
                 if (target.currentHealth <= 0)
                 {
                     combatActive = false;
-                    CanvasManager.instance.ResetUI();
+                    CanvasManager.instance.ResetUICombat();
                     yield break;
                 }
             }
@@ -114,27 +114,26 @@ public class CombatManager : MonoBehaviour
         defenderUnit = null;
         attackerDice = attacker.diceInstance;
         Debug.Log($"StartCombatWithTower: {attackerUnit.name} ataca torre {tower.name}");
-        CanvasManager.instance.ShowTowerCombatUI(true, attacker.diceCount, playerCanRoll: true);
         StartCoroutine(TowerCombatFlow(attackerUnit, tower));
     }
     private IEnumerator TowerCombatFlow(Units attacker, Tower tower)
     {
         int remainingDice = attacker.diceCount;
-        CanvasManager.instance.UpdateDiceRemaining(remainingDice, 0);
-
         while (remainingDice > 0)
         {
             attackerDice.PrepareForRoll();
             CanvasManager.instance.rollClicked = false;
-            CanvasManager.instance.ShowTowerCombatUI(true, remainingDice, playerCanRoll: true);
+            CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
+            CanvasManager.instance.rollButton.gameObject.SetActive(true);
             yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
-            CanvasManager.instance.ShowTowerCombatUI(true, remainingDice, playerCanRoll: false);
+            CanvasManager.instance.rollButton.gameObject.SetActive(false);
             attackerDice.RollDice();
             yield return new WaitUntil(() => attackerDice.hasBeenThrown && attackerDice.hasBeenCounted && attackerDice.IsDiceStill());
             if (pendingDamage > 0)
             {
                 tower.TakeDamage(pendingDamage);
                 CanvasManager.instance.AddDamageToUI(attacker, pendingDamage);
+                CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
                 Debug.Log($"{attacker.name} inflige {pendingDamage} a torre {tower.name}. Vida restante: {tower.currentHealth}");
                 if (tower.currentHealth <= 0)
                 {
@@ -146,11 +145,15 @@ public class CombatManager : MonoBehaviour
             pendingDamage = 0;
             attackerDice.ResetDicePosition();
             remainingDice--;
-            CanvasManager.instance.UpdateDiceRemaining(remainingDice, 0);
+            if (attacker.isPlayerUnit)
+                CanvasManager.instance.UpdateDiceRemaining(remainingDice, 0);
+            else
+                CanvasManager.instance.UpdateDiceRemaining(0, remainingDice);
+            CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
             yield return new WaitForSeconds(0.2f);
         }
         attacker.hasAttackedTowerThisTurn = true;
-        CanvasManager.instance.ResetUI();
+        CanvasManager.instance.ResetUICombat();
         combatActive = false;
     }
     public IEnumerator StartCombatWithTower_Coroutine(Units attacker, Tower tower)
@@ -179,7 +182,6 @@ public class CombatManager : MonoBehaviour
         defenderUnit = null;
         attackerDice = attacker.diceInstance;
         Debug.Log($"StartCombatWithTowerAI: {attackerUnit.name} ataca torre {tower.name}");
-        CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
         StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
     }
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
@@ -188,14 +190,14 @@ public class CombatManager : MonoBehaviour
         while (remainingDice > 0)
         {
             attackerDice.PrepareForRoll();
-            CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
+            CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
             attackerDice.RollDice();
             yield return new WaitUntil(() => attackerDice.hasBeenThrown && attackerDice.hasBeenCounted && attackerDice.IsDiceStill());
-            CanvasManager.instance.ShowTowerCombatUIIA(true, attacker.diceCount);
             if (pendingDamage > 0)
             {
                 tower.TakeDamage(pendingDamage);
                 CanvasManager.instance.AddDamageToUI(attacker, pendingDamage);
+                CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
                 if (tower.currentHealth <= 0)
                 {
                     TowerManager.instance.NotifyTowerDestroyed(tower);
@@ -205,10 +207,11 @@ public class CombatManager : MonoBehaviour
             pendingDamage = 0;
             attackerDice.ResetDicePosition();
             remainingDice--;
+            CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
             yield return new WaitForSeconds(0.2f);
         }
         attacker.hasAttackedTowerThisTurn = true;
-        CanvasManager.instance.ResetUI();
+        CanvasManager.instance.ResetUICombat();
         combatActive = false;
     }
     #endregion
