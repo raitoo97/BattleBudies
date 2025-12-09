@@ -262,7 +262,7 @@ public class CanvasManager : MonoBehaviour
         }
         else
         {
-            enemyDamageText.text = result >= 0 ? $"Healing Tower + {result}:" : "Healing Tower:";
+            enemyDamageText.text = result >= 0 ? $"Healing Tower: + {result}" : "Healing Tower:";
             enemyDamageText.gameObject.SetActive(true);
             enemyDiceRemainingText.gameObject.SetActive(true);
             enemyDiceRemainingText.text = dicesLeft >= 0 ? $"Remaining Dices: {dicesLeft}" : $"Remaining Dices: {defender.healthTowerDice}";
