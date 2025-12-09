@@ -32,6 +32,9 @@ public class CanvasManager : MonoBehaviour
     public GameObject towerStatsPanel;
     public TextMeshProUGUI towerHealthText;
     private Tower hoveredTower = null;
+    [Header("Resources")]
+    public TextMeshProUGUI enemyResources;
+    public TextMeshProUGUI playerResources;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -269,4 +272,8 @@ public class CanvasManager : MonoBehaviour
         }
     }
     #endregion
+    public void RecolectResourcesUI()
+    {
+
+    }
 }

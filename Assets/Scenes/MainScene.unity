@@ -984,6 +984,8 @@ MonoBehaviour:
   unitDiceText: {fileID: 1509737410}
   towerStatsPanel: {fileID: 998094005}
   towerHealthText: {fileID: 199478600}
+  enemyResources: {fileID: 1012189829}
+  playerResources: {fileID: 1519050206}
 --- !u!1001 &265195169
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1419,37 +1421,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342855485}
   m_CullTransparentMesh: 1
---- !u!1 &359628906
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 359628907}
-  m_Layer: 0
-  m_Name: candomba (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &359628907
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 359628906}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1257.4926, y: 346.02945, z: -34.353516}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &396857794
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4256,7 +4227,7 @@ GameObject:
   - component: {fileID: 1012189830}
   - component: {fileID: 1012189829}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ResourcesEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6094,7 +6065,7 @@ GameObject:
   - component: {fileID: 1519050207}
   - component: {fileID: 1519050206}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ResourcesPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8572,4 +8543,3 @@ SceneRoots:
   - {fileID: 1165260219}
   - {fileID: 2048227884}
   - {fileID: 2137208774}
-  - {fileID: 359628907}
