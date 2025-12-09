@@ -2332,7 +2332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71d5d04ea23431444a2078eaed89481d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defendTriggerDistance: 85
+  defendTriggerDistance: 90
 --- !u!114 &563951300
 MonoBehaviour:
   m_ObjectHideFlags: 0
