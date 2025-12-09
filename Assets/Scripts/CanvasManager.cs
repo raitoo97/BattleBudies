@@ -236,4 +236,10 @@ public class CanvasManager : MonoBehaviour
         }
     }
     #endregion
+    #region HealingTower
+    public void HealingTowerUI()
+    {
+
+    }
+    #endregion
 }
