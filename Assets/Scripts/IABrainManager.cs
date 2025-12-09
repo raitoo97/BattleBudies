@@ -225,17 +225,24 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in defenders)
         {
             if (u == null || !u) continue;
-            if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             if (NodeManager.GetHealthNodes().Contains(u.currentNode))
             {
+                Debug.Log($"IA: Defender {u.gameObject.name} está sobre nodo de curación. Cura sin gastar energía.");
                 yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, 0));
                 continue;
             }
+            // Si no hay energía no intento mover
+            if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
             Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
-            yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            if (NodeManager.GetHealthNodes().Contains(u.currentNode))
+            {
+                Debug.Log($"IA: Defender {u.gameObject.name} terminó movimiento sobre nodo de curación. Cura inmediatamente.");
+                HealthTowerManager.instance.StartRecolectedHealth(u as Defenders);
+                yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            }
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }

@@ -21,7 +21,7 @@ public class IADefendTowers : MonoBehaviour
         yield return new WaitUntil(() => isBusy());
         movedAnyUnit = false;
         actionInProgress = true;
-        if (enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f)
+        if (enemy.currentNode == null)
         {
             actionInProgress = false;
             yield break;
@@ -32,6 +32,11 @@ public class IADefendTowers : MonoBehaviour
             Debug.Log($"IA: Unidad enemiga es un Defensor va a tirar de nombre {enemy.gameObject.name}.");
             HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
             yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            actionInProgress = false;
+            yield break;
+        }
+        if (EnergyManager.instance.enemyCurrentEnergy < 1f)
+        {
             actionInProgress = false;
             yield break;
         }
