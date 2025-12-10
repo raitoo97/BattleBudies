@@ -136,7 +136,6 @@ public class CombatManager : MonoBehaviour
                 tower.TakeDamage(pendingDamage);
                 CanvasManager.instance.AddDamageToUI(attacker, pendingDamage);
                 CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
-                Debug.Log($"{attacker.name} inflige {pendingDamage} a torre {tower.name}. Vida restante: {tower.currentHealth}");
                 if (tower.currentHealth <= 0)
                 {
                     Debug.Log($"Torre {tower.name} destruida.");
