@@ -28,8 +28,10 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log("Elegí una unidad para mejorar...");
         CanvasManager.instance.UpgradeUnits.interactable = false;
         UnitController.instance.IsSelectingUpgradeUnit = true;
+        GridVisualizer.instance.upgradeMode = true;
         UnitController.instance.StartUpgradeSelection();
         while (UnitController.instance.IsSelectingUpgradeUnit)yield return null;
+        GridVisualizer.instance.upgradeMode = false;
         isUpgradingPlayer = false;
     }
     public void ApplyUpgradeToPlayerUnit(Units unit)
