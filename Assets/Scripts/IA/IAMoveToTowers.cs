@@ -75,12 +75,12 @@ public class IAMoveToTowers : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         actionInProgress = false;
     }
-    public IEnumerator MoveAllEnemyUnitsToTowers()
+    public IEnumerator MoveAllEnemyUnitsToTowers(List<Attackers> attackers)
     {
         movedAnyUnit = false;
-        List<Units> enemyUnits = GetAllEnemyUnits();
+        if (attackers == null || attackers.Count == 0)yield break;
         List<Node> validNodes = GetValidNodes();
-        foreach (Units enemy in enemyUnits)
+        foreach (Units enemy in attackers)
         {
             yield return new WaitUntil(() => isBusy());
             actionInProgress = true;

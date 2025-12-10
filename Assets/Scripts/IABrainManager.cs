@@ -175,7 +175,7 @@ public class IABrainManager : MonoBehaviour
         float globalChance = Random.value;
         if (globalChance < 0.25f)
         {
-            yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
+            yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers(attackers));
             yield break;
         }
         //MOVIMIENTOS INDIVIDUALES NORMALES
