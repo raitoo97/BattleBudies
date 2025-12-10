@@ -46,33 +46,35 @@ public class UpgradeManager : MonoBehaviour
     public void UpgradeEnemyUnits()
     {
         int upgradeCost = 10;
-        if (ResourcesManager.instance.resourcesEnemy < upgradeCost) return;
-        Units unitToUpgrade = null;
-        foreach (Attackers atk in FindObjectsOfType<Attackers>())
+        while (ResourcesManager.instance.resourcesEnemy >= upgradeCost)
         {
-            if (atk != null && atk.isPlayerUnit == false) // es enemigo
+            Units unitToUpgrade = null;
+            foreach (Attackers atk in FindObjectsOfType<Attackers>())
             {
-                unitToUpgrade = atk;
-                break;
-            }
-        }
-        if (unitToUpgrade == null)
-        {
-            foreach (Defenders def in FindObjectsOfType<Defenders>())
-            {
-                if (def != null && def.isPlayerUnit == false) // es enemigo
+                if (atk != null && !atk.isPlayerUnit)
                 {
-                    unitToUpgrade = def;
+                    unitToUpgrade = atk;
                     break;
                 }
             }
+            if (unitToUpgrade == null)
+            {
+                foreach (Defenders def in FindObjectsOfType<Defenders>())
+                {
+                    if (def != null && !def.isPlayerUnit)
+                    {
+                        unitToUpgrade = def;
+                        break;
+                    }
+                }
+            }
+            if (unitToUpgrade == null)return;
+            unitToUpgrade.currentHealth = unitToUpgrade.maxhealth;
+            unitToUpgrade.diceCount += 1;
+            ResourcesManager.instance.resourcesEnemy -= upgradeCost;
+            CanvasManager.instance.enemyResources.text =ResourcesManager.instance.resourcesEnemy.ToString();
+            Debug.Log($"[UPGRADE ENEMIGO] {unitToUpgrade.name} mejorado | +1 dado | vida al máximo | -10 recursos");
         }
-        if (unitToUpgrade == null) return;
-        unitToUpgrade.currentHealth = unitToUpgrade.maxhealth;
-        unitToUpgrade.diceCount += 1;
-        ResourcesManager.instance.resourcesEnemy -= upgradeCost;
-        CanvasManager.instance.enemyResources.text = ResourcesManager.instance.resourcesEnemy.ToString();
-        Debug.Log($"[UPGRADE ENEMIGO] Se mejoró a {unitToUpgrade.name} | +1 dado | vida al máximo | -{upgradeCost} recursos");
     }
     public bool GetCanUpgradePlayer { get => CanUpgradePlayer; }
 }

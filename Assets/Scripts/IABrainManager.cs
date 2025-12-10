@@ -248,6 +248,7 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator MoveRangers(List<Ranger> rangers)
     {
         if (rangers == null || rangers.Count == 0) yield break;
+        UpgradeManager.instance.UpgradeEnemyUnits();
         List<Node> resourceNodes = NodeManager.GetResourcesNode();
         int currentEnergy = EnergyManager.instance.enemyCurrentEnergy;
         int energyPerUnit = Mathf.Max(1, Mathf.Min((rangers.Count > 0 ? currentEnergy / rangers.Count : 1), maxStepsPerUnit));
