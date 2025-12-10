@@ -17,6 +17,11 @@ public class CameraManager : MonoBehaviour
         positions = 0 ;
         coroutine = null;
     }
+    private void Start()
+    {
+        this.transform.position = _cameraPositions[positions].position;
+        this.transform.rotation = _cameraPositions[positions].rotation;
+    }
     public void ChangeCameras()
     {
         if (CanTransposed)
