@@ -169,7 +169,6 @@ public class IABrainManager : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(0, stepsToMove);
         Debug.Log($"IA: Moviendo {chosen.name} hacia la amenaza de nombre {threat.name} a {stepsToMove} pasos)");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(chosen, nodesToMove));
-        Debug.Log("IA: Acción contra amenaza completada.");
     }
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
