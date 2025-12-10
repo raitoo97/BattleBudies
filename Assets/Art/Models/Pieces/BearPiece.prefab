@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 0
-  maxhealth: 25
+  maxHealth: 25
   diceCount: 1
   isPlayerUnit: 1
   currentNode: {fileID: 0}
