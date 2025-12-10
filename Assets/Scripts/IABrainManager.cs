@@ -173,9 +173,10 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
         float globalChance = Random.value;
-        if (globalChance < 0.25f)
+        if (globalChance < 0.3f)
         {
-            yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
+            Debug.Log("Ataque Global de parte de la IA");
+            yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers(attackers));
             yield break;
         }
         //MOVIMIENTOS INDIVIDUALES NORMALES
@@ -247,6 +248,7 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator MoveRangers(List<Ranger> rangers)
     {
         if (rangers == null || rangers.Count == 0) yield break;
+        UpgradeManager.instance.UpgradeEnemyUnits();
         List<Node> resourceNodes = NodeManager.GetResourcesNode();
         int currentEnergy = EnergyManager.instance.enemyCurrentEnergy;
         int energyPerUnit = Mathf.Max(1, Mathf.Min((rangers.Count > 0 ? currentEnergy / rangers.Count : 1), maxStepsPerUnit));
@@ -273,6 +275,7 @@ public class IABrainManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
+        UpgradeManager.instance.UpgradeEnemyUnits();
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {

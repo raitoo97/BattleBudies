@@ -275,4 +275,26 @@ public static class NodeManager
 
         return towerNodes;
     }
+    public static List<Node> PlayerUnits()
+    {
+        var playerUnits = new List<Units>();
+        var allnUnits = GameObject.FindObjectsOfType<Units>();
+        foreach (var unit in allnUnits)
+        {
+            if(!playerUnits.Contains(unit) && unit.isPlayerUnit)
+            {
+                playerUnits.Add(unit);
+            }
+        }
+        if (playerUnits.Count == 0) return new List<Node>();
+        var nodes = new List<Node>();
+        foreach (var unit in playerUnits) 
+        {
+            if (!nodes.Contains(unit.currentNode))
+            {
+                nodes.Add(unit.currentNode);
+            }
+        }
+        return nodes;
+    }
 }

@@ -20,6 +20,8 @@ public class GridVisualizer : MonoBehaviour
     private Coroutine placementHighlightCoroutine;
     public static GridVisualizer instance;
     private HashSet<Node> dangerNodes = new HashSet<Node>();
+    public bool upgradeMode = false;
+    private Coroutine upgradeHighlightCoroutine;
     private void Awake()
     {
         if (instance == null)
@@ -42,6 +44,16 @@ public class GridVisualizer : MonoBehaviour
             StopCoroutine(placementHighlightCoroutine);
             placementHighlightCoroutine = null;
             ResetPlacementRowColor();
+        }
+        if (upgradeMode && upgradeHighlightCoroutine == null)
+        {
+            upgradeHighlightCoroutine = StartCoroutine(PulsePlayerUnits());
+        }
+        else if (!upgradeMode && upgradeHighlightCoroutine != null)
+        {
+            StopCoroutine(upgradeHighlightCoroutine);
+            upgradeHighlightCoroutine = null;
+            ResetPlayerUnitsColor();
         }
     }
     void CreateAllLines()
@@ -256,6 +268,50 @@ public class GridVisualizer : MonoBehaviour
             {
                 SetColor(n, defaultColor);
                 SetLinePosition(n, false);
+            }
+        }
+    }
+    IEnumerator PulsePlayerUnits()
+    {
+        float duration = 0.5f;
+        float t = 0f;
+        bool toGreen = true;
+        List<Node> playerNodes = NodeManager.PlayerUnits();
+        while (upgradeMode)
+        {
+            t += Time.deltaTime / duration;
+            Color targetColor = toGreen ? placementRowColor : defaultColor;
+            Color fromColor = toGreen ? defaultColor : placementRowColor;
+            Color lerped = Color.Lerp(fromColor, targetColor, t);
+            foreach (var node in playerNodes)
+            {
+                if (node == null) continue;
+
+                if (node != hoveredNode && node != selectedNode)
+                {
+                    SetColor(node, lerped);
+                    SetLinePosition(node, true);
+                }
+            }
+            if (t >= 1f)
+            {
+                t = 0f;
+                toGreen = !toGreen;
+            }
+            yield return null;
+        }
+    }
+    void ResetPlayerUnitsColor()
+    {
+        List<Node> playerNodes = NodeManager.PlayerUnits();
+        foreach (var node in playerNodes)
+        {
+            if (node == null) continue;
+
+            if (node != hoveredNode && node != selectedNode)
+            {
+                SetColor(node, defaultColor);
+                SetLinePosition(node, false);
             }
         }
     }

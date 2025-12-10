@@ -144,7 +144,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d595608d603fd446b6025dde546271a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 40
+  currentHealth: 0
+  maxHealth: 40
   diceCount: 4
   isPlayerUnit: 1
   currentNode: {fileID: 0}

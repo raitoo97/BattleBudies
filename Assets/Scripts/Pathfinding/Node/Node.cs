@@ -83,7 +83,7 @@ public class Node : MonoBehaviour
     {
         if (collision.gameObject.layer == 8)//trampas
         {
-            _cost+= 50;
+            _cost+= 3;
             _isDangerous = true;
         }
         if (collision.gameObject.layer == 9)//resources

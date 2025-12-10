@@ -14,6 +14,7 @@ public class CanvasManager : MonoBehaviour
     public GameObject panelPlayer;
     public TextMeshProUGUI playerDiceRemainingText;
     public TextMeshProUGUI enemyDiceRemainingText;
+    public Button UpgradeUnits;
     [Header("Combat")]
     public Button rollButton;
     public TextMeshProUGUI playerDamageText;
@@ -35,17 +36,26 @@ public class CanvasManager : MonoBehaviour
     [Header("Resources")]
     public TextMeshProUGUI enemyResources;
     public TextMeshProUGUI playerResources;
+    [Header("CameraControl")]
+    public Button changeCameraButton;
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
         rollButton.onClick.AddListener(() => rollClicked = true);
+        changeCameraButton.onClick.AddListener(ChangeCameraCall);
+        UpgradeUnits.onClick.AddListener(UpgradeUnitsPlayerCall);
         ResetUICombat();
     }
     private void Update()
     {
         UpdateUnitStatsHover();
         UpdateTowerStatsHover();
+        if(CameraManager.instance.GetCanTransposed)
+            changeCameraButton.interactable = true;
+        else
+            changeCameraButton.interactable = false;
+        UpgradeUnits.interactable =UpgradeManager.instance.GetCanUpgradePlayer &&!UnitController.instance.IsSelectingUpgradeUnit && !UnitController.instance.IsBusy();
     }
     public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
     {
@@ -286,6 +296,7 @@ public class CanvasManager : MonoBehaviour
         }
     }
     #endregion
+    #region Resources
     public void RecolectResourcesUI(bool show, Ranger ranger, bool playerCanRoll = false, int result = -1, int dicesLeft = -1)
     {
         // Si no hay nada que mostrar, desactivar todo
@@ -316,5 +327,14 @@ public class CanvasManager : MonoBehaviour
             enemyDiceRemainingText.gameObject.SetActive(true);
             enemyDiceRemainingText.text = dicesLeft >= 0 ? $"Remaining Dices: {dicesLeft}" : $"Remaining Dices: {ranger.resourcesDice}";
         }
+    }
+    #endregion
+    private void ChangeCameraCall()
+    {
+        CameraManager.instance.ChangeCameras();
+    }
+    private void UpgradeUnitsPlayerCall()
+    {
+        UpgradeManager.instance?.RequestPlayerUpgrade();
     }
 }

@@ -154,7 +154,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3b793cf5a7abe448b1b7fd29bbfe907, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 30
+  currentHealth: 0
+  maxHealth: 30
   diceCount: 2
   isPlayerUnit: 1
   currentNode: {fileID: 0}
@@ -162,6 +163,7 @@ MonoBehaviour:
   moveSpeed: 20
   diceInstance: {fileID: 0}
   hasAttackedTowerThisTurn: 0
+  hasHealthedTowerThisTurn: 0
   healthTowerDice: 3
 --- !u!136 &5846122604723798370
 CapsuleCollider:

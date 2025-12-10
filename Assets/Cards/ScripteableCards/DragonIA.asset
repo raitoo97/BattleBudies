@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: DragonIA
   m_EditorClassIdentifier: 
   artwork: {fileID: 21300000, guid: 4bc8da3e6748b4d4492bf93faa2f7011, type: 3}
-  cost: 6
+  cost: 7
   unitPrefab: {fileID: 6545163915917098452, guid: e4bba553cc10c0b4791d318ffe071c9b,
     type: 3}
+  unitType: 0
