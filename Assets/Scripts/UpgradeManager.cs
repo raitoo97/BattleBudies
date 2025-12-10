@@ -71,6 +71,7 @@ public class UpgradeManager : MonoBehaviour
         unitToUpgrade.currentHealth = unitToUpgrade.maxhealth;
         unitToUpgrade.diceCount += 1;
         ResourcesManager.instance.resourcesEnemy -= upgradeCost;
+        CanvasManager.instance.enemyResources.text = ResourcesManager.instance.resourcesEnemy.ToString();
         Debug.Log($"[UPGRADE ENEMIGO] Se mejoró a {unitToUpgrade.name} | +1 dado | vida al máximo | -{upgradeCost} recursos");
     }
     public bool GetCanUpgradePlayer { get => CanUpgradePlayer; }
