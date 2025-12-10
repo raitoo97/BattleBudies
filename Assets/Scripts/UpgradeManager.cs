@@ -37,8 +37,9 @@ public class UpgradeManager : MonoBehaviour
     public void ApplyUpgradeToPlayerUnit(Units unit)
     {
         int cost = 10;
+        int bonusHealth = 15;
         if (ResourcesManager.instance.resourcesPlayer < cost) return;
-        unit.currentHealth = unit.maxhealth;
+        unit.currentHealth = Mathf.Min(unit.currentHealth + bonusHealth, unit.maxHealth);
         unit.diceCount += 1;
         ResourcesManager.instance.resourcesPlayer -= cost;
         CanvasManager.instance.playerResources.text = ResourcesManager.instance.resourcesPlayer.ToString();
@@ -46,6 +47,7 @@ public class UpgradeManager : MonoBehaviour
     public void UpgradeEnemyUnits()
     {
         int upgradeCost = 10;
+        int bonusHealth = 15;
         while (ResourcesManager.instance.resourcesEnemy >= upgradeCost)
         {
             Units unitToUpgrade = null;
@@ -69,7 +71,7 @@ public class UpgradeManager : MonoBehaviour
                 }
             }
             if (unitToUpgrade == null)return;
-            unitToUpgrade.currentHealth = unitToUpgrade.maxhealth;
+            unitToUpgrade.currentHealth = Mathf.Min(unitToUpgrade.currentHealth + bonusHealth, unitToUpgrade.maxHealth);
             unitToUpgrade.diceCount += 1;
             ResourcesManager.instance.resourcesEnemy -= upgradeCost;
             CanvasManager.instance.enemyResources.text =ResourcesManager.instance.resourcesEnemy.ToString();
