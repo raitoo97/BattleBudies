@@ -33,6 +33,7 @@ public class HealthTowerManager : MonoBehaviour
         if (defender == null) return;
         onColectedHealth = true;
         diceRoll = defender.diceInstance;
+        pendingHealth = 0;
         StartCoroutine(DefenderRollDiceHealth(defender));
         Debug.Log("Iniciando tirada de recolección de salud");
     }

@@ -79,7 +79,6 @@ public class IABrainManager : MonoBehaviour
             yield return StartCoroutine(UseResidualEnergy(allUnitsRemaining));
         }
         yield return new WaitUntil(() => isBusy());
-        Debug.Log("Energía al final del turno IA: " + EnergyManager.instance.enemyCurrentEnergy);
         GameManager.instance.StartPlayerTurn();
     }
     IEnumerator InitializedTurn()
@@ -182,7 +181,6 @@ public class IABrainManager : MonoBehaviour
         float globalChance = Random.value;
         if (globalChance < 0.25f)
         {
-            Debug.Log("IA impredecible: ATAQUE GLOBAL  TODOS los tipos van a las torres del player");
             yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers());
             yield break;
         }
@@ -319,27 +317,18 @@ public class IABrainManager : MonoBehaviour
                 if (residualEnergy < 1) break;
                 if (Unit is Attackers)
                 {
-                    Debug.Log($"IA usando energía residual para mover Attacker {Unit.gameObject.name}");
-                    Debug.Log($"IA Nodo Anterior al movimiento del attacker {Unit.currentNode}");
                     yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(Unit as Attackers, residualEnergy));
-                    Debug.Log($"IA Nodo Posterior al movimiento del attacker {Unit.currentNode}");
                     anyMoved = true;
                 }
                 else if (Unit is Defenders)
                 {
-                    Debug.Log($"IA usando energía residual para mover Defender {Unit.gameObject.name}");
-                    Debug.Log($"IA Nodo Anterior al movimiento del Defender {Unit.currentNode}");
                     yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(Unit as Defenders, residualEnergy));
-                    Debug.Log($"IA Nodo Posterior al movimiento del Defender {Unit.currentNode}");
                     yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
                     anyMoved = true;
                 }
                 else if (Unit is Ranger)
                 {
-                    Debug.Log($"IA usando energía residual para mover Ranger {Unit.gameObject.name}");
-                    Debug.Log($"IA Nodo Anterior al movimiento del Ranger {Unit.currentNode}");
                     yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(Unit as Ranger, residualEnergy));
-                    Debug.Log($"IA Nodo Posterior al movimiento del Ranger {Unit.currentNode}");
                     yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
                     anyMoved = true;
                 }
@@ -347,7 +336,6 @@ public class IABrainManager : MonoBehaviour
             }
             if (!anyMoved && EnergyManager.instance.enemyCurrentEnergy >= 1)
             {
-                Debug.Log("IA no puede mover unidades restantes, intenta jugar carta con energía residual.");
                 yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
                 anyMoved = true;
             }

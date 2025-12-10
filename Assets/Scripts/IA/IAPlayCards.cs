@@ -68,7 +68,6 @@ public class IAPlayCards : MonoBehaviour
         }
         if (cardToPlay == null)
         {
-            Debug.Log("IA: No hay cartas Attackers disponibles, buscando Defenders...");
             foreach (Transform c in hand)
             {
                 CardInteraction card = c.GetComponent<CardInteraction>();
@@ -82,7 +81,6 @@ public class IAPlayCards : MonoBehaviour
         }
         if (cardToPlay == null)
         {
-            Debug.Log("IA: No hay cartas Defenders disponibles, buscando Rangers...");
             foreach (Transform c in hand)
             {
                 CardInteraction card = c.GetComponent<CardInteraction>();
@@ -96,7 +94,6 @@ public class IAPlayCards : MonoBehaviour
         }
         if (cardToPlay == null)
         {
-            Debug.Log("IA: No hay cartas de prioridad, se jugará cualquier carta disponible si hay energía.");
             foreach (Transform c in hand)
             {
                 CardInteraction card = c.GetComponent<CardInteraction>();

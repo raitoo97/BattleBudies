@@ -34,6 +34,7 @@ public class ResourcesManager : MonoBehaviour
         if(ranger == null) return;
         onColectedResources = true;
         diceRoll = ranger.diceInstance;
+        pendingResources = 0;
         StartCoroutine(RangerRollDiceResources(ranger));
         Debug.Log("Iniciando tirada de recolección");
     }

@@ -24,6 +24,7 @@ public class CombatManager : MonoBehaviour
     {
         if (combatActive) return;
         if (SalvationManager.instance.GetOnSavingThrow) return;
+        pendingDamage = 0;
         if (unit1 == null || unit2 == null)
         {
             Debug.LogError("StartCombat: alguna unidad es null.");
@@ -40,7 +41,7 @@ public class CombatManager : MonoBehaviour
         attackerDice = attackerUnit.diceInstance;
         defenderDice = defenderUnit.diceInstance;
         Debug.Log($"StartCombat: {attackerUnit.name} vs {defenderUnit.name}");
-        CanvasManager.instance.TryShowCombatUI(playerCanRoll: false);
+        CanvasManager.instance.TryShowCombatUI(playerCanRoll: false , true);
         StartCoroutine(CombatFlow(attackerStartsTurn));
     }
     private IEnumerator CombatFlow(bool attackerStartsTurn)
@@ -104,6 +105,7 @@ public class CombatManager : MonoBehaviour
     {
         if (combatActive) return;
         if (SalvationManager.instance.GetOnSavingThrow) return;
+        pendingDamage = 0;
         if (attacker == null || tower == null) return;
         if (attacker.isPlayerUnit && tower.faction == Faction.Player)
         {
@@ -172,6 +174,7 @@ public class CombatManager : MonoBehaviour
     {
         if (combatActive) return;
         if (SalvationManager.instance.GetOnSavingThrow) return;
+        pendingDamage = 0;
         if (attacker == null || tower == null) return;
         if (!attacker.isPlayerUnit && tower.faction == Faction.Enemy)
         {
