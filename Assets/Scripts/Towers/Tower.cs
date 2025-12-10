@@ -32,7 +32,6 @@ public class Tower : MonoBehaviour
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        Debug.Log($"{name} recibió {amount} daño. Vida restante: {currentHealth}");
         if (currentHealth <= 0 && !isDestroyed)
         {
             isDestroyed = true;

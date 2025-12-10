@@ -129,8 +129,22 @@ public class CanvasManager : MonoBehaviour
         }
     }
     #region Combat
-    public void ShowCombatUI(bool show, bool playerCanRoll = false)
+    public void ShowCombatUI(bool show, bool playerCanRoll = false, bool isNewCombat = false)
     {
+        if (show)
+        {
+            // Solo cambiamos el texto al iniciar un combate nuevo
+            if (isNewCombat)
+            {
+                if (playerDamageText != null) playerDamageText.text = "Player Damage:";
+                if (enemyDamageText != null) enemyDamageText.text = "Enemy Damage:";
+            }
+            else
+            {
+                UpdateDamageUI();
+            }
+        }
+
         if (playerDamageText != null) playerDamageText.gameObject.SetActive(show);
         if (enemyDamageText != null) enemyDamageText.gameObject.SetActive(show);
         if (panelEnemy != null) panelEnemy.gameObject.SetActive(show);
@@ -139,9 +153,9 @@ public class CanvasManager : MonoBehaviour
         if (enemyDiceRemainingText != null) enemyDiceRemainingText.gameObject.SetActive(show);
         rollButton.gameObject.SetActive(playerCanRoll);
     }
-    public void TryShowCombatUI(bool playerCanRoll = false)
+    public void TryShowCombatUI(bool playerCanRoll = false, bool isNewCombat = false)
     {
-        ShowCombatUI(true, playerCanRoll);
+        ShowCombatUI(true, playerCanRoll, isNewCombat : false);
         if (SalvationManager.instance.GetOnSavingThrow && !GameManager.instance.isPlayerTurn)
         {
             rollButton.gameObject.SetActive(false);
