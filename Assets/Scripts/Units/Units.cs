@@ -6,6 +6,7 @@ public abstract class Units : MonoBehaviour
     public static bool anyUnitMoving = false;
     [Header("Stats")]
     public int currentHealth;
+    public int maxhealth;
     public int diceCount = 1;
     [Header("Ownership")]
     public bool isPlayerUnit = true;
@@ -34,6 +35,7 @@ public abstract class Units : MonoBehaviour
             snap.y = originalY;
             transform.position = snap;
         }
+        currentHealth = maxhealth;
     }
     protected virtual void Update()
     {

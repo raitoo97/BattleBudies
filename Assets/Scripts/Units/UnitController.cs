@@ -10,6 +10,7 @@ public class UnitController : MonoBehaviour
     private Units hoverUnit;
     public static UnitController instance;
     private bool previousIsPlayerTurn = false;
+    public bool IsSelectingUpgradeUnit = false;
     private void Awake()
     {
         if (instance == null)
@@ -101,6 +102,7 @@ public class UnitController : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
+                UpgradeUnits(hit);
                 Units unit = hit.collider.GetComponent<Units>();
                 Node node = hit.collider.GetComponent<Node>();
                 if (!IsUnitSelectable(unit))
@@ -269,7 +271,26 @@ public class UnitController : MonoBehaviour
     {
         return NodeManager.GetHealthNodes().FindAll(n => n.IsEmpty() || n == unit.currentNode);
     }
-    private bool IsBusy()
+    public void StartUpgradeSelection()
+    {
+        IsSelectingUpgradeUnit = true;
+        Debug.Log("UnitController escuchando selección de unidad para upgrade.");
+    }
+    public void UpgradeUnits(RaycastHit hit)
+    {
+        if (IsSelectingUpgradeUnit)
+        {
+            Units clickedUnit = hit.collider.GetComponent<Units>();
+            if (clickedUnit != null && clickedUnit.isPlayerUnit)
+            {
+                UpgradeManager.instance.ApplyUpgradeToPlayerUnit(clickedUnit);
+                IsSelectingUpgradeUnit = false;
+                Debug.Log($"Unidad mejorada: {clickedUnit.name}");
+            }
+            return;
+        }
+    }
+    public bool IsBusy()
     {
         if (CardPlayManager.instance != null && CardPlayManager.instance.placingMode)
             return true;

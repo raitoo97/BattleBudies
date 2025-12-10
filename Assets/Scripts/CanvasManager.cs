@@ -14,6 +14,7 @@ public class CanvasManager : MonoBehaviour
     public GameObject panelPlayer;
     public TextMeshProUGUI playerDiceRemainingText;
     public TextMeshProUGUI enemyDiceRemainingText;
+    public Button UpgradeUnits;
     [Header("Combat")]
     public Button rollButton;
     public TextMeshProUGUI playerDamageText;
@@ -43,6 +44,7 @@ public class CanvasManager : MonoBehaviour
         else Destroy(gameObject);
         rollButton.onClick.AddListener(() => rollClicked = true);
         changeCameraButton.onClick.AddListener(ChangeCameraCall);
+        UpgradeUnits.onClick.AddListener(UpgradeUnitsPlayerCall);
         ResetUICombat();
     }
     private void Update()
@@ -53,6 +55,7 @@ public class CanvasManager : MonoBehaviour
             changeCameraButton.interactable = true;
         else
             changeCameraButton.interactable = false;
+        UpgradeUnits.interactable =UpgradeManager.instance.GetCanUpgradePlayer &&!UnitController.instance.IsSelectingUpgradeUnit && !UnitController.instance.IsBusy();
     }
     public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
     {
@@ -329,5 +332,9 @@ public class CanvasManager : MonoBehaviour
     private void ChangeCameraCall()
     {
         CameraManager.instance.ChangeCameras();
+    }
+    private void UpgradeUnitsPlayerCall()
+    {
+        UpgradeManager.instance?.RequestPlayerUpgrade();
     }
 }
