@@ -36,7 +36,6 @@ public class ResourcesManager : MonoBehaviour
         diceRoll = ranger.diceInstance;
         pendingResources = 0;
         StartCoroutine(RangerRollDiceResources(ranger));
-        Debug.Log("Iniciando tirada de recolección");
     }
     IEnumerator RangerRollDiceResources(Ranger ranger)
     {
@@ -64,7 +63,6 @@ public class ResourcesManager : MonoBehaviour
             }
             diceRoll.RollDice();
             yield return new WaitUntil(() => diceRoll.hasBeenThrown && diceRoll.hasBeenCounted && diceRoll.IsDiceStill());
-            print("Tirada de recurso " + (i + 1) + " de " + ranger.resourcesDice + ": " + pendingResources + " recursos pendientes.");
             if (pendingResources > 0)
             {
                 if (ranger.isPlayerUnit)

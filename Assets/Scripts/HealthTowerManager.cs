@@ -35,7 +35,6 @@ public class HealthTowerManager : MonoBehaviour
         diceRoll = defender.diceInstance;
         pendingHealth = 0;
         StartCoroutine(DefenderRollDiceHealth(defender));
-        Debug.Log("Iniciando tirada de recolección de salud");
     }
     IEnumerator DefenderRollDiceHealth(Defenders defender)
     {
@@ -63,7 +62,6 @@ public class HealthTowerManager : MonoBehaviour
             diceRoll.RollDice();
             yield return new WaitUntil(() => diceRoll.hasBeenThrown && diceRoll.hasBeenCounted && diceRoll.IsDiceStill());
             CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: false, result: pendingHealth, dicesLeft: dicesLeft);
-            print("Tirada de vida " + (i + 1) + " de " + defender.healthTowerDice + ": " + pendingHealth + " vida pendientes.");
             if (pendingHealth > 0)
             {
                 if (defender.isPlayerUnit)
@@ -73,7 +71,6 @@ public class HealthTowerManager : MonoBehaviour
                         if (selectedTower != null)
                         {
                             selectedTower.Healt(pendingHealth);
-                            Debug.Log("Curaste la torre: " + selectedTower.name + " con " + pendingHealth + " de vida.");
                         }
                     }));
                     pendingHealth = 0;
