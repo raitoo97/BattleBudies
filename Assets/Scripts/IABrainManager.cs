@@ -275,6 +275,7 @@ public class IABrainManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
+        UpgradeManager.instance.UpgradeEnemyUnits();
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
