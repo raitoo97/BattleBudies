@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraAnimations : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private Transform[] _cameraPositions;
     void Start()
     {
         
