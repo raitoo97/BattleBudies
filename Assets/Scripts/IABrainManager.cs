@@ -36,12 +36,7 @@ public class IABrainManager : MonoBehaviour
             float random = Random.value;
             if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
             {
-                Debug.Log("IA decide jugar carta tras enviar defensa");
                 yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
-            }
-            else
-            {
-                Debug.Log("IA no juega carta tras enviar defensa" + random);
             }
             yield return StartCoroutine(MoveAllUnitsToThreat(threat));
         }
