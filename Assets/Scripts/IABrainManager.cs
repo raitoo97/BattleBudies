@@ -173,8 +173,9 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
         float globalChance = Random.value;
-        if (globalChance < 0.25f)
+        if (globalChance < 0.3f)
         {
+            Debug.Log("Ataque Global de parte de la IA");
             yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers(attackers));
             yield break;
         }
