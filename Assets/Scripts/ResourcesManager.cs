@@ -82,4 +82,8 @@ public class ResourcesManager : MonoBehaviour
     {
         pendingResources += changeAmount;
     }
+    public void UsingResources()
+    {
+
+    }
 }
