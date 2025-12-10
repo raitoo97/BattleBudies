@@ -185,7 +185,6 @@ public class IABrainManager : MonoBehaviour
             yield break;
         }
         //MOVIMIENTOS INDIVIDUALES NORMALES
-        Debug.Log("IA: movimientos individuales normales por tipo");
         yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
         yield return StartCoroutine(MoveDefenders(defenders, rangers));
         yield return StartCoroutine(MoveRangers(rangers));
