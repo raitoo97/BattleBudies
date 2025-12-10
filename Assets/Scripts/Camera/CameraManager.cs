@@ -6,8 +6,13 @@ public class CameraManager : MonoBehaviour
     private int positions;
     private bool CanTransposed;
     private Coroutine coroutine;
+    public static CameraManager instance;
     private void Awake()
     {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(this.gameObject);
         CanTransposed = true;
         positions = 0 ;
         coroutine = null;
@@ -49,4 +54,5 @@ public class CameraManager : MonoBehaviour
         yield return null;
         coroutine = null;
     }
+    public bool GetCanTransposed { get => CanTransposed; }
 }
