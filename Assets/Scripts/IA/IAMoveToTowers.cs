@@ -192,14 +192,6 @@ public class IAMoveToTowers : MonoBehaviour
         if (path == null || path.Count == 0) return false;
         return true;
     }
-    private List<Units> GetAllEnemyUnits()
-    {
-        Units[] allUnits = FindObjectsOfType<Units>();
-        List<Units> enemies = new List<Units>();
-        foreach (Units u in allUnits)
-            if (!u.isPlayerUnit) enemies.Add(u);
-        return enemies;
-    }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {
         yield return new WaitUntil(() => attacker.PathEmpty());
