@@ -79,6 +79,11 @@ public class IABrainManager : MonoBehaviour
     IEnumerator InitializedTurn()
     {
         ClearAllPaths();
+        foreach (Ranger r in FindObjectsOfType<Ranger>())
+        {
+            if (r != null && !r.isPlayerUnit)
+                r.hasCollectedThisTurn = false;
+        }
         CardPlayManager.instance?.HideAllHandsAtAITurn();
         EnergyManager.instance?.RefillEnemyEnergy();
         DeckManager.instance?.DrawEnemyCard();
