@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         foreach (var u in allUnits)
         {
             if (u.isPlayerUnit)
-                u.hasAttackedTowerThisTurn = false;
+                u.ResetTurnFlags();
         }
     }
     public bool IsAnyPlayerUnitMoving()
