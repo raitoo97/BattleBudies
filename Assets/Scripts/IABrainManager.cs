@@ -207,11 +207,9 @@ public class IABrainManager : MonoBehaviour
             if (u == null || !u) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Attackers {u.gameObject.name}");
-            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u, moveEnergy));
             yield return new WaitForSeconds(0.2f);
-            Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
@@ -232,12 +230,10 @@ public class IABrainManager : MonoBehaviour
             // Si no hay energía no intento mover
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
-            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
             yield return StartCoroutine(HandleSingleUnitOnSpecialNode(u));
             yield return new WaitForSeconds(0.2f);
-            Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
@@ -258,12 +254,10 @@ public class IABrainManager : MonoBehaviour
             if (u == null || !u) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
-            Debug.Log($"posicion de {u.gameObject.name} antes de moverse {u.currentNode}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
             yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u, moveEnergy));
             yield return StartCoroutine(HandleSingleUnitOnSpecialNode(u));
             yield return new WaitForSeconds(0.2f);
-            Debug.Log($"posicion de {u.gameObject.name} Despues de moverse {u.currentNode}");
         }
         UpgradeManager.instance.UpgradeEnemyUnits();
         float random = Random.value;
@@ -354,6 +348,7 @@ public class IABrainManager : MonoBehaviour
                 ranger.hasCollectedThisTurn = true;
                 ResourcesManager.instance.StartRecolectedResources(ranger);
                 yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+                UpgradeManager.instance.UpgradeEnemyUnits();
             }
             if (u is Defenders def && NodeManager.GetHealthNodes().Contains(u.currentNode) && !u.hasHealthedTowerThisTurn)
             {
@@ -379,6 +374,7 @@ public class IABrainManager : MonoBehaviour
             r.hasCollectedThisTurn = true;
             ResourcesManager.instance.StartRecolectedResources(r);
             yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            UpgradeManager.instance.UpgradeEnemyUnits();
         }
         if (u is Defenders d&& NodeManager.GetHealthNodes().Contains(u.currentNode)&& !d.hasHealthedTowerThisTurn)
         {

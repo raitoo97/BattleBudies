@@ -26,16 +26,7 @@ public class IAMoveToResources : MonoBehaviour
             actionInProgress = false;
             yield break;
         }
-        List<Node> resourceNodes = GetResourcesNode();
-        if (resourceNodes.Contains(enemy.currentNode) && enemy is Ranger ranger && !ranger.hasCollectedThisTurn)
-        {
-            Debug.Log($"IA: Unidad enemiga es un Ranger va a tirar de nombre {enemy.gameObject.name}.");
-            ranger.hasCollectedThisTurn = true;
-            ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
-            yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
-            actionInProgress = false;
-            yield break;
-        }
+        yield return StartCoroutine(IABrainManager.instance.HandleSingleUnitOnSpecialNode(enemy));
         List<Node> validNodes = GetValidNodes();
         bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
         if (!foundPath)
@@ -57,6 +48,7 @@ public class IAMoveToResources : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
         yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
         movedAnyUnit = true;
+        yield return StartCoroutine(IABrainManager.instance.HandleSingleUnitOnSpecialNode(enemy));
         if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
             yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
         yield return new WaitForSeconds(0.2f);
