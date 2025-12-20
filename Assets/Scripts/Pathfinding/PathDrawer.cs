@@ -17,7 +17,7 @@ public class PathDrawer : MonoBehaviour
         lineRenderer.startColor = safeColor;
         lineRenderer.endColor = safeColor;
     }
-    public void DrawPath(Node start, Node end)
+    public void DrawPath(Node start, Node end, Units unit = null)
     {
         if (start == null || end == null)
         {
@@ -93,11 +93,28 @@ public class PathDrawer : MonoBehaviour
                 danger = true;
             }
         }
-        SetLineColor(danger ? dangerColor : safeColor);
+        bool isHealingPath = unit is Defenders && NodeManager.GetHealthNodes().Contains(end);
+        bool isResourcePath = unit is Ranger && NodeManager.GetResourcesNode().Contains(end);
         if (danger)
+        {
+            SetLineColor(dangerColor);
             GridVisualizer.instance.SetDangerNodes(nodesToMark);
+        }
+        else if ((isHealingPath || isResourcePath) && nodesToDraw >= path.Count)
+        {
+            SetLineColor(Color.green);
+            if (end != unit.currentNode)
+            {
+                GridVisualizer.instance.SetColor(end, Color.green);
+                GridVisualizer.instance.SetLinePosition(end, true);
+            }
+        }
         else
+        {
+            SetLineColor(safeColor);
             GridVisualizer.instance.ClearDangerNodes();
+        }
+
         lineRenderer.positionCount = nodesToDraw;
         for (int i = 0; i < nodesToDraw; i++)
         {

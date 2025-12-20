@@ -45,7 +45,7 @@ public class CameraManager : MonoBehaviour
     {
         CanTransposed = false;
         float t = 0;
-        float duration = 0.3f;
+        float duration = 0.5f;
         while(t < duration)
         {
             this.transform.position = Vector3.Lerp(this.transform.position, _cameraPositions[positions].position, t / duration);

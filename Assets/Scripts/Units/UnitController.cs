@@ -130,7 +130,7 @@ public class UnitController : MonoBehaviour
                         return;
                     }
                     selectedEndNode = node;
-                    pathDrawer.DrawPath(selectedUnit.currentNode, selectedEndNode);
+                    pathDrawer.DrawPath(selectedUnit.currentNode, selectedEndNode, selectedUnit);
                 }
                 else
                 {
@@ -212,15 +212,13 @@ public class UnitController : MonoBehaviour
     }
     private IEnumerator RecolectResources(Units unit)
     {
-        if (unit is Ranger && GetValidResourcesNodes(unit).Contains(unit.currentNode))
-        {
-            if (!ResourcesManager.instance.onColectedResources)
-            {
-                ResourcesManager.instance.StartRecolectedResources(unit as Ranger);
-                yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
-            }
-        }
-        yield return null;
+        if (unit is not Ranger ranger) yield break;
+        if (ranger.hasCollectedThisTurn) yield break;
+        if (!GetValidResourcesNodes(unit).Contains(unit.currentNode)) yield break;
+        if (ResourcesManager.instance.onColectedResources) yield break;
+        ranger.hasCollectedThisTurn = true;
+        ResourcesManager.instance.StartRecolectedResources(ranger);
+        yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
     }
     private IEnumerator HealthTower(Units unit)
     {

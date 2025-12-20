@@ -26,15 +26,8 @@ public class IAMoveToTowers : MonoBehaviour
             actionInProgress = false;
             yield break;
         }
-        List<Node> attackNodes = GetAttackNodes();
-        if (attackNodes.Contains(enemy.currentNode))
+        if (NodeManager.GetAllPlayerTowersNodes().Contains(enemy.currentNode))
         {
-            Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
-            if (targetTower != null)
-            {
-                Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} atacará torre {targetTower.name}.");
-                yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
-            }
             actionInProgress = false;
             yield break;
         }
@@ -59,17 +52,7 @@ public class IAMoveToTowers : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
         yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
         movedAnyUnit = true;
-        if (attackNodes.Contains(enemy.currentNode))
-        {
-            Tower targetTower = GetClosestTowerToNode(enemy.currentNode);
-            if (targetTower != null)
-            {
-                Debug.Log($"IA: Unidad enemiga {enemy.gameObject.name} terminó movimiento frente a torre {targetTower.name}. ATACA automáticamente.");
-                yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(enemy, targetTower));
-            }
-            actionInProgress = false;
-            yield break;
-        }
+        yield return StartCoroutine(IABrainManager.instance.HandleSingleUnitOnSpecialNode(enemy));
         if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
             yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
         yield return new WaitForSeconds(0.2f);
@@ -191,14 +174,6 @@ public class IAMoveToTowers : MonoBehaviour
         path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
         if (path == null || path.Count == 0) return false;
         return true;
-    }
-    private List<Units> GetAllEnemyUnits()
-    {
-        Units[] allUnits = FindObjectsOfType<Units>();
-        List<Units> enemies = new List<Units>();
-        foreach (Units u in allUnits)
-            if (!u.isPlayerUnit) enemies.Add(u);
-        return enemies;
     }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {

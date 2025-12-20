@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
                 EnergyManager.instance.RefillPlayerEnergy();
                 CanvasManager.instance.UpdateEnergyUI();
                 DeckManager.instance.DrawPlayerCard();
-                yield return StartCoroutine(HandleUnitsOnTowerNodes());
+                yield return StartCoroutine(HandleUnitsOnSpecialNodes());
                 yield return new WaitUntil(() => playerWantsToEndTurn && !IsAnyPlayerUnitMoving() && !CombatManager.instance.GetCombatActive);
                 isPlayerTurn = false;
                 playerWantsToEndTurn = false;
@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         foreach (var u in allUnits)
         {
             if (u.isPlayerUnit)
-                u.hasAttackedTowerThisTurn = false;
+                u.ResetTurnFlags();
         }
     }
     public bool IsAnyPlayerUnitMoving()
@@ -73,18 +73,30 @@ public class GameManager : MonoBehaviour
         else
             Debug.Log("DERROTA DEL JUGADOR");
     }
-    private IEnumerator HandleUnitsOnTowerNodes()
+    private IEnumerator HandleUnitsOnSpecialNodes()
     {
         Units[] allUnits = FindObjectsOfType<Units>();
-        foreach (var u in allUnits)
+        foreach (Units u in allUnits)
         {
             if (!u.isPlayerUnit) continue;
             if (u.currentNode == null) continue;
-
+            if (u is Ranger ranger &&NodeManager.GetResourcesNode().Contains(u.currentNode) &&!ranger.hasCollectedThisTurn)
+            {
+                ranger.hasCollectedThisTurn = true;
+                ResourcesManager.instance.StartRecolectedResources(ranger);
+                yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+            }
+            if (u is Defenders def && NodeManager.GetHealthNodes().Contains(u.currentNode) &&!u.hasHealthedTowerThisTurn)
+            {
+                HealthTowerManager.instance.StartRecolectedHealth(def);
+                yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+                u.hasHealthedTowerThisTurn = true;
+            }
             if (TowerManager.instance.TryGetTowerAtNode(u.currentNode, out Tower tower))
             {
-                if (!u.hasAttackedTowerThisTurn && TowerManager.instance.CanUnitAttackTower(u, tower))
+                if (!u.hasAttackedTowerThisTurn &&TowerManager.instance.CanUnitAttackTower(u, tower))
                 {
+                    u.hasAttackedTowerThisTurn = true;
                     yield return StartCoroutine(CombatManager.instance.StartCombatWithTower_Coroutine(u, tower));
                 }
             }

@@ -27,9 +27,10 @@ public class IADefendTowers : MonoBehaviour
             yield break;
         }
         List<Node> resourceNodes = GetHealtNodes();
-        if (resourceNodes.Contains(enemy.currentNode) && enemy is Defenders)
+        if (resourceNodes.Contains(enemy.currentNode) && enemy is Defenders def && !def.hasHealthedTowerThisTurn)
         {
             Debug.Log($"IA: Unidad enemiga es un Defensor va a tirar de nombre {enemy.gameObject.name}.");
+            def.hasHealthedTowerThisTurn = true;
             HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
             yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
             actionInProgress = false;
@@ -67,62 +68,6 @@ public class IADefendTowers : MonoBehaviour
             yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
         yield return new WaitForSeconds(0.2f);
         actionInProgress = false;
-    }
-    public IEnumerator MoveAllEnemyUnitsToDefend()
-    {
-        movedAnyUnit = false;
-        List<Units> enemyUnits = GetAllEnemyUnits();
-        List<Node> resourceNodes = GetHealtNodes();
-        List<Node> validNodes = GetValidNodes();
-        foreach (Units enemy in enemyUnits)
-        {
-            yield return new WaitUntil(() => isBusy());
-            actionInProgress = true;
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) 
-            {
-                actionInProgress = false;
-                continue;
-            }
-            if (resourceNodes.Contains(enemy.currentNode))
-            {
-                if (enemy is Defenders)
-                {
-                    Debug.Log("IA: Unidad enemiga es un Defensor va a tirar.");
-                    HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
-                    yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
-                    actionInProgress = false;
-                    continue;
-                }
-                else
-                {
-                    Debug.Log("IA: Unidad enemiga NO es un Defensor NO va a tirar.");
-                    actionInProgress = false;
-                    continue;
-                }
-            }
-            bool foundPath = GetClosestFreeHealthNode(enemy, validNodes, out Node closestNode, out List<Node> path);
-            if (!foundPath)
-            {
-                MoveToRandomNode(enemy, ref closestNode, ref path, ref foundPath);
-            }
-            if (!foundPath)
-            {
-                actionInProgress = false;
-                continue;
-            }
-            // Limitamos path por energía
-            int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-            if (path.Count > maxSteps)
-                path = path.GetRange(0, maxSteps);
-            // Movemos la unidad con tiradas de salvación
-            yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
-            movedAnyUnit = true;
-            // Ataque a unidad jugador si hay vecino
-            if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
-                yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
-            yield return new WaitForSeconds(0.2f);
-            actionInProgress = false;
-        }
     }
     private void MoveToRandomNode(Units enemy, ref Node closestNode, ref List<Node> path, ref bool foundPath)
     {
@@ -165,14 +110,6 @@ public class IADefendTowers : MonoBehaviour
             }
         }
         return false;
-    }
-    private List<Units> GetAllEnemyUnits()
-    {
-        Units[] allUnits = FindObjectsOfType<Units>();
-        List<Units> enemies = new List<Units>();
-        foreach (Units u in allUnits)
-            if (!u.isPlayerUnit) enemies.Add(u);
-        return enemies;
     }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {

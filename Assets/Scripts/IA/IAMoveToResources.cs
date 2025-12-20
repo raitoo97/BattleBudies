@@ -26,15 +26,7 @@ public class IAMoveToResources : MonoBehaviour
             actionInProgress = false;
             yield break;
         }
-        List<Node> resourceNodes = GetResourcesNode();
-        if (resourceNodes.Contains(enemy.currentNode) && enemy is Ranger)
-        {
-            Debug.Log($"IA: Unidad enemiga es un Ranger va a tirar de nombre {enemy.gameObject.name}.");
-            ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
-            yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
-            actionInProgress = false;
-            yield break;
-        }
+        yield return StartCoroutine(IABrainManager.instance.HandleSingleUnitOnSpecialNode(enemy));
         List<Node> validNodes = GetValidNodes();
         bool foundPath = GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path);
         if (!foundPath)
@@ -56,64 +48,11 @@ public class IAMoveToResources : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
         yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, nodesToMove));
         movedAnyUnit = true;
+        yield return StartCoroutine(IABrainManager.instance.HandleSingleUnitOnSpecialNode(enemy));
         if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
             yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
         yield return new WaitForSeconds(0.2f);
         actionInProgress = false;
-    }
-    public IEnumerator MoveAllEnemyUnitsToResorces()
-    {
-        movedAnyUnit = false;
-        List<Units> enemyUnits = GetAllEnemyUnits();
-        List<Node> resourceNodes = GetResourcesNode();
-        List<Node> validNodes = GetValidNodes();
-        foreach (Units enemy in enemyUnits)
-        {
-            yield return new WaitUntil(() => isBusy());
-            actionInProgress = true;
-            if (enemy == null || enemy.currentNode == null || EnergyManager.instance.enemyCurrentEnergy < 1f) 
-            {
-                actionInProgress = false;
-                continue;
-            }
-            if (resourceNodes.Contains(enemy.currentNode)) 
-            {
-                if(enemy is Ranger)
-                {
-                    Debug.Log("IA: Unidad enemiga es un ranger va a tirar.");
-                    ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
-                    yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
-                    actionInProgress = false;
-                    continue;
-                }
-                else
-                {
-                    Debug.Log("IA: Unidad enemiga NO es un ranger NO va a tirar.");
-                    actionInProgress = false;
-                    continue;
-                }
-            }
-            if (!GetClosestFreeResourceNode(enemy, validNodes, out Node closestNode, out List<Node> path)) // No hay nodo alcanzable
-            {
-                if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
-                {
-                    actionInProgress = false;
-                    continue;
-                }
-            }  
-            // Limitamos path por energía
-            int maxSteps = Mathf.FloorToInt(EnergyManager.instance.enemyCurrentEnergy);
-            if (path.Count > maxSteps)
-                path = path.GetRange(0, maxSteps);
-            // Movemos la unidad con tiradas de salvación
-            yield return StartCoroutine(ExecuteMovementPathWithSavingThrows(enemy, path));
-            movedAnyUnit = true;
-            // Ataque a unidad jugador si hay vecino
-            if (TryGetPlayerNeighbor(enemy, out Units playerUnit))
-                yield return StartCoroutine(StartCombatAfterMove(enemy, playerUnit));
-            yield return new WaitForSeconds(0.2f);
-            actionInProgress = false;
-        }
     }
     private bool GetClosestFreeResourceNode(Units enemy, List<Node> validNodes, out Node closestNode, out List<Node> pathToNode)
     {
@@ -153,14 +92,6 @@ public class IAMoveToResources : MonoBehaviour
         path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
         if (path == null || path.Count == 0) return false;
         return true;
-    }
-    private List<Units> GetAllEnemyUnits()
-    {
-        Units[] allUnits = FindObjectsOfType<Units>();
-        List<Units> enemies = new List<Units>();
-        foreach (Units u in allUnits)
-            if (!u.isPlayerUnit) enemies.Add(u);
-        return enemies;
     }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {
