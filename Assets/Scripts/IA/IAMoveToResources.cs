@@ -30,8 +30,8 @@ public class IAMoveToResources : MonoBehaviour
         if (resourceNodes.Contains(enemy.currentNode) && enemy is Ranger ranger && !ranger.hasCollectedThisTurn)
         {
             Debug.Log($"IA: Unidad enemiga es un Ranger va a tirar de nombre {enemy.gameObject.name}.");
-            ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
             ranger.hasCollectedThisTurn = true;
+            ResourcesManager.instance.StartRecolectedResources(enemy as Ranger);
             yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
             actionInProgress = false;
             yield break;
