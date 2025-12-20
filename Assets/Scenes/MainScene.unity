@@ -953,7 +953,7 @@ GameObject:
   - component: {fileID: 227764017}
   - component: {fileID: 227764016}
   m_Layer: 0
-  m_Name: HEALINGTOWERS
+  m_Name: VFXHealingTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
