@@ -26,6 +26,11 @@ public class IAMoveToTowers : MonoBehaviour
             actionInProgress = false;
             yield break;
         }
+        if (NodeManager.GetAllPlayerTowersNodes().Contains(enemy.currentNode))
+        {
+            actionInProgress = false;
+            yield break;
+        }
         List<Node> validNodes = GetValidNodes();
         bool foundPath = GetClosestTowerPlayer(enemy, validNodes, out Node closestNode, out List<Node> path);
         if (!foundPath)
