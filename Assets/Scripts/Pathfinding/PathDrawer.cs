@@ -99,7 +99,7 @@ public class PathDrawer : MonoBehaviour
             SetLineColor(dangerColor);
             GridVisualizer.instance.SetDangerNodes(nodesToMark);
         }
-        else if (isHealingPath)
+        else if (isHealingPath && nodesToDraw >= path.Count)
         {
             SetLineColor(Color.green);
             if (end != unit.currentNode)
