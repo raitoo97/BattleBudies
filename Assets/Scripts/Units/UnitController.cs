@@ -130,7 +130,7 @@ public class UnitController : MonoBehaviour
                         return;
                     }
                     selectedEndNode = node;
-                    pathDrawer.DrawPath(selectedUnit.currentNode, selectedEndNode);
+                    pathDrawer.DrawPath(selectedUnit.currentNode, selectedEndNode, selectedUnit);
                 }
                 else
                 {

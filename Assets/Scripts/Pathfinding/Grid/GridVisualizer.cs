@@ -213,7 +213,7 @@ public class GridVisualizer : MonoBehaviour
             }
         }
     }
-    void SetColor(Node n, Color c)
+    public void SetColor(Node n, Color c)
     {
         var idx = n.gridIndex;
         SetColor(lines[idx.x, idx.y], c);
@@ -225,7 +225,7 @@ public class GridVisualizer : MonoBehaviour
         if (lr.material.HasProperty("_Color"))
             lr.material.SetColor("_Color", c);
     }
-    void SetLinePosition(Node n, bool lifted)
+    public void SetLinePosition(Node n, bool lifted)
     {
         var idx = n.gridIndex;
         SetLinePosition(lines[idx.x, idx.y], lifted);
