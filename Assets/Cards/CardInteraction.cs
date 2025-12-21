@@ -19,6 +19,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     private RectTransform playerHand;
     private UICard uiCard;
     [HideInInspector] public bool isPlayerCard = false;
+    public static bool isOnDraging = false;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -88,6 +89,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, eventData.position, canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null, out globalMousePos);
         pointerOffset = rectTransform.position - globalMousePos;
         rectTransform.SetAsLastSibling();
+        isOnDraging = true;
     }
     public void OnDrag(PointerEventData eventData)
     {
@@ -97,6 +99,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         {
             rectTransform.position = globalMousePos + pointerOffset;
         }
+        isOnDraging = true;
     }
     public void OnEndDrag(PointerEventData eventData)
     {
@@ -120,6 +123,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         {
             CardPlayManager.instance.TryPlayCard(this, uiCard.cardData);
         }
+        isOnDraging = false;
     }
     public void UpdateTint()
     {

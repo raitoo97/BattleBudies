@@ -26,7 +26,7 @@ public class CardPlayManager : MonoBehaviour
             HideAllHands();
             return;
         }
-        if (!placingMode && GameManager.instance.isPlayerTurn)
+        if (!placingMode && GameManager.instance.isPlayerTurn && !CardInteraction.isOnDraging)
         {
             if (Input.GetKeyDown(KeyCode.Tab))
             {
