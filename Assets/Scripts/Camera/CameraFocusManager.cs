@@ -77,7 +77,7 @@ public class CameraFocusManager : MonoBehaviour
         if (focusUnits.Count == 0) return;
         Vector3 center = GetFocusCenter();
         Vector3 dir = (center - Camera.main.transform.position).normalized;
-        float distance = 3;
+        float distance = 15;
         Ray ray = new Ray(Camera.main.transform.position, dir);
         if (Physics.Raycast(ray, out RaycastHit hit, distance))
         {
