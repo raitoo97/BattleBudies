@@ -306,6 +306,8 @@ public class UnitController : MonoBehaviour
             return true;
         if (playerUnitMoving)
             return true;
+        if(CardInteraction.isOnDraging)
+            return true;
         return false;
     }
 }
