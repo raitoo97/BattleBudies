@@ -190,6 +190,7 @@ public class UnitController : MonoBehaviour
             SalvationManager.instance.StartSavingThrow(unit);
             yield return new WaitUntil(() => !SalvationManager.instance.GetOnSavingThrow);
         }
+        yield return new WaitForSeconds(0.5f);
         if (unit == null || unit.currentNode == null)
             yield break;
         yield return StartCoroutine(RecolectResources(unit));

@@ -15,7 +15,7 @@ public class UpgradeManager : MonoBehaviour
     }
     private void Update()
     {
-        CanUpgradePlayer = ResourcesManager.instance.resourcesPlayer >= 10;
+        CanUpgradePlayer = ResourcesManager.instance.resourcesPlayer >= 15;
     }
     public void RequestPlayerUpgrade()
     {
@@ -36,8 +36,8 @@ public class UpgradeManager : MonoBehaviour
     }
     public void ApplyUpgradeToPlayerUnit(Units unit)
     {
-        int cost = 10;
-        int bonusHealth = 15;
+        int cost = 15;
+        int bonusHealth = 7;
         if (ResourcesManager.instance.resourcesPlayer < cost) return;
         unit.currentHealth = Mathf.Min(unit.currentHealth + bonusHealth, unit.maxHealth);
         unit.diceCount += 1;
@@ -46,27 +46,35 @@ public class UpgradeManager : MonoBehaviour
     }
     public void UpgradeEnemyUnits()
     {
-        int upgradeCost = 10;
-        int bonusHealth = 15;
+        int upgradeCost = 15;
+        int bonusHealth = 7;
         while (ResourcesManager.instance.resourcesEnemy >= upgradeCost)
         {
             Units unitToUpgrade = null;
+            int minDice = int.MaxValue;
             foreach (Attackers atk in FindObjectsOfType<Attackers>())
             {
                 if (atk != null && !atk.isPlayerUnit)
                 {
-                    unitToUpgrade = atk;
-                    break;
+                    if (atk.diceCount < minDice)
+                    {
+                        minDice = atk.diceCount;
+                        unitToUpgrade = atk;
+                    }
                 }
             }
             if (unitToUpgrade == null)
             {
+                minDice = int.MaxValue;
                 foreach (Defenders def in FindObjectsOfType<Defenders>())
                 {
                     if (def != null && !def.isPlayerUnit)
                     {
-                        unitToUpgrade = def;
-                        break;
+                        if (def.diceCount < minDice)
+                        {
+                            minDice = def.diceCount;
+                            unitToUpgrade = def;
+                        }
                     }
                 }
             }

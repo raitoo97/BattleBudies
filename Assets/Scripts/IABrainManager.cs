@@ -30,7 +30,14 @@ public class IABrainManager : MonoBehaviour
         defenders.RemoveAll(u => u == null || !u);
         rangers.RemoveAll(u => u == null || !u);
         int totalUnits = attackers.Count + defenders.Count + rangers.Count;
+
         // ----------------- DEFENSA -----------------
+        Units specialTarget;
+        if (IsPlayerUsingSpecialNode(out specialTarget))
+        {
+            Debug.Log("IA detecta unidad del jugador usando nodo especial");
+            yield return StartCoroutine(SendAttackersToKillTarget(specialTarget));
+        }
         Units threat = null;
         if (IsPlayerThreateningTower(out threat))
         {
@@ -121,6 +128,70 @@ public class IABrainManager : MonoBehaviour
         }
         return false;
     }
+    private bool IsPlayerUsingSpecialNode(out Units target)
+    {
+        target = null;
+        List<Node> resourceNodes = NodeManager.GetResourcesNode();
+        List<Node> healthNodes = NodeManager.GetHealthNodes();
+        Units[] allUnits = FindObjectsOfType<Units>();
+        foreach (Units u in allUnits)
+        {
+            if (u == null || !u.isPlayerUnit || u.currentNode == null)
+                continue;
+            if (u is Ranger && resourceNodes.Contains(u.currentNode))
+            {
+                target = u;
+                return true;
+            }
+            if (u is Defenders && healthNodes.Contains(u.currentNode))
+            {
+                target = u;
+                return true;
+            }
+        }
+        return false;
+    }
+    private IEnumerator SendAttackersToKillTarget(Units target)
+    {
+        if (target == null) yield break;
+        List<Units> enemyUnits = new List<Units>();
+        Units[] allUnits = FindObjectsOfType<Units>();
+        foreach (Units u in allUnits)
+        {
+            if (u != null && !u.isPlayerUnit)
+                enemyUnits.Add(u);
+        }
+        if (enemyUnits.Count == 0) yield break;
+        // 1. Ordenar por cercanía al objetivo
+        enemyUnits.Sort((a, b) =>Vector3.Distance(a.transform.position, target.transform.position).CompareTo(Vector3.Distance(b.transform.position, target.transform.position)));
+        Units unitToSend = enemyUnits[0];
+        if (unitToSend.currentNode == null) yield break;
+        if (EnergyManager.instance.enemyCurrentEnergy < 1)yield break;
+        // 3. Energía limitada como cualquier unidad
+        int huntMaxSteps = 5;
+        int energyForThisUnit = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, huntMaxSteps);
+        Node targetNode = target.currentNode;
+        Node finalTarget = null;
+        // 4. Buscar un vecino libre del objetivo
+        foreach (Node n in targetNode.Neighbors)
+        {
+            if (n != null && n.IsEmpty())
+            {
+                finalTarget = n;
+                break;
+            }
+        }
+        if (finalTarget == null)
+            finalTarget = NodeManager.GetClosetNode(target.transform.position);
+        if (finalTarget == null) yield break;
+        List<Node> path = PathFinding.CalculateAstart(unitToSend.currentNode, finalTarget);
+        if (path == null || path.Count == 0) yield break;
+        int steps = Mathf.Min(path.Count, energyForThisUnit);
+        if (steps <= 0) yield break;
+        List<Node> nodesToMove = path.GetRange(0, steps);
+        Debug.Log($"IA: Attacker {unitToSend.name} va a cazar a {target.name}");
+        yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unitToSend, nodesToMove));
+    }
     private IEnumerator MoveAllUnitsToThreat(Units threat)
     {
         if (threat == null || !threat)
@@ -185,7 +256,7 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
         float globalChance = Random.value;
-        if (globalChance < 0.3f)
+        if (globalChance < 0.1f)
         {
             Debug.Log("Ataque Global de parte de la IA");
             yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers(attackers));
