@@ -4,81 +4,95 @@ using UnityEngine;
 using UnityEngine.Rendering;
 public class CameraFocusManager : MonoBehaviour
 {
-    public List<Transform> points;
+    public static CameraFocusManager instance;
+
+    [Header("Focus")]
+    private List<Units> focusUnits = new List<Units>();
+    [Header("Camera Settings")]
+    private float distanceBack = 10f;
+    private float heightUp = 10f;
+    private float moveDuration = 2f;
+    private float focusHoldTime = 1f;
     private Renderer lastHitRenderer = null;
     private Color originalColor;
-    private int originalMode = 0;
-    private int originalRenderQueue = -1;
-    IEnumerator CameraAnimation()
+    private int originalRenderQueue;
+    private int originalZWrite = 1;
+    private float originalSurface = 0f;
+    private void Awake()
     {
-        yield return new WaitForSeconds(2);
-        float duration = 3.0f;
-        float elapsed = 0.0f;
-        Vector3 initialPosition = this.transform.position;
-        Vector3 targetPosition = Vector3.zero;
-        Vector3 promedio = Vector3.zero;
-        yield return new WaitUntil(() => points.Count > 0);
-        foreach (Transform target in points)
-        {
-            promedio += target.position;
-        }
-        promedio /= points.Count;
-        yield return new WaitForSeconds(1);
-        targetPosition = promedio - Vector3.forward * 5 + Vector3.up * 3;
-        while (elapsed < duration)
-        {
-            this.transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        this.transform.position = targetPosition;
-        yield return new WaitForSeconds(3);
-        elapsed = 0.0f;
-        while (elapsed < duration)
-        {
-            this.transform.position = Vector3.Lerp(targetPosition, initialPosition, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        this.transform.position = initialPosition;
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
     }
     private void Update()
     {
-        TrasnpartentMaterials();
+        HandleTransparency();
     }
-    public void TrasnpartentMaterials()
+    public void FocusOnUnit(Units unit)
     {
-        print("s");
-        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-        Vector3 promedio = Vector3.zero;
-        foreach (Transform target in points)
+        focusUnits.Clear();
+        if (unit != null)
+            focusUnits.Add(unit);
+
+        StopAllCoroutines();
+        StartCoroutine(CameraAnimation());
+    }
+    public void FocusOnUnits(Units a, Units b)
+    {
+        focusUnits.Clear();
+        if (a != null) focusUnits.Add(a);
+        if (b != null) focusUnits.Add(b);
+
+        StopAllCoroutines();
+        StartCoroutine(CameraAnimation());
+    }
+    private IEnumerator CameraAnimation()
+    {
+        yield return new WaitUntil(() => focusUnits.Count > 0);
+        Vector3 initialPosition = transform.position;
+        Vector3 targetPosition;
+        yield return new WaitForSeconds(1f);
+        Vector3 center = GetFocusCenter();
+        targetPosition = center - Vector3.forward * distanceBack + Vector3.up * heightUp;
+        float elapsed = 0f;
+        while (elapsed < moveDuration)
         {
-            promedio += target.position;
+            transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsed / moveDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
         }
-        promedio /= points.Count;
-        var lenght = 3;
-        if (Physics.Raycast(ray, out RaycastHit hit, lenght))
+        transform.position = targetPosition;
+        yield return new WaitForSeconds(focusHoldTime);
+        elapsed = 0f;
+        while (elapsed < moveDuration)
         {
-            var renderer = hit.collider.GetComponent<Renderer>();
+            transform.position = Vector3.Lerp(targetPosition, initialPosition, elapsed / moveDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = initialPosition;
+        focusUnits.Clear();
+    }
+    private void HandleTransparency()
+    {
+        if (focusUnits.Count == 0) return;
+        Vector3 center = GetFocusCenter();
+        Vector3 dir = (center - Camera.main.transform.position).normalized;
+        float distance = Vector3.Distance(Camera.main.transform.position, center);
+        Ray ray = new Ray(Camera.main.transform.position, dir);
+        if (Physics.Raycast(ray, out RaycastHit hit, distance))
+        {
+            Renderer renderer = hit.collider.GetComponent<Renderer>();
             if (renderer == null) return;
-            var material = renderer.material;
+            Material material = renderer.material;
             if (renderer != lastHitRenderer)
             {
-                originalColor = material.color;
-                originalMode = (int)material.GetFloat("_Mode");
-                originalRenderQueue = material.renderQueue;
+                if (lastHitRenderer != null)
+                    RestoreOriginalMaterial(lastHitRenderer);
+                CacheOriginalMaterial(material);
             }
-            material.SetInt("_Mode", 2);
-            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-            material.SetInt("_ZWrite", 0);
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.EnableKeyword("_ALPHABLEND_ON");
-            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            material.renderQueue = 3000;
-            Color color = material.color;
-            color.a = 0.2f;
-            material.color = color;
+            SetMaterialTransparent(material);
             lastHitRenderer = renderer;
         }
         else
@@ -90,22 +104,54 @@ public class CameraFocusManager : MonoBehaviour
             }
         }
     }
-    private void RestoreOriginalMaterial(Renderer rendererToRestore)
+    private void CacheOriginalMaterial(Material material)
     {
-        var material = rendererToRestore.material;
-        material.SetInt("_Mode", originalMode);
-        if (originalMode == 0)
-        {
-            material.SetInt("_ZWrite", 1);
-            material.SetInt("_SrcBlend", (int)BlendMode.One);
-            material.SetInt("_DstBlend", (int)BlendMode.Zero);
-            material.DisableKeyword("_ALPHABLEND_ON");
-            if (originalMode == 0) // Opaco
-            {
-                material.DisableKeyword("_ALPHATEST_ON");
-            }
-        }
+        originalColor = material.color;
+        originalRenderQueue = material.renderQueue;
+        if (material.HasProperty("_ZWrite"))
+            originalZWrite = material.GetInt("_ZWrite");
+
+        if (material.HasProperty("_Surface"))
+            originalSurface = material.GetFloat("_Surface");
+    }
+    private void SetMaterialTransparent(Material material)
+    {
+        if (material.HasProperty("_Surface"))
+            material.SetFloat("_Surface", 1f); // Transparent
+
+        if (material.HasProperty("_ZWrite"))
+            material.SetInt("_ZWrite", 0);
+        material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+        material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+        material.renderQueue = (int)RenderQueue.Transparent;
+        Color c = material.color;
+        c.a = 0.2f;
+        material.color = c;
+    }
+    private void RestoreOriginalMaterial(Renderer renderer)
+    {
+        Material material = renderer.material;
+        if (material.HasProperty("_Surface"))
+            material.SetFloat("_Surface", originalSurface);
+        if (material.HasProperty("_ZWrite"))
+            material.SetInt("_ZWrite", originalZWrite);
+        material.SetInt("_SrcBlend", (int)BlendMode.One);
+        material.SetInt("_DstBlend", (int)BlendMode.Zero);
         material.color = originalColor;
         material.renderQueue = originalRenderQueue;
+    }
+    private Vector3 GetFocusCenter()
+    {
+        Vector3 sum = Vector3.zero;
+        int count = 0;
+        foreach (var unit in focusUnits)
+        {
+            if (unit != null)
+            {
+                sum += unit.transform.position;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : Vector3.zero;
     }
 }

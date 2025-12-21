@@ -41,6 +41,10 @@ public class CombatManager : MonoBehaviour
         attackerDice = attackerUnit.diceInstance;
         defenderDice = defenderUnit.diceInstance;
         Debug.Log($"StartCombat: {attackerUnit.name} vs {defenderUnit.name}");
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnits(attackerUnit, defenderUnit);
+        }
         CanvasManager.instance.TryShowCombatUI(playerCanRoll: false , true);
         StartCoroutine(CombatFlow(attackerStartsTurn));
     }
