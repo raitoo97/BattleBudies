@@ -9,9 +9,9 @@ public class CameraFocusManager : MonoBehaviour
     [Header("Focus")]
     private List<Units> focusUnits = new List<Units>();
     [Header("Camera Settings")]
-    private float distanceBack = 10f;
-    private float heightUp = 10f;
-    private float moveDuration = 2f;
+    private float distanceBack = 15f;
+    private float heightUp = 30f;
+    private float moveDuration = 1f;
     private float focusHoldTime = 1f;
     private Renderer lastHitRenderer = null;
     private Color originalColor;
@@ -34,7 +34,6 @@ public class CameraFocusManager : MonoBehaviour
         focusUnits.Clear();
         if (unit != null)
             focusUnits.Add(unit);
-
         StopAllCoroutines();
         StartCoroutine(CameraAnimation());
     }
@@ -43,7 +42,6 @@ public class CameraFocusManager : MonoBehaviour
         focusUnits.Clear();
         if (a != null) focusUnits.Add(a);
         if (b != null) focusUnits.Add(b);
-
         StopAllCoroutines();
         StartCoroutine(CameraAnimation());
     }
@@ -79,7 +77,7 @@ public class CameraFocusManager : MonoBehaviour
         if (focusUnits.Count == 0) return;
         Vector3 center = GetFocusCenter();
         Vector3 dir = (center - Camera.main.transform.position).normalized;
-        float distance = Vector3.Distance(Camera.main.transform.position, center);
+        float distance = 3;
         Ray ray = new Ray(Camera.main.transform.position, dir);
         if (Physics.Raycast(ray, out RaycastHit hit, distance))
         {
