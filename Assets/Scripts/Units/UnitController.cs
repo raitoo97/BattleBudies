@@ -11,6 +11,7 @@ public class UnitController : MonoBehaviour
     public static UnitController instance;
     private bool previousIsPlayerTurn = false;
     public bool IsSelectingUpgradeUnit = false;
+    private bool playerUnitMoving = false;
     private void Awake()
     {
         if (instance == null)
@@ -175,6 +176,7 @@ public class UnitController : MonoBehaviour
         }
         if (path.Count > 0)
         {
+            playerUnitMoving = true;
             selectedUnit.SetPath(path);
             selectedEndNode = null;
             pathDrawer.ClearPath();
@@ -184,6 +186,7 @@ public class UnitController : MonoBehaviour
     private IEnumerator StartCombatAfterMove(Units unit)
     {
         yield return new WaitUntil(() => unit.PathEmpty());
+        playerUnitMoving = false;
         if (unit.currentNode == null) yield break;
         if (unit.currentNode.IsDangerous)
         {
@@ -301,7 +304,7 @@ public class UnitController : MonoBehaviour
             return true;
         if (HealthTowerManager.instance != null && HealthTowerManager.instance.onColectedHealth)
             return true;
-        if (Units.anyUnitMoving)
+        if (playerUnitMoving)
             return true;
         return false;
     }
