@@ -9,6 +9,7 @@ public class CombatManager : MonoBehaviour
     private DiceRoll defenderDice;
     private int pendingDamage = 0;
     private bool combatActive = false;
+    private float _delayAfterFocus = 2.5f;
     private void Awake()
     {
         if (instance == null)
@@ -44,13 +45,14 @@ public class CombatManager : MonoBehaviour
         if (CameraFocusManager.instance != null)
         {
             CameraFocusManager.instance.FocusOnUnits(attackerUnit, defenderUnit);
+            //ACTIVAR UI
         }
         CanvasManager.instance.TryShowCombatUI(playerCanRoll: false , true);
         StartCoroutine(CombatFlow(attackerStartsTurn));
     }
     private IEnumerator CombatFlow(bool attackerStartsTurn)
     {
-        yield return new WaitForSeconds(1.6f);
+        yield return new WaitForSeconds(_delayAfterFocus);
         bool attackerTurn = true;
         while (combatActive)
         {
@@ -121,10 +123,16 @@ public class CombatManager : MonoBehaviour
         defenderUnit = null;
         attackerDice = attacker.diceInstance;
         Debug.Log($"StartCombatWithTower: {attackerUnit.name} ataca torre {tower.name}");
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnit(attackerUnit);
+            //ACTIVAR UI
+        }
         StartCoroutine(TowerCombatFlow(attackerUnit, tower));
     }
     private IEnumerator TowerCombatFlow(Units attacker, Tower tower)
     {
+        yield return new WaitForSeconds(_delayAfterFocus);
         int remainingDice = attacker.diceCount;
         while (remainingDice > 0)
         {
@@ -189,10 +197,16 @@ public class CombatManager : MonoBehaviour
         defenderUnit = null;
         attackerDice = attacker.diceInstance;
         Debug.Log($"StartCombatWithTowerAI: {attackerUnit.name} ataca torre {tower.name}");
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnit(attackerUnit);
+            //ACTIVAR UI
+        }
         StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
     }
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
     {
+        yield return new WaitForSeconds(_delayAfterFocus);
         int remainingDice = attacker.diceCount;
         while (remainingDice > 0)
         {
