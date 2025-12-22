@@ -64,7 +64,6 @@ public abstract class Units : MonoBehaviour
             targetPos.y = originalY;
         Vector3 moveDelta = (targetPos - transform.position);
         float step = moveSpeed * Time.deltaTime;
-
         if (moveDelta.magnitude <= step)
         {
             transform.position = GetSnappedPosition(nextNode);
@@ -111,6 +110,7 @@ public abstract class Units : MonoBehaviour
         Vector3 pos = node.transform.position;
         if (pos.y < originalY)
             pos.y = originalY;
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("Step"), 1f, false);
         return pos;
     }
     public void SetCurrentNode(Node newNode)
