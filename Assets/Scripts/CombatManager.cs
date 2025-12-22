@@ -50,6 +50,7 @@ public class CombatManager : MonoBehaviour
     }
     private IEnumerator CombatFlow(bool attackerStartsTurn)
     {
+        yield return new WaitForSeconds(1.6f);
         bool attackerTurn = true;
         while (combatActive)
         {

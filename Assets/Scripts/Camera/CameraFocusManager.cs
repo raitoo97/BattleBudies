@@ -11,7 +11,7 @@ public class CameraFocusManager : MonoBehaviour
     private float distanceBack = 15f;
     private float heightUp = 30f;
     private float moveDuration = 1f;
-    private float focusHoldTime = 1f;
+    private float focusHoldTime = 0.5f;
     private Renderer lastHitRenderer = null;
     private Color originalColor;
     private int originalRenderQueue;
