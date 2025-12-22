@@ -52,7 +52,9 @@ public class CombatManager : MonoBehaviour
     }
     private IEnumerator CombatFlow(bool attackerStartsTurn)
     {
+        CanvasManager.instance.ChangeCameraText(true, "Combat", Color.red);
         yield return new WaitForSeconds(_delayAfterFocus);
+        CanvasManager.instance.ChangeCameraText(false);
         bool attackerTurn = true;
         while (combatActive)
         {
@@ -126,13 +128,14 @@ public class CombatManager : MonoBehaviour
         if (CameraFocusManager.instance != null)
         {
             CameraFocusManager.instance.FocusOnUnit(attackerUnit);
-            //ACTIVAR UI
         }
         StartCoroutine(TowerCombatFlow(attackerUnit, tower));
     }
     private IEnumerator TowerCombatFlow(Units attacker, Tower tower)
     {
+        CanvasManager.instance.ChangeCameraText(true, "Tower Atack", Color.red);
         yield return new WaitForSeconds(_delayAfterFocus);
+        CanvasManager.instance.ChangeCameraText(false);
         int remainingDice = attacker.diceCount;
         while (remainingDice > 0)
         {
@@ -206,7 +209,9 @@ public class CombatManager : MonoBehaviour
     }
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
     {
+        CanvasManager.instance.ChangeCameraText(true, "Tower Atack", Color.red);
         yield return new WaitForSeconds(_delayAfterFocus);
+        CanvasManager.instance.ChangeCameraText(false);
         int remainingDice = attacker.diceCount;
         while (remainingDice > 0)
         {

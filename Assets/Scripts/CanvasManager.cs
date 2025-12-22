@@ -38,6 +38,7 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI playerResources;
     [Header("CameraControl")]
     public Button changeCameraButton;
+    public TextMeshProUGUI changeCameraText;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -46,6 +47,7 @@ public class CanvasManager : MonoBehaviour
         changeCameraButton.onClick.AddListener(ChangeCameraCall);
         UpgradeUnits.onClick.AddListener(UpgradeUnitsPlayerCall);
         ResetUICombat();
+        ChangeCameraText(false);
     }
     private void Update()
     {
@@ -336,5 +338,11 @@ public class CanvasManager : MonoBehaviour
     private void UpgradeUnitsPlayerCall()
     {
         UpgradeManager.instance?.RequestPlayerUpgrade();
+    }
+    public void ChangeCameraText(bool activate,string text = "", Color color = default)
+    {
+        changeCameraText.gameObject.SetActive(activate);
+        changeCameraText.text = text;
+        changeCameraText.color = color;
     }
 }
