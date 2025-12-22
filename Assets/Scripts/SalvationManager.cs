@@ -33,6 +33,8 @@ public class SalvationManager : MonoBehaviour
     }
     IEnumerator UnitRollDiceSalvation(Units unit, int salvationTreshold)
     {
+
+        yield return new WaitForSeconds(2.5f);
         Node safeNodeBeforeRoll = unit.lastSafeNode;
         diceRoll.PrepareForRoll();
         if (unit.isPlayerUnit)
