@@ -35,11 +35,18 @@ public class ResourcesManager : MonoBehaviour
         onColectedResources = true;
         diceRoll = ranger.diceInstance;
         pendingResources = 0;
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnit(ranger);
+        }
         StartCoroutine(RangerRollDiceResources(ranger));
     }
     IEnumerator RangerRollDiceResources(Ranger ranger)
     {
-        if(ranger == null)
+        CanvasManager.instance.ChangeCameraText(true, "Recoleted Resources", Color.green);
+        yield return new WaitForSeconds(2.5f);
+        CanvasManager.instance.ChangeCameraText(false);
+        if (ranger == null)
         {
             onColectedResources = false;
             yield break;
