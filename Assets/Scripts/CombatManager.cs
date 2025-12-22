@@ -45,7 +45,6 @@ public class CombatManager : MonoBehaviour
         if (CameraFocusManager.instance != null)
         {
             CameraFocusManager.instance.FocusOnUnits(attackerUnit, defenderUnit);
-            //ACTIVAR UI
         }
         CanvasManager.instance.TryShowCombatUI(playerCanRoll: false , true);
         StartCoroutine(CombatFlow(attackerStartsTurn));
@@ -203,7 +202,6 @@ public class CombatManager : MonoBehaviour
         if (CameraFocusManager.instance != null)
         {
             CameraFocusManager.instance.FocusOnUnit(attackerUnit);
-            //ACTIVAR UI
         }
         StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
     }
