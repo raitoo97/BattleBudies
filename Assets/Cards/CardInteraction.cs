@@ -122,6 +122,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         else
         {
             CardPlayManager.instance.TryPlayCard(this, uiCard.cardData);
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CardPlay"), 1f, false);
         }
         isOnDraging = false;
     }
