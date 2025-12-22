@@ -5,7 +5,6 @@ using UnityEngine.Rendering;
 public class CameraFocusManager : MonoBehaviour
 {
     public static CameraFocusManager instance;
-
     [Header("Focus")]
     private List<Units> focusUnits = new List<Units>();
     [Header("Camera Settings")]
@@ -49,27 +48,34 @@ public class CameraFocusManager : MonoBehaviour
     {
         yield return new WaitUntil(() => focusUnits.Count > 0);
         Vector3 initialPosition = transform.position;
+        Quaternion initRotation = transform.rotation;
         Vector3 targetPosition;
+        Quaternion targetRotation;
         yield return new WaitForSeconds(1f);
         Vector3 center = GetFocusCenter();
         targetPosition = center - Vector3.forward * distanceBack + Vector3.up * heightUp;
+        targetRotation = Quaternion.LookRotation(center - targetPosition);
         float elapsed = 0f;
         while (elapsed < moveDuration)
         {
             transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsed / moveDuration);
+            transform.rotation = Quaternion.Slerp(initRotation, targetRotation, elapsed / moveDuration);
             elapsed += Time.deltaTime;
             yield return null;
         }
         transform.position = targetPosition;
+        transform.rotation = targetRotation;
         yield return new WaitForSeconds(focusHoldTime);
         elapsed = 0f;
         while (elapsed < moveDuration)
         {
             transform.position = Vector3.Lerp(targetPosition, initialPosition, elapsed / moveDuration);
+            transform.rotation = Quaternion.Slerp(targetRotation, initRotation, elapsed / moveDuration);
             elapsed += Time.deltaTime;
             yield return null;
         }
         transform.position = initialPosition;
+        transform.rotation = initRotation;
         focusUnits.Clear();
     }
     private void HandleTransparency()
