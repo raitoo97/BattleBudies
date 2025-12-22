@@ -36,7 +36,7 @@ public class IABrainManager : MonoBehaviour
         if (IsPlayerUsingSpecialNode(out specialTarget))
         {
             Debug.Log("IA detecta unidad del jugador usando nodo especial");
-            yield return StartCoroutine(SendAttackersToKillTarget(specialTarget));
+            yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
         }
         Units threat = null;
         if (IsPlayerThreateningTower(out threat))
@@ -151,7 +151,7 @@ public class IABrainManager : MonoBehaviour
         }
         return false;
     }
-    private IEnumerator SendAttackersToKillTarget(Units target)
+    private IEnumerator SendUnitToKillTarget(Units target)
     {
         if (target == null) yield break;
         List<Units> enemyUnits = new List<Units>();
@@ -358,6 +358,20 @@ public class IABrainManager : MonoBehaviour
             anyMoved = false;
             safetyCounter++;
             if (safetyCounter > 20) break;
+            Units threat;
+            if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerThreateningTower(out threat))
+            {
+                yield return StartCoroutine(MoveAllUnitsToThreat(threat));
+                anyMoved = true;
+                continue;
+            }
+            Units specialTarget;
+            if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerUsingSpecialNode(out specialTarget))
+            {
+                yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
+                anyMoved = true;
+                continue;
+            }
             int residualEnergy = EnergyManager.instance.enemyCurrentEnergy;
             foreach (Units Unit in allUnits)
             {
