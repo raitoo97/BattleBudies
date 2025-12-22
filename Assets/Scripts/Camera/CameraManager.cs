@@ -59,5 +59,5 @@ public class CameraManager : MonoBehaviour
         yield return null;
         coroutine = null;
     }
-    public bool GetCanTransposed { get => CanTransposed; }
+    public bool GetCanTransposed { get => CanTransposed; set => value = CanTransposed; }
 }
