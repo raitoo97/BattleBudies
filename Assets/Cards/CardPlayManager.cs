@@ -135,6 +135,7 @@ public class CardPlayManager : MonoBehaviour
             {
                 unit.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             }
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("SpawnUnit"), 1f, false);
         }
         Destroy(currentUIcard.gameObject);
         placingMode = false;
