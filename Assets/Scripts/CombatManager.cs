@@ -9,6 +9,7 @@ public class CombatManager : MonoBehaviour
     private DiceRoll defenderDice;
     private int pendingDamage = 0;
     private bool combatActive = false;
+    private float _delayAfterFocus = 2.5f;
     private void Awake()
     {
         if (instance == null)
@@ -41,11 +42,18 @@ public class CombatManager : MonoBehaviour
         attackerDice = attackerUnit.diceInstance;
         defenderDice = defenderUnit.diceInstance;
         Debug.Log($"StartCombat: {attackerUnit.name} vs {defenderUnit.name}");
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnits(attackerUnit, defenderUnit);
+        }
         CanvasManager.instance.TryShowCombatUI(playerCanRoll: false , true);
         StartCoroutine(CombatFlow(attackerStartsTurn));
     }
     private IEnumerator CombatFlow(bool attackerStartsTurn)
     {
+        CanvasManager.instance.ChangeCameraText(true, "Combat", Color.red);
+        yield return new WaitForSeconds(_delayAfterFocus);
+        CanvasManager.instance.ChangeCameraText(false);
         bool attackerTurn = true;
         while (combatActive)
         {
@@ -116,10 +124,17 @@ public class CombatManager : MonoBehaviour
         defenderUnit = null;
         attackerDice = attacker.diceInstance;
         Debug.Log($"StartCombatWithTower: {attackerUnit.name} ataca torre {tower.name}");
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnit(attackerUnit);
+        }
         StartCoroutine(TowerCombatFlow(attackerUnit, tower));
     }
     private IEnumerator TowerCombatFlow(Units attacker, Tower tower)
     {
+        CanvasManager.instance.ChangeCameraText(true, "Tower Atack", Color.red);
+        yield return new WaitForSeconds(_delayAfterFocus);
+        CanvasManager.instance.ChangeCameraText(false);
         int remainingDice = attacker.diceCount;
         while (remainingDice > 0)
         {
@@ -184,10 +199,17 @@ public class CombatManager : MonoBehaviour
         defenderUnit = null;
         attackerDice = attacker.diceInstance;
         Debug.Log($"StartCombatWithTowerAI: {attackerUnit.name} ataca torre {tower.name}");
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnit(attackerUnit);
+        }
         StartCoroutine(TowerCombatFlowAI(attackerUnit, tower));
     }
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
     {
+        CanvasManager.instance.ChangeCameraText(true, "Tower Atack", Color.red);
+        yield return new WaitForSeconds(_delayAfterFocus);
+        CanvasManager.instance.ChangeCameraText(false);
         int remainingDice = attacker.diceCount;
         while (remainingDice > 0)
         {

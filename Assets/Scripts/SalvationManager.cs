@@ -21,6 +21,10 @@ public class SalvationManager : MonoBehaviour
         OnSalvingThrow = true;
         diceRoll = unit.diceInstance;
         pendingSalvation = 0;
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnit(unit);
+        }
         StartCoroutine(SavingThrowCoroutine(unit));
     }
     IEnumerator SavingThrowCoroutine(Units unit)
@@ -33,6 +37,9 @@ public class SalvationManager : MonoBehaviour
     }
     IEnumerator UnitRollDiceSalvation(Units unit, int salvationTreshold)
     {
+        CanvasManager.instance.ChangeCameraText(true,"Salvation Throw", new Vector4(1.0f, 0.5f, 0.0f, 1.0f));
+        yield return new WaitForSeconds(2.5f);
+        CanvasManager.instance.ChangeCameraText(false);
         Node safeNodeBeforeRoll = unit.lastSafeNode;
         diceRoll.PrepareForRoll();
         if (unit.isPlayerUnit)

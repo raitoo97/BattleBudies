@@ -34,10 +34,17 @@ public class HealthTowerManager : MonoBehaviour
         onColectedHealth = true;
         diceRoll = defender.diceInstance;
         pendingHealth = 0;
+        if (CameraFocusManager.instance != null)
+        {
+            CameraFocusManager.instance.FocusOnUnit(defender);
+        }
         StartCoroutine(DefenderRollDiceHealth(defender));
     }
     IEnumerator DefenderRollDiceHealth(Defenders defender)
     {
+        CanvasManager.instance.ChangeCameraText(true, "Health Tower", Color.green);
+        yield return new WaitForSeconds(2.5f);
+        CanvasManager.instance.ChangeCameraText(false);
         if (defender == null)
         {
             onColectedHealth = false;
