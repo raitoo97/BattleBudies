@@ -158,7 +158,9 @@ public class IABrainManager : MonoBehaviour
         Units[] allUnits = FindObjectsOfType<Units>();
         foreach (Units u in allUnits)
         {
-            if (u != null && !u.isPlayerUnit)
+            if (u == null || u.isPlayerUnit) continue;
+            if (u is Defenders) continue;
+            if (u is Attackers || u is Ranger)
                 enemyUnits.Add(u);
         }
         if (enemyUnits.Count == 0) yield break;
