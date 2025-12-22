@@ -46,6 +46,7 @@ public class CameraFocusManager : MonoBehaviour
     }
     private IEnumerator CameraAnimation()
     {
+        CameraManager.instance.GetCanTransposed = false;
         yield return new WaitUntil(() => focusUnits.Count > 0);
         Vector3 initialPosition = transform.position;
         Quaternion initRotation = transform.rotation;
@@ -77,6 +78,7 @@ public class CameraFocusManager : MonoBehaviour
         transform.position = initialPosition;
         transform.rotation = initRotation;
         focusUnits.Clear();
+        CameraManager.instance.GetCanTransposed = true;
     }
     private void HandleTransparency()
     {

@@ -4,7 +4,7 @@ public class CameraManager : MonoBehaviour
 {
     [SerializeField] private Transform[] _cameraPositions;
     private int positions;
-    private bool CanTransposed;
+    [SerializeField]private bool CanTransposed;
     private Coroutine coroutine;
     public static CameraManager instance;
     private void Awake()
@@ -59,5 +59,5 @@ public class CameraManager : MonoBehaviour
         yield return null;
         coroutine = null;
     }
-    public bool GetCanTransposed { get => CanTransposed; set => value = CanTransposed; }
+    public bool GetCanTransposed { get => CanTransposed; set => CanTransposed = value; }
 }
