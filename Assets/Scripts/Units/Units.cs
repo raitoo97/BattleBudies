@@ -138,7 +138,7 @@ public abstract class Units : MonoBehaviour
     }
     private void Die()
     {
-        Debug.Log($"{gameObject.name} ha muerto.");
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("UnitDeath"), 0.5f, false);
         if (currentNode != null && currentNode.unitOnNode == this.gameObject)
             currentNode.unitOnNode = null;
         Destroy(gameObject);
