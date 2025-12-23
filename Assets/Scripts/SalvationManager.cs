@@ -94,6 +94,7 @@ public class SalvationManager : MonoBehaviour
         {
             if (safeNodeBeforeRoll != null)
             {
+                SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("ExplosionImpact"), 1f, false);
                 unit.SetCurrentNode(safeNodeBeforeRoll);
                 unit.transform.position = unit.GetSnappedPosition(safeNodeBeforeRoll);
                 unit.TakeDamage(3);
