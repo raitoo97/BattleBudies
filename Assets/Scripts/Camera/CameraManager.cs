@@ -26,6 +26,7 @@ public class CameraManager : MonoBehaviour
     {
         if (CanTransposed)
         {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CameraMove"), 0.2f, false);
             positions++;
             if (positions < _cameraPositions.Length)
             {
