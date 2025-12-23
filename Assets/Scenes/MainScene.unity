@@ -2673,6 +2673,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 5a0a30ba4eb27ca4fb10ddb4f8e779dd, type: 3}
   - {fileID: 8300000, guid: f4e3de42f4ad3224cac5ec4a9d30de94, type: 3}
   - {fileID: 8300000, guid: 8bc61def03530c64fbf96406f05d37e9, type: 3}
+  - {fileID: 8300000, guid: a533afa59b2a6b54fb5ebd9587fcb4a4, type: 3}
   Pool_Size: 5
 --- !u!114 &563951302
 MonoBehaviour:
