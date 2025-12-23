@@ -155,6 +155,7 @@ public class UnitController : MonoBehaviour
         if (!GameManager.instance.isPlayerTurn) return;
         if (!Input.GetKeyDown(KeyCode.Space)) return;
         if (selectedUnit == null || selectedEndNode == null) return;
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("UnitMove"), 1f, false);
         List<Node> path = PathFinding.CalculateAstart(selectedUnit.currentNode, selectedEndNode);
         if (path == null || path.Count == 0) return;
         if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))
