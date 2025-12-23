@@ -104,6 +104,7 @@ public class CombatManager : MonoBehaviour
                 }
             }
             pendingDamage = 0;
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("AtackPieces"), 0.5f, false);
             dice.ResetDicePosition();
             yield return new WaitForSeconds(0.3f);
         }

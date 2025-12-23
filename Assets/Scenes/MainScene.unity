@@ -2667,6 +2667,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3d28a457cc1f7d64b9fd3c85fc4e95f7, type: 3}
   - {fileID: 8300000, guid: 039d36ed7e5e85b459d47dd1c8a6eb29, type: 3}
   - {fileID: 8300000, guid: b914d2fdab06cc1489c59f112493d929, type: 3}
+  - {fileID: 8300000, guid: 6a521bcdc10da3f46b40f186a07970b9, type: 3}
+  - {fileID: 8300000, guid: 3eb2554f53ee90841b62c68e1600112a, type: 3}
   Pool_Size: 5
 --- !u!114 &563951302
 MonoBehaviour:
