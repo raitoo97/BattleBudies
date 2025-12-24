@@ -47,6 +47,7 @@ public class SalvationManager : MonoBehaviour
             CanvasManager.instance.rollClicked = false;
             CanvasManager.instance.ShowSalvationUI(true, unit, playerCanRoll: true);
             yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
+            CanvasManager.instance.ShowSalvationUI(true, unit, playerCanRoll: false);
         }
         else
         {
