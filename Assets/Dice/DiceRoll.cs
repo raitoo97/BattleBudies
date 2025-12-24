@@ -20,6 +20,7 @@ public class DiceRoll : MonoBehaviour
     public float minImpactVelocity = 0.5f;
     public float soundCooldown = 0.1f;
     private float lastSoundTime = 0f;
+    private bool resetSoundPlayed = false;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -54,12 +55,18 @@ public class DiceRoll : MonoBehaviour
         hasBeenThrown = false;
         hasBeenCounted = false;
         ResetDicePosition();
+        if (!resetSoundPlayed)
+        {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("DiceReset"),1f,false);
+            resetSoundPlayed = true;
+        }
     }
     public void RollDice()
     {
         hasBeenThrown = true;
         hasBeenCounted = false;
         stillTimer = 0f;
+        resetSoundPlayed = false;
         foreach (FaceDetector fd in GetComponentsInChildren<FaceDetector>())
             fd.ResetFaceDetector();
         Vector3 force = new Vector3(Random.Range(horizontalForceRange.x, horizontalForceRange.y), upwardForce, Random.Range(horizontalForceRange.x, horizontalForceRange.y));
@@ -78,7 +85,6 @@ public class DiceRoll : MonoBehaviour
             isOnTable = true;
         }
         float impactStrength = collision.relativeVelocity.magnitude;
-        print(impactStrength);
         if (impactStrength >= minImpactVelocity && Time.time - lastSoundTime > soundCooldown)
         {
             PlayDiceImpactSound(impactStrength);
