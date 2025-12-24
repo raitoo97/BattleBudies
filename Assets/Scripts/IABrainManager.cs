@@ -31,27 +31,19 @@ public class IABrainManager : MonoBehaviour
         defenders.RemoveAll(u => u == null || !u);
         rangers.RemoveAll(u => u == null || !u);
         int totalUnits = attackers.Count + defenders.Count + rangers.Count;
-
         // ----------------- DEFENSA -----------------
-        Units specialTarget;
-        if (IsPlayerUsingSpecialNode(out specialTarget))
-        {
-            Debug.Log("IA detecta unidad del jugador usando nodo especial");
-            yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
-        }
         Units threat = null;
-        if (IsPlayerThreateningTower(out threat))
+        if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
-            float random = Random.value;
-            if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
-            {
-                yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
-            }
             yield return StartCoroutine(MoveAllUnitsToThreat(threat));
+        }
+        Units specialTarget;
+        if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
+        {
+            yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
         }
         else
         {
-            // ----------------- MOVIMIENTO POR TIPOS -----------------
             yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
         }
         yield return new WaitForSeconds(1f);
@@ -171,11 +163,21 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator SendUnitToKillTarget(Units target)
     {
-        if (target == null) yield break;
+        if (target == null)
+        {
+            // Liberar todas las unidades pendientes si el target ya no existe
+            Units[] allUnits = FindObjectsOfType<Units>();
+            foreach (Units u in allUnits)
+            {
+                if (!u.isPlayerUnit)
+                    u.isPendingTarget = false;
+            }
+            yield break;
+        }
         // 1. Buscar si ya hay alguna unidad enemiga con isPendingTarget = true
         Units unitToMove = null;
-        Units[] allUnits = FindObjectsOfType<Units>();
-        foreach (Units u in allUnits)
+        Units[] enemyUnits = FindObjectsOfType<Units>();
+        foreach (Units u in enemyUnits)
         {
             if (u != null && !u.isPlayerUnit && u.isPendingTarget)
             {
@@ -187,7 +189,7 @@ public class IABrainManager : MonoBehaviour
         if (unitToMove == null)
         {
             float minDist = float.MaxValue;
-            foreach (Units u in allUnits)
+            foreach (Units u in enemyUnits)
             {
                 if (u != null && !u.isPlayerUnit)
                 {
@@ -317,7 +319,7 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in attackers)
         {
             if (u == null || !u) continue;
-            if (u.isPendingThreat || u.isPendingTarget) continue;
+            if (u.isPendingTarget) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Attackers {u.gameObject.name}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
@@ -340,7 +342,7 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in defenders)
         {
             if (u == null || !u) continue;
-            if (u.isPendingThreat || u.isPendingTarget) continue;
+            if (u.isPendingTarget) continue;
             // Si no hay energía no intento mover
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
@@ -366,7 +368,7 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in rangers)
         {
             if (u == null || !u) continue;
-            if (u.isPendingThreat || u.isPendingTarget) continue;
+            if (u.isPendingTarget) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
