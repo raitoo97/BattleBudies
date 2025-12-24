@@ -114,4 +114,82 @@ public class IAPlayCards : MonoBehaviour
         }
         return cardToPlay;
     }
+    private CardInteraction GetCardToPlay_PrioritizeRanger(Transform hand)
+    {
+        CardInteraction cardToPlay = null;
+        // 1. Prioridad: Ranger
+        foreach (Transform c in hand)
+        {
+            CardInteraction card = c.GetComponent<CardInteraction>();
+            if (card != null && card.GetComponent<UICard>().cardData.cost <= EnergyManager.instance.enemyCurrentEnergy &&
+                card.GetComponent<UICard>().cardData.unitType == UnitType.Ranger)
+            {
+                cardToPlay = card;
+                break;
+            }
+        }
+        // 2. Si no hay Ranger, intentar Attacker
+        if (cardToPlay == null)
+        {
+            foreach (Transform c in hand)
+            {
+                CardInteraction card = c.GetComponent<CardInteraction>();
+                if (card != null && card.GetComponent<UICard>().cardData.cost <= EnergyManager.instance.enemyCurrentEnergy &&
+                    card.GetComponent<UICard>().cardData.unitType == UnitType.Attacker)
+                {
+                    cardToPlay = card;
+                    break;
+                }
+            }
+        }
+        // 3. Si no hay Attacker, intentar Defender
+        if (cardToPlay == null)
+        {
+            foreach (Transform c in hand)
+            {
+                CardInteraction card = c.GetComponent<CardInteraction>();
+                if (card != null && card.GetComponent<UICard>().cardData.cost <= EnergyManager.instance.enemyCurrentEnergy &&
+                    card.GetComponent<UICard>().cardData.unitType == UnitType.Defender)
+                {
+                    cardToPlay = card;
+                    break;
+                }
+            }
+        }
+        // 4. Si no hay ninguno de los anteriores, cualquier carta jugable
+        if (cardToPlay == null)
+        {
+            foreach (Transform c in hand)
+            {
+                CardInteraction card = c.GetComponent<CardInteraction>();
+                if (card != null && card.GetComponent<UICard>().cardData.cost <= EnergyManager.instance.enemyCurrentEnergy)
+                {
+                    cardToPlay = card;
+                    break;
+                }
+            }
+        }
+        if (cardToPlay == null)
+        {
+            Debug.Log("IA: No hay cartas jugables disponibles.");
+        }
+        return cardToPlay;
+    }
+    public IEnumerator PlayOneCard_PrioritizeRanger()
+    {
+        Transform hand = DeckManager.instance.enemyHand;
+        CardInteraction cardToPlay = GetCardToPlay_PrioritizeRanger(hand);
+        if (cardToPlay == null) yield break;
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CardPlay"), 1f, false);
+        Node spawnNode = NodeManager.GetRandomEmptyNodeOnRow(14);
+        if (spawnNode == null) yield break;
+        yield return new WaitForSeconds(1f);
+        CardPlayManager.instance.GetcurrentUIcard = cardToPlay;
+        CardPlayManager.instance.GetcurrentCardData = cardToPlay.GetComponent<UICard>().cardData;
+        CardPlayManager.instance.GetselectedNode = spawnNode;
+        CardPlayManager.instance.placingMode = true;
+        CardPlayManager.instance.PlaceUnitAtNode();
+        yield return new WaitUntil(() => !CardPlayManager.instance.placingMode);
+        yield return new WaitForSeconds(2f);
+    }
 }

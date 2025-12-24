@@ -126,6 +126,7 @@ public class IABrainManager : MonoBehaviour
             if (u is Ranger && resourceNodes.Contains(u.currentNode))
             {
                 print("Ranger detectado en nodo de recursos: " + u.name);
+                StartCoroutine(IAPlayCards.instance?.PlayOneCard_PrioritizeRanger());
                 target = u;
                 return true;
             }
