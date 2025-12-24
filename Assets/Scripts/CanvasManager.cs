@@ -44,6 +44,7 @@ public class CanvasManager : MonoBehaviour
         if (instance == null) instance = this;
         else Destroy(gameObject);
         rollButton.onClick.AddListener(() => rollClicked = true);
+        rollButton.onClick.AddListener(PlayRollSound);
         changeCameraButton.onClick.AddListener(ChangeCameraCall);
         UpgradeUnits.onClick.AddListener(UpgradeUnitsPlayerCall);
         ResetUICombat();
@@ -344,5 +345,9 @@ public class CanvasManager : MonoBehaviour
         changeCameraText.gameObject.SetActive(activate);
         changeCameraText.text = text;
         changeCameraText.color = color;
+    }
+    private void PlayRollSound()
+    {
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("RollDice"),1f,false);
     }
 }

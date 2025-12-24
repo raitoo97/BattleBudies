@@ -2538,6 +2538,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c6b029aae87dc344096b3fa344f65169, type: 3}
   - {fileID: 8300000, guid: 5af01c18f6aee0747b4fcb22f2ab5f21, type: 3}
   - {fileID: 8300000, guid: 363df119fc51b5648ab80d5c8a1871b0, type: 3}
+  - {fileID: 8300000, guid: 52bddb88259425849b19688cb02de8d7, type: 3}
+  - {fileID: 8300000, guid: 47879abfaf8458242997c5ca6545004c, type: 3}
+  - {fileID: 8300000, guid: 1c30109ddb46a9045acb64c718e94060, type: 3}
+  - {fileID: 8300000, guid: 6a28902615bce234da0366dd3fd923c0, type: 3}
+  - {fileID: 8300000, guid: d9c9ea06ad93a754b82594c7038e3b09, type: 3}
   Pool_Size: 5
 --- !u!114 &563951302
 MonoBehaviour:
@@ -5256,6 +5261,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1185011399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1185011400}
+  m_Layer: 0
+  m_Name: GORDAMATAMBRIMITO
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1185011400
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185011399}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1215129949
 GameObject:
   m_ObjectHideFlags: 0
@@ -6594,37 +6630,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1519050204}
   m_CullTransparentMesh: 1
---- !u!1 &1561923351
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1561923352}
-  m_Layer: 0
-  m_Name: GORDAZAPALLO
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1561923352
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1561923351}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -29.5, y: 7.632784, z: -21.599998}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1571885260
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9178,4 +9183,4 @@ SceneRoots:
   - {fileID: 1165260219}
   - {fileID: 2048227884}
   - {fileID: 2137208774}
-  - {fileID: 1561923352}
+  - {fileID: 1185011400}
