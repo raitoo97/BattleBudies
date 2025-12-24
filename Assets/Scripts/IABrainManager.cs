@@ -126,11 +126,13 @@ public class IABrainManager : MonoBehaviour
                 continue;
             if (u is Ranger && resourceNodes.Contains(u.currentNode))
             {
+                print("Ranger detectado en nodo de recursos: " + u.name);
                 target = u;
                 return true;
             }
             if (u is Defenders && healthNodes.Contains(u.currentNode))
             {
+                print("Defender detectado en nodo de recursos: " + u.name);
                 target = u;
                 return true;
             }
@@ -186,7 +188,21 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator MoveUnitToTarget(Units unit, Units target)
     {
-        if (unit == null || target == null || unit.currentNode == null) yield break;
+        if (unit == null)
+        {
+            Debug.LogWarning("MoveUnitToTarget: unit es null");
+            yield break;
+        }
+        if (target == null)
+        {
+            Debug.LogWarning("MoveUnitToTarget: target es null");
+            yield break;
+        }
+        if (unit.currentNode == null)
+        {
+            Debug.LogWarning($"MoveUnitToTarget: {unit.name} no tiene currentNode");
+            yield break;
+        }
         int huntMaxSteps = 5;
         int energyForThisUnit = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, huntMaxSteps);
         Node targetNode = target.currentNode;
@@ -201,15 +217,39 @@ public class IABrainManager : MonoBehaviour
             }
         }
         if (finalTarget == null)
-            finalTarget = NodeManager.GetClosetNode(target.transform.position);
-        if (finalTarget == null) yield break;
+        {
+            if (targetNode.IsEmpty())
+            {
+                finalTarget = targetNode;
+                Debug.Log($"IA: Nodo objetivo {targetNode.name} está libre, se usará como finalTarget");
+            }
+            else
+            {
+                finalTarget = NodeManager.GetClosetNode(target.transform.position);
+                Debug.Log($"IA: Ningún vecino libre, usando nodo más cercano: {(finalTarget != null ? finalTarget.name : "null")}");
+            }
+        }
+        if (finalTarget == null)
+        {
+            Debug.LogWarning("MoveUnitToTarget: No se encontró nodo final válido");
+            yield break;
+        }
         List<Node> path = PathFinding.CalculateAstart(unit.currentNode, finalTarget);
-        if (path == null || path.Count == 0) yield break;
+        if (path == null || path.Count == 0)
+        {
+            Debug.LogWarning($"MoveUnitToTarget: No se encontró path de {unit.name} a {finalTarget.name}");
+            yield break;
+        }
         int steps = Mathf.Min(path.Count, energyForThisUnit);
-        if (steps <= 0) yield break;
+        if (steps <= 0)
+        {
+            Debug.LogWarning($"MoveUnitToTarget: pasos calculados <= 0 para {unit.name}");
+            yield break;
+        }
         List<Node> nodesToMove = path.GetRange(0, steps);
         Debug.Log($"IA: Moviendo {unit.name} hacia {target.name} con {steps} pasos");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
+        Debug.Log($"IA: {unit.name} terminó movimiento. Distancia al target: {Vector3.Distance(unit.transform.position, target.transform.position)}");
         if (Vector3.Distance(unit.transform.position, target.transform.position) < arriveToTarget || target==null)
             unit.isPendingTarget = false;
     }
