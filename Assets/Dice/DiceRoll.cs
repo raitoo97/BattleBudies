@@ -16,6 +16,10 @@ public class DiceRoll : MonoBehaviour
     public Vector2 torqueRange;// Torques aleatorios para giro
     public Vector2 horizontalForceRange;// Impulso horizontal
     public float extraGravity;     // Gravedad extra para simular caída rápida
+    [Header("Sound")]
+    public float minImpactVelocity = 0.5f;
+    public float soundCooldown = 0.1f;
+    private float lastSoundTime = 0f;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -73,6 +77,13 @@ public class DiceRoll : MonoBehaviour
         {
             isOnTable = true;
         }
+        float impactStrength = collision.relativeVelocity.magnitude;
+        print(impactStrength);
+        if (impactStrength >= minImpactVelocity && Time.time - lastSoundTime > soundCooldown)
+        {
+            PlayDiceImpactSound(impactStrength);
+            lastSoundTime = Time.time;
+        }
     }
     private void OnCollisionExit(Collision collision)
     {
@@ -94,5 +105,10 @@ public class DiceRoll : MonoBehaviour
         transform.rotation = resetPoint.rotation;
         hasBeenThrown = false;
         hasBeenCounted = false;
+    }
+    private void PlayDiceImpactSound(float impact)
+    {
+        float volume = Mathf.Clamp01(impact / 5f);
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("DiceHit"),volume,false);
     }
 }
