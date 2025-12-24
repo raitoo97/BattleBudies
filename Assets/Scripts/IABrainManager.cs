@@ -34,6 +34,7 @@ public class IABrainManager : MonoBehaviour
         if (totalUnits == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             Debug.Log("IA no tiene unidades: juega cartas iniciales");
+            yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard_PrioritizeRanger());
             yield return StartCoroutine(IAPlayCards.instance?.PlayCards());
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
