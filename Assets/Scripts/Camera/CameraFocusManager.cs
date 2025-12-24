@@ -56,6 +56,7 @@ public class CameraFocusManager : MonoBehaviour
         Vector3 center = GetFocusCenter();
         targetPosition = center - Vector3.forward * distanceBack + Vector3.up * heightUp;
         targetRotation = Quaternion.LookRotation(center - targetPosition);
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CameraZoom"),.3f,false);
         float elapsed = 0f;
         while (elapsed < moveDuration)
         {
@@ -67,6 +68,7 @@ public class CameraFocusManager : MonoBehaviour
         transform.position = targetPosition;
         transform.rotation = targetRotation;
         yield return new WaitForSeconds(focusHoldTime);
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CameraZoom"), .3f, false);
         elapsed = 0f;
         while (elapsed < moveDuration)
         {
