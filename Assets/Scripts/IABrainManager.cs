@@ -153,7 +153,7 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator SendUnitToKillTarget(Units target)
     {
-        if (target == null) yield break;
+        if (target == null) { Debug.Log("SendUnitToKillTarget: target es null"); yield break; }
         List<Units> enemyUnits = new List<Units>();
         Units[] allUnits = FindObjectsOfType<Units>();
         foreach (Units u in allUnits)
@@ -163,12 +163,12 @@ public class IABrainManager : MonoBehaviour
             if (u is Attackers || u is Ranger)
                 enemyUnits.Add(u);
         }
-        if (enemyUnits.Count == 0) yield break;
+        if (enemyUnits.Count == 0) { Debug.Log("SendUnitToKillTarget: no hay unidades disponibles"); yield break; }
         // 1. Ordenar por cercanía al objetivo
         enemyUnits.Sort((a, b) =>Vector3.Distance(a.transform.position, target.transform.position).CompareTo(Vector3.Distance(b.transform.position, target.transform.position)));
         Units unitToSend = enemyUnits[0];
-        if (unitToSend.currentNode == null) yield break;
-        if (EnergyManager.instance.enemyCurrentEnergy < 1)yield break;
+        if (unitToSend.currentNode == null) { Debug.Log($"SendUnitToKillTarget: unidad {unitToSend.name} sin currentNode"); yield break; }
+        if (EnergyManager.instance.enemyCurrentEnergy < 1) { Debug.Log("SendUnitToKillTarget: sin energía"); yield break; }
         // 3. Energía limitada como cualquier unidad
         int huntMaxSteps = 5;
         int energyForThisUnit = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, huntMaxSteps);

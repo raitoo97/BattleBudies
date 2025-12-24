@@ -23,6 +23,8 @@ public abstract class Units : MonoBehaviour
     public DiceRoll diceInstance;
     [HideInInspector]public bool hasAttackedTowerThisTurn = false;
     [HideInInspector]public bool hasHealthedTowerThisTurn = false;
+    public bool isPendingTarget = false;
+    public bool isPendingThreat = false;
     protected virtual void Start()
     {
         currentNode = NodeManager.GetClosetNode(transform.position);
@@ -147,6 +149,8 @@ public abstract class Units : MonoBehaviour
     {
         hasAttackedTowerThisTurn = false;
         hasHealthedTowerThisTurn = false;
+        isPendingTarget = false;
+        isPendingThreat = false;
         if (this is Ranger ranger)
             ranger.hasCollectedThisTurn = false;
     }
