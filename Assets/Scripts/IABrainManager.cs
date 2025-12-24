@@ -210,29 +210,36 @@ public class IABrainManager : MonoBehaviour
         // Buscar un vecino libre del target
         foreach (Node n in targetNode.Neighbors)
         {
-            if (n != null && n.IsEmpty())
+            if (n != null && n.IsEmpty() && !n._isBlock)
             {
                 finalTarget = n;
                 break;
             }
         }
+
+        // Si ningún vecino está libre, usar el nodo del target si está libre y no bloqueado
         if (finalTarget == null)
         {
-            if (targetNode.IsEmpty())
+            if (targetNode.IsEmpty() && !targetNode._isBlock)
             {
                 finalTarget = targetNode;
-                Debug.Log($"IA: Nodo objetivo {targetNode.name} está libre, se usará como finalTarget");
+                Debug.Log($"IA: Nodo objetivo {targetNode.name} está libre y no bloqueado, se usará como finalTarget");
             }
             else
             {
                 finalTarget = NodeManager.GetClosetNode(target.transform.position);
-                Debug.Log($"IA: Ningún vecino libre, usando nodo más cercano: {(finalTarget != null ? finalTarget.name : "null")}");
+                Debug.Log($"IA: Ningún vecino libre y no bloqueado, usando nodo más cercano: {(finalTarget != null ? finalTarget.name : "null")}");
             }
         }
+
         if (finalTarget == null)
         {
             Debug.LogWarning("MoveUnitToTarget: No se encontró nodo final válido");
             yield break;
+        }
+        else
+        {
+            Debug.LogWarning("MoveUnitToTarget: finalTarget seria el nodo " + finalTarget.name);
         }
         List<Node> path = PathFinding.CalculateAstart(unit.currentNode, finalTarget);
         if (path == null || path.Count == 0)
