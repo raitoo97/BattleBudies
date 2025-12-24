@@ -171,6 +171,7 @@ public class IABrainManager : MonoBehaviour
             {
                 if (u != null && !u.isPlayerUnit)
                 {
+                    if (u is Attackers) continue;
                     float dist = Vector3.Distance(u.transform.position, target.transform.position);
                     if (dist < minDist)
                     {
