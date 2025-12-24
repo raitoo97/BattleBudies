@@ -2637,6 +2637,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1292302330}
   - component: {fileID: 1292302331}
+  - component: {fileID: 1292302332}
   m_Layer: 0
   m_Name: MenuManager
   m_TagString: Untagged
@@ -2680,6 +2681,22 @@ MonoBehaviour:
   panelMain: {fileID: 912534396}
   panelTutorial: {fileID: 816413183}
   panelCredits: {fileID: 126448959}
+--- !u!114 &1292302332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292302329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad187f01b3bc653429d679e44058f8cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sources: []
+  clips:
+  - {fileID: 8300000, guid: 745d38cb859b16f458f4bf04264b0485, type: 3}
+  Pool_Size: 5
 --- !u!1 &1417283968
 GameObject:
   m_ObjectHideFlags: 0

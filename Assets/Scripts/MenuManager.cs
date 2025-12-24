@@ -23,6 +23,7 @@ public class MenuManager : MonoBehaviour
         tutorialButon.onClick.AddListener(TutorialButon);
         creditsButon.onClick.AddListener(CreditsButon);
         ExitButton.onClick.AddListener(QuitGame);
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("MenuMusic"), 0.5f, true);
     }
     private void StartGame()
     {
@@ -30,24 +31,28 @@ public class MenuManager : MonoBehaviour
     }
     private void TutorialButon()
     {
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         panelTutorial.SetActive(true);
         panelCredits.SetActive(false);
         panelMain.SetActive(false);
     }
     private void ReturnButon()
     {
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         panelTutorial.SetActive(false);
         panelCredits.SetActive(false);
         panelMain.SetActive(true);
     }
     private void CreditsButon()
     {
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         panelTutorial.SetActive(false);
         panelCredits.SetActive(true);
         panelMain.SetActive(false);
     }
     private void QuitGame()
     {
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         Application.Quit();
         print("No funciona en Editor");
     }

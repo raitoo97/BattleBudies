@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         DeckManager.instance.FillHandsAtStart();
-        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("MusicBackground"), 1f, true);
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("MusicBackground"), 0.5f, true);
         StartCoroutine(TurnLoop());
     }
     private IEnumerator TurnLoop()
