@@ -78,6 +78,7 @@ public class ResourcesManager : MonoBehaviour
                     AddResources(false, pendingResources);
             }
             pendingResources = 0;
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("ResourceCollected"), 1f, false);
             CanvasManager.instance.RecolectResourcesUI(true, ranger, playerCanRoll: false, dicesLeft: numberOfDiceToRoll - (i + 1));
             diceRoll.ResetDicePosition();
             yield return new WaitForSeconds(0.3f);

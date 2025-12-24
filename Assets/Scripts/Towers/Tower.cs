@@ -34,6 +34,7 @@ public class Tower : MonoBehaviour
         currentHealth -= amount;
         if (currentHealth <= 0 && !isDestroyed)
         {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("TowerDestroyed"), 1.0f, false);
             isDestroyed = true;
             Debug.Log($"{name} ha sido destruida");
             TowerManager.instance.NotifyTowerDestroyed(this);

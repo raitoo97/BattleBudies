@@ -189,6 +189,7 @@ public class GridVisualizer : MonoBehaviour
         selectedNode = node;
         if (!dangerNodes.Contains(selectedNode))
         {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
             SetColor(selectedNode, selectedColor);
             SetLinePosition(selectedNode, true);
         }

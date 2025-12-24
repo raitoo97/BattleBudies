@@ -60,6 +60,7 @@ public class HealthTowerManager : MonoBehaviour
                 CanvasManager.instance.rollClicked = false;
                 CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: true, result: -1, dicesLeft: dicesLeft);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
+                CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: false, result: -1, dicesLeft: dicesLeft);
             }
             else
             {
@@ -88,8 +89,9 @@ public class HealthTowerManager : MonoBehaviour
                 }
             }
             pendingHealth = 0;
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("HealtTower"), 1f, false);
             diceRoll.PrepareForRoll();
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(1f);
         }
         onColectedHealth = false;
         CanvasManager.instance.HealingTowerUI(false, defender);

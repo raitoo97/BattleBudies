@@ -47,6 +47,7 @@ public class SalvationManager : MonoBehaviour
             CanvasManager.instance.rollClicked = false;
             CanvasManager.instance.ShowSalvationUI(true, unit, playerCanRoll: true);
             yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
+            CanvasManager.instance.ShowSalvationUI(true, unit, playerCanRoll: false);
         }
         else
         {
@@ -94,6 +95,7 @@ public class SalvationManager : MonoBehaviour
         {
             if (safeNodeBeforeRoll != null)
             {
+                SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("ExplosionImpact"), 1f, false);
                 unit.SetCurrentNode(safeNodeBeforeRoll);
                 unit.transform.position = unit.GetSnappedPosition(safeNodeBeforeRoll);
                 unit.TakeDamage(3);

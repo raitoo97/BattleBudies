@@ -27,8 +27,10 @@ public class IAPlayCards : MonoBehaviour
         {
             CardInteraction cardToPlay = GetCardToPlay(hand);
             if (cardToPlay == null) yield break;
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CardPlay"), 1f, false);
             Node spawnNode= NodeManager.GetRandomEmptyNodeOnRow(14);
             if (spawnNode == null) yield break;
+            yield return new WaitForSeconds(1f);
             CardPlayManager.instance.GetcurrentUIcard = cardToPlay;
             CardPlayManager.instance.GetcurrentCardData = cardToPlay.GetComponent<UICard>().cardData;
             CardPlayManager.instance.GetselectedNode = spawnNode;
@@ -43,8 +45,10 @@ public class IAPlayCards : MonoBehaviour
         Transform hand = DeckManager.instance.enemyHand;
         CardInteraction cardToPlay = GetCardToPlay(hand);
         if (cardToPlay == null) yield break;
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CardPlay"), 1f, false);
         Node spawnNode = NodeManager.GetRandomEmptyNodeOnRow(14);
         if (spawnNode == null) yield break;
+        yield return new WaitForSeconds(1f);
         CardPlayManager.instance.GetcurrentUIcard = cardToPlay;
         CardPlayManager.instance.GetcurrentCardData = cardToPlay.GetComponent<UICard>().cardData;
         CardPlayManager.instance.GetselectedNode = spawnNode;

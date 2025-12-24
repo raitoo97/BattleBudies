@@ -62,6 +62,10 @@ public class UnitController : MonoBehaviour
                 if (hoverGlow != null && hoverUnit != selectedUnit)
                     hoverGlow.SetGlowOff();
 
+                if (unit != null && hoverUnit == null && unit.isPlayerUnit && unit != selectedUnit)
+                {
+                    SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("HoverUnit"),1f,false);
+                }
                 hoverUnit = unit;
                 hoverGlow = unit != null ? unit.GetComponent<GlowUnit>() : null;
             }
@@ -110,6 +114,10 @@ public class UnitController : MonoBehaviour
                     unit = null;
                 if (unit != null)
                 {
+                    if (unit.isPlayerUnit && unit != selectedUnit)
+                    {
+                        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("SelectUnit"),1f,false);
+                    }
                     if (selectedUnit != null)
                     {
                         var oldGlow = selectedUnit.GetComponent<GlowUnit>();
@@ -147,6 +155,7 @@ public class UnitController : MonoBehaviour
         if (!GameManager.instance.isPlayerTurn) return;
         if (!Input.GetKeyDown(KeyCode.Space)) return;
         if (selectedUnit == null || selectedEndNode == null) return;
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("UnitMove"), 1f, false);
         List<Node> path = PathFinding.CalculateAstart(selectedUnit.currentNode, selectedEndNode);
         if (path == null || path.Count == 0) return;
         if (NodeManager.PathTouchesUnitNeighbor(path, out List<Node> dangerNodes))

@@ -23,6 +23,7 @@ public abstract class Units : MonoBehaviour
     public DiceRoll diceInstance;
     [HideInInspector]public bool hasAttackedTowerThisTurn = false;
     [HideInInspector]public bool hasHealthedTowerThisTurn = false;
+    public bool isPendingTarget = false;
     protected virtual void Start()
     {
         currentNode = NodeManager.GetClosetNode(transform.position);
@@ -64,7 +65,6 @@ public abstract class Units : MonoBehaviour
             targetPos.y = originalY;
         Vector3 moveDelta = (targetPos - transform.position);
         float step = moveSpeed * Time.deltaTime;
-
         if (moveDelta.magnitude <= step)
         {
             transform.position = GetSnappedPosition(nextNode);
@@ -111,6 +111,7 @@ public abstract class Units : MonoBehaviour
         Vector3 pos = node.transform.position;
         if (pos.y < originalY)
             pos.y = originalY;
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("Step"), 1f, false);
         return pos;
     }
     public void SetCurrentNode(Node newNode)
@@ -138,7 +139,7 @@ public abstract class Units : MonoBehaviour
     }
     private void Die()
     {
-        Debug.Log($"{gameObject.name} ha muerto.");
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("UnitDeath"), 0.5f, false);
         if (currentNode != null && currentNode.unitOnNode == this.gameObject)
             currentNode.unitOnNode = null;
         Destroy(gameObject);
@@ -147,6 +148,7 @@ public abstract class Units : MonoBehaviour
     {
         hasAttackedTowerThisTurn = false;
         hasHealthedTowerThisTurn = false;
+        isPendingTarget = false;
         if (this is Ranger ranger)
             ranger.hasCollectedThisTurn = false;
     }
