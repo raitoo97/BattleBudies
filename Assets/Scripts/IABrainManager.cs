@@ -237,51 +237,41 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator MoveAllUnitsToThreat(Units threat)
     {
-        if (threat == null || !threat)
+        if (threat == null)
         {
             Debug.LogWarning("MoveAllUnitsToThreat: La amenaza es null");
             yield break;
         }
-        // 1. Buscar si ya hay alguna unidad enemiga con isPendingThreat = true
         Units unitToMove = null;
+        float minDist = float.MaxValue;
         Units[] allUnits = FindObjectsOfType<Units>();
         foreach (Units u in allUnits)
         {
-            if (u != null && !u.isPlayerUnit && u.isPendingThreat)
+            if (u != null && !u.isPlayerUnit)
             {
-                unitToMove = u;
-                break;
-            }
-        }
-        // 2. Si no hay ninguna, elegir la unidad enemiga más cercana al threat
-        if (unitToMove == null)
-        {
-            float minDist = float.MaxValue;
-            foreach (Units u in allUnits)
-            {
-                if (u != null && !u.isPlayerUnit)
+                float dist = Vector3.Distance(u.transform.position, threat.transform.position);
+                if (dist < minDist)
                 {
-                    float dist = Vector3.Distance(u.transform.position, threat.transform.position);
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        unitToMove = u;
-                    }
+                    minDist = dist;
+                    unitToMove = u;
                 }
             }
-            if (unitToMove != null)
-                unitToMove.isPendingThreat = true;
         }
-        // 3. Mover la unidad seleccionada al threat
         if (unitToMove != null)
+        {
+            Debug.Log($"IA: Unidad más cercana al threat {threat.name} seleccionada: {unitToMove.name}, distancia: {minDist}");
             yield return StartCoroutine(MoveUnitToThreat(unitToMove, threat));
+        }
+        else
+        {
+            Debug.Log("IA: No hay unidades disponibles para mover hacia la amenaza");
+        }
     }
     private IEnumerator MoveUnitToThreat(Units unit, Units threat)
     {
         if (unit == null || threat == null || unit.currentNode == null) yield break;
         Node threatNode = threat.currentNode;
         Node finalTarget = null;
-        // Intentar vecinos libres
         if (threatNode != null)
         {
             foreach (Node n in threatNode.Neighbors)
@@ -293,7 +283,6 @@ public class IABrainManager : MonoBehaviour
                 }
             }
         }
-        // Si no hay vecinos libres, ir al nodo más cercano
         if (finalTarget == null)
             finalTarget = NodeManager.GetClosetNode(threat.transform.position);
         if (finalTarget == null) yield break;
@@ -302,10 +291,8 @@ public class IABrainManager : MonoBehaviour
         int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count);
         if (stepsToMove <= 0) yield break;
         List<Node> nodesToMove = path.GetRange(0, stepsToMove);
-        Debug.Log($"IA: Moviendo {unit.name} hacia la amenaza {threat.name} ({stepsToMove} pasos)");
+        Debug.Log($"IA: Moviendo {unit.name} hacia amenaza {threat.name} ({stepsToMove} pasos)");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
-        if (Vector3.Distance(unit.transform.position, threat.transform.position) < arriveToTarget || threat == null)
-            unit.isPendingThreat = false;
     }
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
