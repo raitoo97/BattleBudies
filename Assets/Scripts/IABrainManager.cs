@@ -216,7 +216,6 @@ public class IABrainManager : MonoBehaviour
                 break;
             }
         }
-
         // Si ningún vecino está libre, usar el nodo del target si está libre y no bloqueado
         if (finalTarget == null)
         {
@@ -227,19 +226,26 @@ public class IABrainManager : MonoBehaviour
             }
             else
             {
-                finalTarget = NodeManager.GetClosetNode(target.transform.position);
-                Debug.Log($"IA: Ningún vecino libre y no bloqueado, usando nodo más cercano: {(finalTarget != null ? finalTarget.name : "null")}");
+                Node closest = NodeManager.GetClosetNode(target.transform.position);
+                if (closest != null && closest.IsEmpty() && !closest._isBlock)
+                {
+                    finalTarget = closest;
+                    Debug.Log($"IA: Usando nodo más cercano válido: {finalTarget.name}");
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        $"MoveUnitToTarget: Nodo más cercano inválido. " +
+                        $"IsEmpty={closest?.IsEmpty()} _isBlock={closest?._isBlock}"
+                    );
+                    yield break;
+                }
             }
         }
-
         if (finalTarget == null)
         {
             Debug.LogWarning("MoveUnitToTarget: No se encontró nodo final válido");
             yield break;
-        }
-        else
-        {
-            Debug.LogWarning("MoveUnitToTarget: finalTarget seria el nodo " + finalTarget.name);
         }
         List<Node> path = PathFinding.CalculateAstart(unit.currentNode, finalTarget);
         if (path == null || path.Count == 0)
@@ -301,7 +307,7 @@ public class IABrainManager : MonoBehaviour
         {
             foreach (Node n in threatNode.Neighbors)
             {
-                if (n != null && n.IsEmpty())
+                if (n != null && n.IsEmpty() && !n._isBlock)
                 {
                     finalTarget = n;
                     break;
