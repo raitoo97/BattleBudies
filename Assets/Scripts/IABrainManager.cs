@@ -151,6 +151,10 @@ public class IABrainManager : MonoBehaviour
             }
             yield break;
         }
+        List<Node> resourceNodes = NodeManager.GetResourcesNode();
+        List<Node> healthNodes = NodeManager.GetHealthNodes();
+        bool targetOnResourceNode = target.currentNode != null && resourceNodes.Contains(target.currentNode);
+        bool targetOnHealthNode = target.currentNode != null && healthNodes.Contains(target.currentNode);
         // 1. Buscar si ya hay alguna unidad enemiga con isPendingTarget = true
         Units unitToMove = null;
         Units[] enemyUnits = FindObjectsOfType<Units>();
@@ -158,6 +162,11 @@ public class IABrainManager : MonoBehaviour
         {
             if (u != null && !u.isPlayerUnit && u.isPendingTarget)
             {
+                if (u is Attackers && targetOnResourceNode)
+                {
+                    u.isPendingTarget = false;
+                    continue;
+                }
                 unitToMove = u;
                 break;
             }
@@ -165,22 +174,90 @@ public class IABrainManager : MonoBehaviour
         // 2. Si no hay, elegir la unidad enemiga más cercana al target
         if (unitToMove == null)
         {
+            Units bestUnit = null;
             float minDist = float.MaxValue;
-            foreach (Units u in enemyUnits)
+            if (targetOnResourceNode) // Nodo de recolección
             {
-                if (u != null && !u.isPlayerUnit)
+                //Prioridad  Rangers
+                foreach (Units u in enemyUnits)
                 {
-                    if (u is Attackers) continue;
+                    if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
+                    if (u is Attackers || u is Defenders) continue; // Solo Rangers
                     float dist = Vector3.Distance(u.transform.position, target.transform.position);
                     if (dist < minDist)
                     {
                         minDist = dist;
-                        unitToMove = u;
+                        bestUnit = u;
+                    }
+                }
+                //Prioridad 2:Defenders si no hay Rangers
+                if (bestUnit == null)
+                {
+                    minDist = float.MaxValue;
+                    foreach (Units u in enemyUnits)
+                    {
+                        if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
+                        if (u is Attackers || u is Ranger) continue;
+                        float dist = Vector3.Distance(u.transform.position, target.transform.position);
+                        if (dist < minDist)
+                        {
+                            minDist = dist;
+                            bestUnit = u;
+                        }
                     }
                 }
             }
-            if (unitToMove != null)
+            else if(targetOnHealthNode)
+            {
+                foreach (Units u in enemyUnits)
+                {
+                    if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
+                    if (u is Ranger || u is Defenders) continue; // Solo Attackers
+                    float dist = Vector3.Distance(u.transform.position, target.transform.position);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        bestUnit = u;
+                    }
+                }
+                // Prioridad 2: Defenders si no hay Attackers
+                if (bestUnit == null)
+                {
+                    minDist = float.MaxValue;
+                    foreach (Units u in enemyUnits)
+                    {
+                        if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
+                        if (u is Ranger || u is Attackers) continue; // Solo Defenders
+                        float dist = Vector3.Distance(u.transform.position, target.transform.position);
+                        if (dist < minDist)
+                        {
+                            minDist = dist;
+                            bestUnit = u;
+                        }
+                    }
+                }
+                // Prioridad 3: Rangers si no hay Attackers ni Defenders
+                if (bestUnit == null)
+                {
+                    minDist = float.MaxValue;
+                    foreach (Units u in enemyUnits)
+                    {
+                        if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
+                        if (u is Defenders || u is Attackers) continue;
+                        float dist = Vector3.Distance(u.transform.position, target.transform.position);
+                        if (dist < minDist)
+                        {
+                            minDist = dist;
+                            bestUnit = u;
+                        }
+                    }
+                }
+            }
+            if (bestUnit != null)
+            {
+                unitToMove = bestUnit;
                 unitToMove.isPendingTarget = true;
+            }
         }
         // 3. Mover la unidad seleccionada al target
         if (unitToMove != null)
@@ -264,7 +341,7 @@ public class IABrainManager : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
         Debug.Log($"IA: Moviendo {unit.name} hacia {target.name} con {stepsToMove} pasos");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
-        if (target == null)
+        if (target == null || target.currentNode == null)
         {
             unit.isPendingTarget = false;
             yield break;
