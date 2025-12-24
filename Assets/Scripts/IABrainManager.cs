@@ -315,8 +315,32 @@ public class IABrainManager : MonoBehaviour
             }
         }
         if (finalTarget == null)
-            finalTarget = NodeManager.GetClosetNode(threat.transform.position);
-        if (finalTarget == null) yield break;
+        {
+            if (threatNode != null && threatNode.IsEmpty() && !threatNode._isBlock)
+            {
+                finalTarget = threatNode;
+                Debug.Log($"IA: Nodo de amenaza {threatNode.name} está libre y no bloqueado");
+            }
+            else
+            {
+                Node closest = NodeManager.GetClosetNode(threat.transform.position);
+                if (closest != null && closest.IsEmpty() && !closest._isBlock)
+                {
+                    finalTarget = closest;
+                    Debug.Log($"IA: Usando nodo más cercano válido a la amenaza: {finalTarget.name}");
+                }
+                else
+                {
+                    Debug.LogWarning($"MoveUnitToThreat: Nodo más cercano inválido. " +$"IsEmpty={closest?.IsEmpty()} _isBlock={closest?._isBlock}");
+                    yield break;
+                }
+            }
+        }
+        if (finalTarget == null)
+        {
+            Debug.LogWarning("MoveUnitToThreat: No se encontró nodo final válido");
+            yield break;
+        }
         List<Node> path = PathFinding.CalculateAstart(unit.currentNode, finalTarget);
         if (path == null || path.Count == 0) yield break;
         int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count);
