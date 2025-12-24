@@ -420,6 +420,22 @@ public class IABrainManager : MonoBehaviour
                 break;
 
         } while (EnergyManager.instance.enemyCurrentEnergy > 0);
+        while (EnergyManager.instance.enemyCurrentEnergy > 0)
+        {
+            foreach (Units u in allUnits)
+            {
+                if (u == null || !u) continue;
+                int moveEnergy = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, 1); // 1 paso a la vez
+                if (moveEnergy <= 0) continue;
+                if (u is Attackers)
+                    yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u as Attackers, moveEnergy));
+                else if (u is Defenders)
+                    yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u as Defenders, moveEnergy));
+                else if (u is Ranger)
+                    yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u as Ranger, moveEnergy));
+                if (EnergyManager.instance.enemyCurrentEnergy <= 0) break;
+            }
+        }
     }
     private void GetEnemyUnitsByType(ref List<Attackers> atk,ref List<Defenders> def,ref List<Ranger> rng)
     {
