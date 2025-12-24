@@ -21,26 +21,21 @@ public class IABrainManager : MonoBehaviour
             Debug.LogWarning("IA no puede ejecutarse: faltan instancias necesarias");
             yield break;
         }
-
         yield return StartCoroutine(InitializedTurn());
         yield return StartCoroutine(HandleEnemyUnitsOnSpecialNodes());
-
         List<Attackers> attackers = new List<Attackers>();
         List<Defenders> defenders = new List<Defenders>();
         List<Ranger> rangers = new List<Ranger>();
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-
         attackers.RemoveAll(u => u == null || !u);
         defenders.RemoveAll(u => u == null || !u);
         rangers.RemoveAll(u => u == null || !u);
         int totalUnits = attackers.Count + defenders.Count + rangers.Count;
-
-        // 1?? Si no tiene unidades, jugar cartas primero
+        //  Si no tiene unidades, jugar cartas primero
         if (totalUnits == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             Debug.Log("IA no tiene unidades: juega cartas iniciales");
             yield return StartCoroutine(IAPlayCards.instance?.PlayCards());
-
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
             List<Units> newlySpawnedUnits = new List<Units>();
@@ -48,44 +43,30 @@ public class IABrainManager : MonoBehaviour
             newlySpawnedUnits.AddRange(defenders);
             newlySpawnedUnits.AddRange(rangers);
             newlySpawnedUnits.RemoveAll(u => u == null || !u);
-
             if (newlySpawnedUnits.Count > 0)
             {
-                Debug.Log("IA mueve unidades recién invocadas para aprovechar energía");
                 yield return StartCoroutine(UseResidualEnergy(newlySpawnedUnits));
             }
         }
-
-        // 2?? DEFENSA: mover unidades a amenazas de torre
         Units threat;
         if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
             yield return StartCoroutine(MoveAllUnitsToThreat(threat));
         }
-
-        // 3?? ATACAR UNIDADES ESPECIALES DEL PLAYER
         Units specialTarget;
         if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
             yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
         }
-
-        // 4?? MOVIMIENTOS NORMALES
         yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
-
         yield return new WaitForSeconds(0.5f);
-
-        // 5?? ENERGÍA RESIDUAL: repetir prioridades hasta gastar energía
         List<Units> allUnits = new List<Units>();
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
         allUnits.AddRange(attackers);
         allUnits.AddRange(defenders);
         allUnits.AddRange(rangers);
         allUnits.RemoveAll(u => u == null || !u);
-
         yield return StartCoroutine(UseResidualEnergy(allUnits));
-
-        // 6?? FIN DE TURNO: pasar al jugador
         yield return new WaitUntil(() => isBusy());
         GameManager.instance.StartPlayerTurn();
     }
@@ -382,15 +363,13 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator UseResidualEnergy(List<Units> allUnits)
     {
         if (allUnits == null || allUnits.Count == 0) yield break;
-
         int safetyCounter = 0;
         bool anyMoved;
-
         do
         {
             anyMoved = false;
             safetyCounter++;
-            if (safetyCounter > 50) break; // evita bucles infinitos
+            if (safetyCounter > 50) break;
             Units threat;
             if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerThreateningTower(out threat))
             {
@@ -408,8 +387,6 @@ public class IABrainManager : MonoBehaviour
             foreach (Units u in allUnits)
             {
                 if (u == null || !u) continue;
-
-                // saltar si ya está en nodo especial
                 if (u is Defenders && NodeManager.GetHealthNodes().Contains(u.currentNode)) continue;
                 if (u is Ranger && NodeManager.GetResourcesNode().Contains(u.currentNode)) continue;
                 int energyAvailable = EnergyManager.instance.enemyCurrentEnergy;
