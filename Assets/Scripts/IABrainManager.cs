@@ -253,14 +253,16 @@ public class IABrainManager : MonoBehaviour
             Debug.LogWarning($"MoveUnitToTarget: No se encontró path de {unit.name} a {finalTarget.name}");
             yield break;
         }
-        int steps = Mathf.Min(path.Count, energyForThisUnit);
-        if (steps <= 0)
+        int pathOffset = (path.Count > 0 && path[0] == unit.currentNode) ? 1 : 0;
+        int stepsToMove = Mathf.Min(energyForThisUnit, path.Count - pathOffset);
+        if (stepsToMove <= 0)
         {
-            Debug.LogWarning($"MoveUnitToTarget: pasos calculados <= 0 para {unit.name}");
+            Debug.LogWarning($"MoveUnitToTarget: {unit.name} no puede moverse con la energía restante");
             yield break;
         }
-        List<Node> nodesToMove = path.GetRange(0, steps);
-        Debug.Log($"IA: Moviendo {unit.name} hacia {target.name} con {steps} pasos");
+
+        List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
+        Debug.Log($"IA: Moviendo {unit.name} hacia {target.name} con {stepsToMove} pasos");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
         if (Vector3.Distance(unit.transform.position, target.transform.position) < arriveToTarget || target==null)
             unit.isPendingTarget = false;
@@ -342,9 +344,14 @@ public class IABrainManager : MonoBehaviour
         }
         List<Node> path = PathFinding.CalculateAstart(unit.currentNode, finalTarget);
         if (path == null || path.Count == 0) yield break;
-        int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, path.Count);
-        if (stepsToMove <= 0) yield break;
-        List<Node> nodesToMove = path.GetRange(0, stepsToMove);
+        int pathOffset = (path.Count > 0 && path[0] == unit.currentNode) ? 1 : 0;
+        int stepsToMove = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy,path.Count - pathOffset);
+        if (stepsToMove <= 0)
+        {
+            Debug.LogWarning($"MoveUnitToThreat: {unit.name} no puede moverse con la energía restante");
+            yield break;
+        }
+        List<Node> nodesToMove = path.GetRange(pathOffset, stepsToMove);
         Debug.Log($"IA: Moviendo {unit.name} hacia amenaza {threat.name} ({stepsToMove} pasos)");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
     }
