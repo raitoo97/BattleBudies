@@ -230,6 +230,7 @@ public class IABrainManager : MonoBehaviour
         int steps = Mathf.Min(path.Count, energyForThisUnit);
         if (steps <= 0) yield break;
         List<Node> nodesToMove = path.GetRange(0, steps);
+        Debug.Log($"IA: Moviendo {unit.name} hacia {target.name} con {steps} pasos");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
         if (Vector3.Distance(unit.transform.position, target.transform.position) < arriveToTarget || target==null)
             unit.isPendingTarget = false;
@@ -273,9 +274,9 @@ public class IABrainManager : MonoBehaviour
         }
         // 3. Mover la unidad seleccionada al threat
         if (unitToMove != null)
-            yield return StartCoroutine(MoveSingleUnitToThreat(unitToMove, threat));
+            yield return StartCoroutine(MoveUnitToThreat(unitToMove, threat));
     }
-    private IEnumerator MoveSingleUnitToThreat(Units unit, Units threat)
+    private IEnumerator MoveUnitToThreat(Units unit, Units threat)
     {
         if (unit == null || threat == null || unit.currentNode == null) yield break;
         Node threatNode = threat.currentNode;
@@ -408,17 +409,13 @@ public class IABrainManager : MonoBehaviour
             }
         }
         if (!anyUnitCanAct) yield break;
-
         int safetyCounter = 0;
         bool anyMoved;
-
         do
         {
             anyMoved = false;
             safetyCounter++;
-            if (safetyCounter > 30) break; // Prevención loop infinito
-
-            // Prioridad 1: mover unidades hacia amenazas
+            if (safetyCounter > 30) break;
             Units threat;
             if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerThreateningTower(out threat))
             {
@@ -426,8 +423,6 @@ public class IABrainManager : MonoBehaviour
                 anyMoved = true;
                 continue;
             }
-
-            // Prioridad 2: atacar unidades en nodos especiales
             Units specialTarget;
             if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerUsingSpecialNode(out specialTarget))
             {
@@ -435,7 +430,6 @@ public class IABrainManager : MonoBehaviour
                 anyMoved = true;
                 continue;
             }
-
             // Prioridad 3: mover unidades normalmente
             foreach (Units unit in allUnits)
             {
@@ -464,12 +458,8 @@ public class IABrainManager : MonoBehaviour
                     yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
                     anyMoved = true;
                 }
-
-                // Si gastó energía, salir del foreach para recalcular
                 if (anyMoved) break;
             }
-
-            // Prioridad 4: jugar carta si todavía queda energía y no se movió nada
             if (!anyMoved && EnergyManager.instance.enemyCurrentEnergy > 0)
             {
                 yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
