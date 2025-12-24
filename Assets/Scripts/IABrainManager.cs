@@ -21,76 +21,71 @@ public class IABrainManager : MonoBehaviour
             Debug.LogWarning("IA no puede ejecutarse: faltan instancias necesarias");
             yield break;
         }
+
         yield return StartCoroutine(InitializedTurn());
         yield return StartCoroutine(HandleEnemyUnitsOnSpecialNodes());
+
         List<Attackers> attackers = new List<Attackers>();
         List<Defenders> defenders = new List<Defenders>();
         List<Ranger> rangers = new List<Ranger>();
         GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+
         attackers.RemoveAll(u => u == null || !u);
         defenders.RemoveAll(u => u == null || !u);
         rangers.RemoveAll(u => u == null || !u);
         int totalUnits = attackers.Count + defenders.Count + rangers.Count;
-        // ----------------- DEFENSA -----------------
-        Units threat = null;
-        if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
+
+        // 1?? Si no tiene unidades, jugar cartas primero
+        if (totalUnits == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
-            yield return StartCoroutine(MoveAllUnitsToThreat(threat));
-        }
-        Units specialTarget;
-        if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
-        {
-            yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
-        }
-        else
-        {
-            yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
-        }
-        yield return new WaitForSeconds(1f);
-        // ----------------- ENERGÍA RESIDUAL -----------------
-        List<Units> allUnits = new List<Units>();
-        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        allUnits.AddRange(attackers);
-        allUnits.AddRange(defenders);
-        allUnits.AddRange(rangers);
-        allUnits.RemoveAll(u => u == null || !u);
-        yield return StartCoroutine(UseResidualEnergy(allUnits));
-        // ----------------- JUEGO DE CARTAS FINAL -----------------
-        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        attackers.RemoveAll(u => u == null || !u);
-        defenders.RemoveAll(u => u == null || !u);
-        rangers.RemoveAll(u => u == null || !u);
-        totalUnits = attackers.Count + defenders.Count + rangers.Count;
-        // Si todavía hay energía y no hay unidades, jugar cartas
-        if (EnergyManager.instance.enemyCurrentEnergy >= 1 && totalUnits == 0)
-        {
-            Debug.Log("IA juega cartas iniciales porque no tiene unidades");
+            Debug.Log("IA no tiene unidades: juega cartas iniciales");
             yield return StartCoroutine(IAPlayCards.instance?.PlayCards());
 
-            // Actualizar lista de unidades tras invocar nuevas
+            // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
             List<Units> newlySpawnedUnits = new List<Units>();
             newlySpawnedUnits.AddRange(attackers);
             newlySpawnedUnits.AddRange(defenders);
             newlySpawnedUnits.AddRange(rangers);
             newlySpawnedUnits.RemoveAll(u => u == null || !u);
+
             if (newlySpawnedUnits.Count > 0)
             {
-                Debug.Log("IA usa energía sobrante para mover unidades recién invocadas");
+                Debug.Log("IA mueve unidades recién invocadas para aprovechar energía");
                 yield return StartCoroutine(UseResidualEnergy(newlySpawnedUnits));
             }
         }
-        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
-        List<Units> allUnitsRemaining = new List<Units>();
-        allUnitsRemaining.AddRange(attackers);
-        allUnitsRemaining.AddRange(defenders);
-        allUnitsRemaining.AddRange(rangers);
-        allUnitsRemaining.RemoveAll(u => u == null || !u);
-        if (EnergyManager.instance.enemyCurrentEnergy >= 1 && allUnitsRemaining.Count > 0)
+
+        // 2?? DEFENSA: mover unidades a amenazas de torre
+        Units threat;
+        if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
-            Debug.Log("IA usa energía sobrante para mover unidades existentes");
-            yield return StartCoroutine(UseResidualEnergy(allUnitsRemaining));
+            yield return StartCoroutine(MoveAllUnitsToThreat(threat));
         }
+
+        // 3?? ATACAR UNIDADES ESPECIALES DEL PLAYER
+        Units specialTarget;
+        if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
+        {
+            yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
+        }
+
+        // 4?? MOVIMIENTOS NORMALES
+        yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
+
+        yield return new WaitForSeconds(0.5f);
+
+        // 5?? ENERGÍA RESIDUAL: repetir prioridades hasta gastar energía
+        List<Units> allUnits = new List<Units>();
+        GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
+        allUnits.AddRange(attackers);
+        allUnits.AddRange(defenders);
+        allUnits.AddRange(rangers);
+        allUnits.RemoveAll(u => u == null || !u);
+
+        yield return StartCoroutine(UseResidualEnergy(allUnits));
+
+        // 6?? FIN DE TURNO: pasar al jugador
         yield return new WaitUntil(() => isBusy());
         GameManager.instance.StartPlayerTurn();
     }
@@ -386,25 +381,16 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator UseResidualEnergy(List<Units> allUnits)
     {
-        // Verificar si hay alguna unidad que pueda actuar
-        bool anyUnitCanAct = false;
-        foreach (Units unit in allUnits)
-        {
-            if (unit == null || !unit) continue;
-            if (unit is Attackers || unit is Ranger || (unit is Defenders && !NodeManager.GetHealthNodes().Contains(unit.currentNode)))
-            {
-                anyUnitCanAct = true;
-                break;
-            }
-        }
-        if (!anyUnitCanAct) yield break;
+        if (allUnits == null || allUnits.Count == 0) yield break;
+
         int safetyCounter = 0;
         bool anyMoved;
+
         do
         {
             anyMoved = false;
             safetyCounter++;
-            if (safetyCounter > 30) break;
+            if (safetyCounter > 50) break; // evita bucles infinitos
             Units threat;
             if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerThreateningTower(out threat))
             {
@@ -419,34 +405,33 @@ public class IABrainManager : MonoBehaviour
                 anyMoved = true;
                 continue;
             }
-            // Prioridad 3: mover unidades normalmente
-            foreach (Units unit in allUnits)
+            foreach (Units u in allUnits)
             {
-                if (unit == null || !unit) continue;
+                if (u == null || !u) continue;
 
-                if (unit is Defenders && NodeManager.GetHealthNodes().Contains(unit.currentNode)) continue;
-                if (unit is Ranger && NodeManager.GetResourcesNode().Contains(unit.currentNode)) continue;
-
+                // saltar si ya está en nodo especial
+                if (u is Defenders && NodeManager.GetHealthNodes().Contains(u.currentNode)) continue;
+                if (u is Ranger && NodeManager.GetResourcesNode().Contains(u.currentNode)) continue;
                 int energyAvailable = EnergyManager.instance.enemyCurrentEnergy;
                 if (energyAvailable <= 0) break;
-
-                if (unit is Attackers)
+                if (u is Attackers)
                 {
-                    yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(unit as Attackers, energyAvailable));
+                    yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u as Attackers, energyAvailable));
                     anyMoved = true;
                 }
-                else if (unit is Defenders)
+                else if (u is Defenders)
                 {
-                    yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(unit as Defenders, energyAvailable));
+                    yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u as Defenders, energyAvailable));
                     yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
                     anyMoved = true;
                 }
-                else if (unit is Ranger)
+                else if (u is Ranger)
                 {
-                    yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(unit as Ranger, energyAvailable));
+                    yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u as Ranger, energyAvailable));
                     yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
                     anyMoved = true;
                 }
+                u.isPendingTarget = false;
                 if (anyMoved) break;
             }
             if (!anyMoved && EnergyManager.instance.enemyCurrentEnergy > 0)
@@ -454,6 +439,8 @@ public class IABrainManager : MonoBehaviour
                 yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
                 anyMoved = true;
             }
+            if (!anyMoved && EnergyManager.instance.enemyCurrentEnergy <= 0)
+                break;
 
         } while (EnergyManager.instance.enemyCurrentEnergy > 0);
     }
