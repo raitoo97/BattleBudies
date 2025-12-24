@@ -7,6 +7,7 @@ public class IABrainManager : MonoBehaviour
     private float chanceToPlayCards = 0.85f;
     private int maxStepsPerUnit = 3;
     [SerializeField]private float defendTriggerDistance;
+    private float arriveToTarget = 18;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -159,14 +160,13 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in allUnits)
         {
             if (u == null || u.isPlayerUnit) continue;
-            if (u is Defenders) continue;
-            if (u is Attackers || u is Ranger)
                 enemyUnits.Add(u);
         }
         if (enemyUnits.Count == 0) { Debug.Log("SendUnitToKillTarget: no hay unidades disponibles"); yield break; }
         // 1. Ordenar por cercanía al objetivo
         enemyUnits.Sort((a, b) =>Vector3.Distance(a.transform.position, target.transform.position).CompareTo(Vector3.Distance(b.transform.position, target.transform.position)));
         Units unitToSend = enemyUnits[0];
+        unitToSend.isPendingTarget = true;
         if (unitToSend.currentNode == null) { Debug.Log($"SendUnitToKillTarget: unidad {unitToSend.name} sin currentNode"); yield break; }
         if (EnergyManager.instance.enemyCurrentEnergy < 1) { Debug.Log("SendUnitToKillTarget: sin energía"); yield break; }
         // 3. Energía limitada como cualquier unidad
@@ -193,6 +193,10 @@ public class IABrainManager : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(0, steps);
         Debug.Log($"IA: Attacker {unitToSend.name} va a cazar a {target.name}");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unitToSend, nodesToMove));
+        if(Vector3.Distance(unitToSend.transform.position, target.transform.position) < arriveToTarget)
+        {
+            unitToSend .isPendingTarget = false;
+        }
     }
     private IEnumerator MoveAllUnitsToThreat(Units threat)
     {
@@ -213,6 +217,7 @@ public class IABrainManager : MonoBehaviour
         // Ordena TODAS las unidades enemigas por distancia a la amenaza
         enemyUnits.Sort((a, b) =>Vector3.Distance(a.transform.position, threat.transform.position).CompareTo(Vector3.Distance(b.transform.position, threat.transform.position)));
         Units chosen = enemyUnits[0];
+        chosen.isPendingThreat = true;
         Debug.Log($"IA: Unidad más cercana seleccionada -> {chosen.name}");
         Node playerNode = threat.currentNode;
         Node finalTarget = null;
@@ -254,6 +259,10 @@ public class IABrainManager : MonoBehaviour
         List<Node> nodesToMove = path.GetRange(0, stepsToMove);
         Debug.Log($"IA: Moviendo {chosen.name} hacia la amenaza de nombre {threat.name} a {stepsToMove} pasos)");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(chosen, nodesToMove));
+        if (Vector3.Distance(chosen.transform.position, threat.transform.position) < arriveToTarget)
+        {
+            chosen.isPendingTarget = false;
+        }
     }
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
@@ -278,6 +287,7 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in attackers)
         {
             if (u == null || !u) continue;
+            if (u.isPendingThreat || u.isPendingTarget) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Attackers {u.gameObject.name}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
@@ -300,6 +310,7 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in defenders)
         {
             if (u == null || !u) continue;
+            if (u.isPendingThreat || u.isPendingTarget) continue;
             // Si no hay energía no intento mover
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
@@ -325,6 +336,7 @@ public class IABrainManager : MonoBehaviour
         foreach (Units u in rangers)
         {
             if (u == null || !u) continue;
+            if (u.isPendingThreat || u.isPendingTarget) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
