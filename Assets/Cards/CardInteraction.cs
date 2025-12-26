@@ -98,6 +98,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
                     transform.SetAsLastSibling();
                     if (layoutElement != null)
                         layoutElement.ignoreLayout = true;
+                    SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CardHover"), 1f, false);
                 }
             }
             else

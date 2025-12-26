@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87683e91aeb8d5949859241c4c3a4a9c, type: 3}
   m_Name: Siren
   m_EditorClassIdentifier: 
-  artwork: {fileID: 21300000, guid: 3a5825abae269674a9e217f3302d3f71, type: 3}
+  artwork: {fileID: 21300000, guid: d48816c7ee2b93643ba0727653277655, type: 3}
   cost: 6
   unitPrefab: {fileID: 4587801041154643403, guid: bf60a0abcb9f34a44b6c22b85eec4478,
     type: 3}

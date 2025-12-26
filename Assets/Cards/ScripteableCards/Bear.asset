@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87683e91aeb8d5949859241c4c3a4a9c, type: 3}
   m_Name: Bear
   m_EditorClassIdentifier: 
-  artwork: {fileID: 21300000, guid: eb466129e7f13e34884cb9609f3336d1, type: 3}
+  artwork: {fileID: 21300000, guid: 4e4c52d8b8a27de44a16ea87122bb9b8, type: 3}
   cost: 4
   unitPrefab: {fileID: 8180767408621440831, guid: 2aeca483b7053c34cacedabe873053ee,
     type: 3}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87683e91aeb8d5949859241c4c3a4a9c, type: 3}
   m_Name: Robot
   m_EditorClassIdentifier: 
-  artwork: {fileID: 21300000, guid: 3a0afad5ced1db541a9f852385cbf19f, type: 3}
+  artwork: {fileID: 21300000, guid: 5b86b92cfd250e64abc030ec2d64727a, type: 3}
   cost: 4
   unitPrefab: {fileID: 4684953630393334421, guid: b5a5a18a608239747bfac116f5966613,
     type: 3}
