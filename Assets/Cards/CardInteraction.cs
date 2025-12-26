@@ -7,8 +7,9 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     [Header("Scale Settings")]
     public float normalScale = 1f;
     public float hoverScale = 1.2f;
-    public float scaleSpeed = 10f;
+    private float hoverDuration = 0.15f;
     private Vector3 targetScale;
+    private Vector3 scaleVelocity;
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Vector2 originalPosition;
@@ -96,7 +97,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
                     layoutElement.ignoreLayout = false;
             }
         }
-        visualRoot.localScale = Vector3.Lerp(visualRoot.localScale,targetScale,Time.deltaTime * scaleSpeed);
+        visualRoot.localScale = Vector3.SmoothDamp(visualRoot.localScale,targetScale,ref scaleVelocity,hoverDuration);
         if (isPlayerCard)
             UpdateTint();
     }
