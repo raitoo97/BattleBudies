@@ -25,6 +25,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     private bool isHovering = false;
     public static CardInteraction hoveredCard;
     private LayoutElement layoutElement;
+    private RectTransform visualRoot;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -51,6 +52,15 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
                 playerHand = ph.GetComponent<RectTransform>();
             else
                 Debug.LogWarning("No se encontró PlayerHand dentro del Canvas");
+        }
+        Graphic graphic = GetComponentInChildren<Graphic>();
+        if (graphic != null)
+        {
+            visualRoot = graphic.rectTransform;
+        }
+        else
+        {
+            Debug.LogError("UIPrefabCard no tiene ningún Graphic hijo");
         }
     }
     private void Start()
@@ -86,7 +96,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
                     layoutElement.ignoreLayout = false;
             }
         }
-        rectTransform.localScale = Vector3.Lerp(rectTransform.localScale,targetScale,Time.deltaTime * scaleSpeed);
+        visualRoot.localScale = Vector3.Lerp(visualRoot.localScale,targetScale,Time.deltaTime * scaleSpeed);
         if (isPlayerCard)
             UpdateTint();
     }
