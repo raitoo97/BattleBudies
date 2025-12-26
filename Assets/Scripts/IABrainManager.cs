@@ -473,7 +473,7 @@ public class IABrainManager : MonoBehaviour
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
-            Debug.Log("IA decide jugar carta tras mover Attackers");
+            Debug.Log("IA decide jugar carta iniciar movimiento fichas");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
         yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
