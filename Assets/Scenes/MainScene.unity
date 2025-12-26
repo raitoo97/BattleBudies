@@ -780,7 +780,7 @@ GameObject:
   m_Component:
   - component: {fileID: 200215745}
   m_Layer: 0
-  m_Name: GORDAMATAMBRE
+  m_Name: GORDAMATAMBREDELIMON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
