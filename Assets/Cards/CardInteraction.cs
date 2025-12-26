@@ -4,12 +4,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    [Header("Scale Settings")]
-    public float normalScale = 1f;
-    public float hoverScale = 1.2f;
+    private float hoverScale = 0.5f;
     private float hoverDuration = 0.15f;
+    private Vector3 baseVisualScale;
     private Vector3 targetScale;
     private Vector3 scaleVelocity;
+    private bool scaleInitialized = false;
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Vector2 originalPosition;
@@ -66,9 +66,14 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     }
     private void Start()
     {
-        targetScale = Vector3.one * normalScale;
-        rectTransform.localScale = targetScale;
         originalSiblingIndex = transform.GetSiblingIndex();
+        if (visualRoot != null)
+        {
+            baseVisualScale = visualRoot.localScale;
+            targetScale = baseVisualScale;
+            scaleInitialized = true;
+            print("Entro");
+        }
     }
     private void Update()
     {
@@ -81,7 +86,10 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
             {
                 isHovering = true;
                 hoveredCard = this;
-                targetScale = Vector3.one * hoverScale;
+                scaleVelocity = Vector3.zero;
+                targetScale = baseVisualScale * (1f + hoverScale);
+                print(baseVisualScale);
+                print(targetScale);
                 transform.SetAsLastSibling();
                 if (layoutElement != null)
                     layoutElement.ignoreLayout = true;
@@ -91,13 +99,17 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
                 isHovering = false;
                 if (hoveredCard == this)
                     hoveredCard = null;
-                targetScale = Vector3.one * normalScale;
+                scaleVelocity = Vector3.zero;
+                targetScale = baseVisualScale;
                 transform.SetSiblingIndex(originalSiblingIndex);
                 if (layoutElement != null)
                     layoutElement.ignoreLayout = false;
             }
         }
-        visualRoot.localScale = Vector3.SmoothDamp(visualRoot.localScale,targetScale,ref scaleVelocity,hoverDuration);
+        if (scaleInitialized)
+        {
+            visualRoot.localScale = Vector3.SmoothDamp(visualRoot.localScale,targetScale,ref scaleVelocity,hoverDuration);
+        }
         if (isPlayerCard)
             UpdateTint();
     }
@@ -140,7 +152,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         if (!isPlayerCard || !isDragging) return;
         isDragging = false;
         canvasGroup.blocksRaycasts = true;
-        targetScale = Vector3.one * normalScale;
+        targetScale = baseVisualScale;
         bool insideHand = false;
         if (playerHand != null)
         {
