@@ -128,50 +128,9 @@ public class IAPlayCards : MonoBehaviour
                 break;
             }
         }
-        // 2. Si no hay Ranger, intentar Attacker
         if (cardToPlay == null)
         {
-            foreach (Transform c in hand)
-            {
-                CardInteraction card = c.GetComponent<CardInteraction>();
-                if (card != null && card.GetComponent<UICard>().cardData.cost <= EnergyManager.instance.enemyCurrentEnergy &&
-                    card.GetComponent<UICard>().cardData.unitType == UnitType.Attacker)
-                {
-                    cardToPlay = card;
-                    break;
-                }
-            }
-        }
-        // 3. Si no hay Attacker, intentar Defender
-        if (cardToPlay == null)
-        {
-            foreach (Transform c in hand)
-            {
-                CardInteraction card = c.GetComponent<CardInteraction>();
-                if (card != null && card.GetComponent<UICard>().cardData.cost <= EnergyManager.instance.enemyCurrentEnergy &&
-                    card.GetComponent<UICard>().cardData.unitType == UnitType.Defender)
-                {
-                    cardToPlay = card;
-                    break;
-                }
-            }
-        }
-        // 4. Si no hay ninguno de los anteriores, cualquier carta jugable
-        if (cardToPlay == null)
-        {
-            foreach (Transform c in hand)
-            {
-                CardInteraction card = c.GetComponent<CardInteraction>();
-                if (card != null && card.GetComponent<UICard>().cardData.cost <= EnergyManager.instance.enemyCurrentEnergy)
-                {
-                    cardToPlay = card;
-                    break;
-                }
-            }
-        }
-        if (cardToPlay == null)
-        {
-            Debug.Log("IA: No hay cartas jugables disponibles.");
+            Debug.Log("IA: No hay cartas de Rangers jugables disponibles.");
         }
         return cardToPlay;
     }

@@ -34,7 +34,8 @@ public class IABrainManager : MonoBehaviour
         if (totalUnits == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
             Debug.Log("IA no tiene unidades: juega cartas iniciales");
-            yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard_PrioritizeRanger());
+            yield return StartCoroutine(IACheckEnemies());
+            yield return new WaitForSeconds(4f);
             yield return StartCoroutine(IAPlayCards.instance?.PlayCards());
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
@@ -48,16 +49,8 @@ public class IABrainManager : MonoBehaviour
                 yield return StartCoroutine(UseResidualEnergy(newlySpawnedUnits));
             }
         }
-        Units threat;
-        if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
-        {
-            yield return StartCoroutine(MoveAllUnitsToThreat(threat));
-        }
-        Units specialTarget;
-        if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
-        {
-            yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
-        }
+        yield return new WaitForSeconds(1.5f);
+        yield return StartCoroutine(IACheckEnemies());
         yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
         yield return new WaitForSeconds(0.5f);
         List<Units> allUnits = new List<Units>();
@@ -127,7 +120,24 @@ public class IABrainManager : MonoBehaviour
             if (u is Ranger && resourceNodes.Contains(u.currentNode))
             {
                 print("Ranger detectado en nodo de recursos: " + u.name);
-                StartCoroutine(IAPlayCards.instance?.PlayOneCard_PrioritizeRanger());
+                bool iaHasRanger = false;
+                foreach (Units unit in allUnits)
+                {
+                    if (!unit.isPlayerUnit && unit is Ranger)
+                    {
+                        iaHasRanger = true;
+                        break;
+                    }
+                }
+                if (iaHasRanger)
+                {
+                    print("IA ya tiene un Ranger, no invoca otro");
+                }
+                else
+                {
+                    print("IA NO tiene un Ranger, trata de invocar uno");
+                    StartCoroutine(IAPlayCards.instance?.PlayOneCard_PrioritizeRanger());
+                }
                 target = u;
                 return true;
             }
@@ -437,16 +447,35 @@ public class IABrainManager : MonoBehaviour
         Debug.Log($"IA: Moviendo {unit.name} hacia amenaza {threat.name} ({stepsToMove} pasos)");
         yield return StartCoroutine(IAMoveToTowers.instance.ExecuteMovementPathWithSavingThrows(unit, nodesToMove));
     }
+    private IEnumerator IACheckEnemies()
+    {
+        Units threat;
+        if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
+        {
+            yield return StartCoroutine(MoveAllUnitsToThreat(threat));
+        }
+        Units specialTarget;
+        if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
+        {
+            yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
+        }
+    }
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
     {
         float globalChance = Random.value;
-        if (globalChance < 0.1f)
+        if (globalChance < 0.05f)
         {
             Debug.Log("Ataque Global de parte de la IA");
             yield return StartCoroutine(IAMoveToTowers.instance.MoveAllEnemyUnitsToTowers(attackers));
             yield break;
         }
         //MOVIMIENTOS INDIVIDUALES NORMALES
+        float random = Random.value;
+        if (random < 0.90 && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        {
+            Debug.Log("IA decide jugar carta tras mover Attackers");
+            yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
+        }
         yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
         yield return StartCoroutine(MoveDefenders(defenders, rangers));
         yield return StartCoroutine(MoveRangers(rangers));
@@ -600,6 +629,12 @@ public class IABrainManager : MonoBehaviour
                     yield return StartCoroutine(IAMoveToResources.instance.MoveSingleUnit(u as Ranger, moveEnergy));
                 if (EnergyManager.instance.enemyCurrentEnergy <= 0) break;
             }
+        }
+        float random = Random.value;
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        {
+            Debug.Log("IA decide jugar carta tras mover Attackers");
+            yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
     }
     private void GetEnemyUnitsByType(ref List<Attackers> atk,ref List<Defenders> def,ref List<Ranger> rng)
