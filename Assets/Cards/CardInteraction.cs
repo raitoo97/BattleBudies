@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private float hoverScale = 0.55f;
+    private float hoverScale = 0.70f;
     private float hoverDuration = 0.15f;
     private float hoverDelay = 0.25f;
     private float undoHoverDelay = 0.1f;
