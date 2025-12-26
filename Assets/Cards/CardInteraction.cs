@@ -4,8 +4,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private float hoverScale = 0.5f;
+    private float hoverScale = 0.55f;
     private float hoverDuration = 0.15f;
+    private float hoverDelay = 0.25f;
+    private float undoHoverDelay = 0.1f;
+    private float undoHoverTimer = 0f;
+    private float hoverTimer = 0f;
+    private bool hoverConfirmed = false;
     private Vector3 baseVisualScale;
     private Vector3 targetScale;
     private Vector3 scaleVelocity;
@@ -23,7 +28,6 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     [HideInInspector] public bool isPlayerCard = false;
     public static bool isOnDraging = false;
     private int originalSiblingIndex;
-    private bool isHovering = false;
     public static CardInteraction hoveredCard;
     private LayoutElement layoutElement;
     private RectTransform visualRoot;
@@ -72,7 +76,6 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
             baseVisualScale = visualRoot.localScale;
             targetScale = baseVisualScale;
             scaleInitialized = true;
-            print("Entro");
         }
     }
     private void Update()
@@ -82,28 +85,36 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
             bool mouseOver = IsMouseOverThisCard();
             if (mouseOver && hoveredCard != null && hoveredCard != this)
                 return;
-            if (mouseOver && !isHovering)
+            if (mouseOver)
             {
-                isHovering = true;
-                hoveredCard = this;
-                scaleVelocity = Vector3.zero;
-                targetScale = baseVisualScale * (1f + hoverScale);
-                print(baseVisualScale);
-                print(targetScale);
-                transform.SetAsLastSibling();
-                if (layoutElement != null)
-                    layoutElement.ignoreLayout = true;
+                hoverTimer += Time.deltaTime;
+                undoHoverTimer = 0f;
+                if (!hoverConfirmed && hoverTimer >= hoverDelay)
+                {
+                    hoverConfirmed = true;
+                    hoveredCard = this;
+                    scaleVelocity = Vector3.zero;
+                    targetScale = baseVisualScale * (1f + hoverScale);
+                    transform.SetAsLastSibling();
+                    if (layoutElement != null)
+                        layoutElement.ignoreLayout = true;
+                }
             }
-            else if (!mouseOver && isHovering)
+            else
             {
-                isHovering = false;
-                if (hoveredCard == this)
-                    hoveredCard = null;
-                scaleVelocity = Vector3.zero;
-                targetScale = baseVisualScale;
-                transform.SetSiblingIndex(originalSiblingIndex);
-                if (layoutElement != null)
-                    layoutElement.ignoreLayout = false;
+                undoHoverTimer += Time.deltaTime;
+                hoverTimer = 0f;
+                if (hoverConfirmed && undoHoverTimer >= undoHoverDelay)
+                {
+                    hoverConfirmed = false;
+                    if (hoveredCard == this)
+                        hoveredCard = null;
+                    scaleVelocity = Vector3.zero;
+                    targetScale = baseVisualScale;
+                    transform.SetSiblingIndex(originalSiblingIndex);
+                    if (layoutElement != null)
+                        layoutElement.ignoreLayout = false;
+                }
             }
         }
         if (scaleInitialized)
