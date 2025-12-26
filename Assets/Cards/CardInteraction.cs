@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("Scale Settings")]
@@ -20,6 +21,10 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     private UICard uiCard;
     [HideInInspector] public bool isPlayerCard = false;
     public static bool isOnDraging = false;
+    private int originalSiblingIndex;
+    private bool isHovering = false;
+    public static CardInteraction hoveredCard;
+    private LayoutElement layoutElement;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -27,6 +32,9 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         canvasGroup.blocksRaycasts = true;
         uiCard = GetComponent<UICard>();
         canvas = GetComponentInParent<Canvas>();
+        layoutElement = GetComponent<LayoutElement>();
+        if (layoutElement == null)
+            layoutElement = gameObject.AddComponent<LayoutElement>();
         if (canvas == null)
         {
             Debug.LogError("No se encontró un Canvas en los padres!");
@@ -49,21 +57,38 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     {
         targetScale = Vector3.one * normalScale;
         rectTransform.localScale = targetScale;
+        originalSiblingIndex = transform.GetSiblingIndex();
     }
     private void Update()
     {
         if (!isDragging)
         {
-            if (IsMouseOverThisCard())
+            bool mouseOver = IsMouseOverThisCard();
+            if (mouseOver && hoveredCard != null && hoveredCard != this)
+                return;
+            if (mouseOver && !isHovering)
+            {
+                isHovering = true;
+                hoveredCard = this;
                 targetScale = Vector3.one * hoverScale;
-            else
+                transform.SetAsLastSibling();
+                if (layoutElement != null)
+                    layoutElement.ignoreLayout = true;
+            }
+            else if (!mouseOver && isHovering)
+            {
+                isHovering = false;
+                if (hoveredCard == this)
+                    hoveredCard = null;
                 targetScale = Vector3.one * normalScale;
+                transform.SetSiblingIndex(originalSiblingIndex);
+                if (layoutElement != null)
+                    layoutElement.ignoreLayout = false;
+            }
         }
-        rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, targetScale, Time.deltaTime * scaleSpeed);
+        rectTransform.localScale = Vector3.Lerp(rectTransform.localScale,targetScale,Time.deltaTime * scaleSpeed);
         if (isPlayerCard)
-        {
             UpdateTint();
-        }
     }
     private bool IsMouseOverThisCard()
     {
@@ -71,11 +96,9 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
         PointerEventData pointerData = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
         List<RaycastResult> hits = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointerData, hits);
-        foreach (RaycastResult hit in hits)
-        {
-            if (hit.gameObject == gameObject) return true;
-        }
-        return false;
+        if (hits.Count == 0)
+            return false;
+        return hits[0].gameObject == gameObject;
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
