@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 0
-  maxHealth: 30
+  maxHealth: 45
   diceCount: 2
   isPlayerUnit: 1
   currentNode: {fileID: 0}
@@ -164,6 +164,7 @@ MonoBehaviour:
   diceInstance: {fileID: 0}
   hasAttackedTowerThisTurn: 0
   hasHealthedTowerThisTurn: 0
+  isPendingTarget: 0
   healthTowerDice: 3
 --- !u!136 &5846122604723798370
 CapsuleCollider:

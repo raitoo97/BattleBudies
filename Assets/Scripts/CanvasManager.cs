@@ -15,6 +15,7 @@ public class CanvasManager : MonoBehaviour
     public TextMeshProUGUI playerDiceRemainingText;
     public TextMeshProUGUI enemyDiceRemainingText;
     public Button UpgradeUnits;
+    public TextMeshProUGUI updateUnitsText;
     [Header("Combat")]
     public Button rollButton;
     public TextMeshProUGUI playerDamageText;
@@ -39,6 +40,7 @@ public class CanvasManager : MonoBehaviour
     [Header("CameraControl")]
     public Button changeCameraButton;
     public TextMeshProUGUI changeCameraText;
+    public TextMeshProUGUI changeCameraTextRotation;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -58,7 +60,14 @@ public class CanvasManager : MonoBehaviour
             changeCameraButton.interactable = true;
         else
             changeCameraButton.interactable = false;
-        UpgradeUnits.interactable =UpgradeManager.instance.GetCanUpgradePlayer &&!UnitController.instance.IsSelectingUpgradeUnit && !UnitController.instance.IsBusy();
+        Color c = changeCameraTextRotation.color;
+        c.a = CameraManager.instance.GetCanTransposed ? 1f : 0.3f;
+        changeCameraTextRotation.color = c;
+        bool canUpgrade = UpgradeManager.instance.GetCanUpgradePlayer && !UnitController.instance.IsSelectingUpgradeUnit && !UnitController.instance.IsBusy();
+        UpgradeUnits.interactable = canUpgrade;
+        Color cu = updateUnitsText.color;
+        cu.a = canUpgrade ? 1f : 0.3f;
+        updateUnitsText.color = cu;
     }
     public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
     {

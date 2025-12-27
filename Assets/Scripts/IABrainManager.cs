@@ -190,7 +190,7 @@ public class IABrainManager : MonoBehaviour
             float minDist = float.MaxValue;
             if (targetOnResourceNode) // Nodo de recolección
             {
-                //Prioridad  Rangers
+                //solo  Rangers
                 foreach (Units u in enemyUnits)
                 {
                     if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
@@ -202,25 +202,15 @@ public class IABrainManager : MonoBehaviour
                         bestUnit = u;
                     }
                 }
-                //Prioridad 2:Defenders si no hay Rangers
+                //Si no hay ranger no manda a ninguna unidad
                 if (bestUnit == null)
                 {
-                    minDist = float.MaxValue;
-                    foreach (Units u in enemyUnits)
-                    {
-                        if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
-                        if (u is Attackers || u is Ranger) continue;
-                        float dist = Vector3.Distance(u.transform.position, target.transform.position);
-                        if (dist < minDist)
-                        {
-                            minDist = dist;
-                            bestUnit = u;
-                        }
-                    }
+                    Debug.Log("IA: No hay Rangers disponibles para enviar al nodo de recursos");
                 }
             }
             else if(targetOnHealthNode)
             {
+                // Prioridad 1: Attackers
                 foreach (Units u in enemyUnits)
                 {
                     if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
@@ -251,18 +241,7 @@ public class IABrainManager : MonoBehaviour
                 // Prioridad 3: Rangers si no hay Attackers ni Defenders
                 if (bestUnit == null)
                 {
-                    minDist = float.MaxValue;
-                    foreach (Units u in enemyUnits)
-                    {
-                        if (u == null || u.isPlayerUnit || u.currentNode == null) continue;
-                        if (u is Defenders || u is Attackers) continue;
-                        float dist = Vector3.Distance(u.transform.position, target.transform.position);
-                        if (dist < minDist)
-                        {
-                            minDist = dist;
-                            bestUnit = u;
-                        }
-                    }
+                    Debug.Log("IA: No hay Attackers o Defenders disponibles para enviar al nodo de salud");
                 }
             }
             if (bestUnit != null)
@@ -473,7 +452,7 @@ public class IABrainManager : MonoBehaviour
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
-            Debug.Log("IA decide jugar carta tras mover Attackers");
+            Debug.Log("IA decide jugar carta iniciar movimiento fichas");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
         yield return StartCoroutine(MoveAttackers(attackers, totalUnits));

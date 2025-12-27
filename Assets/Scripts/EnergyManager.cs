@@ -43,10 +43,18 @@ public class EnergyManager : MonoBehaviour
     }
     public void RefillPlayerEnergy()
     {
+        if (currentEnergy < maxEnergy)
+        {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("EnergyRefill"), 0.5f, false);
+        }
         currentEnergy = maxEnergy;
     }
     public void RefillEnemyEnergy()
     {
+        if (enemyCurrentEnergy < enemyMaxEnergy)
+        {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("EnergyRefill"), 0.5f, false);
+        }
         enemyCurrentEnergy = enemyMaxEnergy;
     }
 }
