@@ -89,7 +89,6 @@ public class HealthTowerManager : MonoBehaviour
                 }
             }
             pendingHealth = 0;
-            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("HealtTower"), 1f, false);
             diceRoll.PrepareForRoll();
             yield return new WaitForSeconds(1f);
         }
