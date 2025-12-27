@@ -24,8 +24,10 @@ public abstract class Units : MonoBehaviour
     [HideInInspector]public bool hasAttackedTowerThisTurn = false;
     [HideInInspector]public bool hasHealthedTowerThisTurn = false;
     public bool isPendingTarget = false;
+    private ParticleSystem _woodParticles;
     protected virtual void Start()
     {
+        _woodParticles = transform.GetChild(0).GetComponent<ParticleSystem>();
         currentNode = NodeManager.GetClosetNode(transform.position);
         targetNode = null;
         _glow = GetComponent<GlowUnit>();
@@ -36,6 +38,8 @@ public abstract class Units : MonoBehaviour
             snap.y = originalY;
             transform.position = snap;
         }
+        if(_woodParticles == null)
+            Debug.LogWarning("Wood Particles not found on " + gameObject.name);
         currentHealth = maxHealth;
     }
     protected virtual void Update()
@@ -131,6 +135,7 @@ public abstract class Units : MonoBehaviour
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
+        _woodParticles?.Play();
         if (currentHealth <= 0)
         {
             currentHealth = 0;
