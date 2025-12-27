@@ -52,8 +52,8 @@ public class Tower : MonoBehaviour
         if (_healtParticles != null)
         {
             _healtParticles.Play();
-            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("TowerHealt"), 1.0f, false);
         }
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("HealtTower"), 1.0f, false);
         currentHealth += amount;
     }
     private void HandleHover()
