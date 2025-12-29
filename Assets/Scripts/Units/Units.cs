@@ -138,6 +138,7 @@ public abstract class Units : MonoBehaviour
         _woodParticles?.Play();
         if (currentHealth <= 0)
         {
+            ParticleManager.instance.PlayParticleEffect(ParticleType.DeathUnit, this.transform);
             currentHealth = 0;
             Die();
         }
