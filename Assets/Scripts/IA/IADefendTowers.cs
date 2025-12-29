@@ -18,6 +18,17 @@ public class IADefendTowers : MonoBehaviour
     public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
     {
         if (enemy == null) yield break;
+        if (enemy.isLockedOnSpecialNode)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        if (enemy is Defenders def &&enemy.currentNode != null &&NodeManager.GetHealthNodes().Contains(enemy.currentNode))
+        {
+            def.isLockedOnSpecialNode = true;
+            actionInProgress = false;
+            yield break;
+        }
         yield return new WaitUntil(() => isBusy());
         movedAnyUnit = false;
         actionInProgress = true;
@@ -27,10 +38,10 @@ public class IADefendTowers : MonoBehaviour
             yield break;
         }
         List<Node> resourceNodes = GetHealtNodes();
-        if (resourceNodes.Contains(enemy.currentNode) && enemy is Defenders def && !def.hasHealthedTowerThisTurn)
+        if (resourceNodes.Contains(enemy.currentNode) && enemy is Defenders defender && !defender.hasHealthedTowerThisTurn)
         {
             Debug.Log($"IA: Unidad enemiga es un Defensor va a tirar de nombre {enemy.gameObject.name}.");
-            def.hasHealthedTowerThisTurn = true;
+            defender.hasHealthedTowerThisTurn = true;
             HealthTowerManager.instance.StartRecolectedHealth(enemy as Defenders);
             yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
             actionInProgress = false;

@@ -24,6 +24,7 @@ public abstract class Units : MonoBehaviour
     [HideInInspector]public bool hasAttackedTowerThisTurn = false;
     [HideInInspector]public bool hasHealthedTowerThisTurn = false;
     public bool isPendingTarget = false;
+    public bool isLockedOnSpecialNode = false;
     private ParticleSystem _woodParticles;
     protected virtual void Start()
     {
@@ -155,6 +156,7 @@ public abstract class Units : MonoBehaviour
         hasAttackedTowerThisTurn = false;
         hasHealthedTowerThisTurn = false;
         isPendingTarget = false;
+        isLockedOnSpecialNode = false;
         if (this is Ranger ranger)
             ranger.hasCollectedThisTurn = false;
     }

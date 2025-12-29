@@ -247,12 +247,15 @@ public class IABrainManager : MonoBehaviour
             if (bestUnit != null)
             {
                 unitToMove = bestUnit;
-                unitToMove.isPendingTarget = true;
             }
         }
         // 3. Mover la unidad seleccionada al target
         if (unitToMove != null)
+        {
+            unitToMove.isLockedOnSpecialNode = false;
+            unitToMove.isPendingTarget = true;
             yield return StartCoroutine(MoveUnitToTarget(unitToMove, target));
+        }
     }
     private IEnumerator MoveUnitToTarget(Units unit, Units target)
     {
@@ -363,6 +366,7 @@ public class IABrainManager : MonoBehaviour
         if (unitToMove != null)
         {
             Debug.Log($"IA: Unidad más cercana al threat {threat.name} seleccionada: {unitToMove.name}, distancia: {minDist}");
+            unitToMove.isLockedOnSpecialNode = false;
             yield return StartCoroutine(MoveUnitToThreat(unitToMove, threat));
         }
         else
@@ -492,6 +496,7 @@ public class IABrainManager : MonoBehaviour
         {
             if (u == null || !u) continue;
             if (u.isPendingTarget) continue;
+            if (u.isLockedOnSpecialNode) continue;
             // Si no hay energía no intento mover
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
@@ -518,6 +523,7 @@ public class IABrainManager : MonoBehaviour
         {
             if (u == null || !u) continue;
             if (u.isPendingTarget) continue;
+            if (u.isLockedOnSpecialNode) continue;
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Rangers {u.gameObject.name}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
@@ -560,8 +566,7 @@ public class IABrainManager : MonoBehaviour
             foreach (Units u in allUnits)
             {
                 if (u == null || !u) continue;
-                if (u is Defenders && NodeManager.GetHealthNodes().Contains(u.currentNode)) continue;
-                if (u is Ranger && NodeManager.GetResourcesNode().Contains(u.currentNode)) continue;
+                if (u.isLockedOnSpecialNode)continue;
                 int energyAvailable = EnergyManager.instance.enemyCurrentEnergy;
                 if (energyAvailable <= 0) break;
                 if (u is Attackers)
@@ -598,6 +603,7 @@ public class IABrainManager : MonoBehaviour
             foreach (Units u in allUnits)
             {
                 if (u == null || !u) continue;
+                if (u.isLockedOnSpecialNode) continue;
                 int moveEnergy = Mathf.Min(EnergyManager.instance.enemyCurrentEnergy, 1); // 1 paso a la vez
                 if (moveEnergy <= 0) continue;
                 if (u is Attackers)
@@ -666,16 +672,24 @@ public class IABrainManager : MonoBehaviour
         if (u == null || u.currentNode == null) yield break;
         if (u is Ranger r&& NodeManager.GetResourcesNode().Contains(u.currentNode)&& !r.hasCollectedThisTurn)
         {
-            r.hasCollectedThisTurn = true;
-            ResourcesManager.instance.StartRecolectedResources(r);
-            yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
-            UpgradeManager.instance.UpgradeEnemyUnits();
+            r.isLockedOnSpecialNode = true;
+            if (!r.hasCollectedThisTurn)
+            {
+                r.hasCollectedThisTurn = true;
+                ResourcesManager.instance.StartRecolectedResources(r);
+                yield return new WaitUntil(() => !ResourcesManager.instance.onColectedResources);
+                UpgradeManager.instance.UpgradeEnemyUnits();
+            }
         }
         if (u is Defenders d&& NodeManager.GetHealthNodes().Contains(u.currentNode)&& !d.hasHealthedTowerThisTurn)
         {
-            d.hasHealthedTowerThisTurn = true;
-            HealthTowerManager.instance.StartRecolectedHealth(d);
-            yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            d.isLockedOnSpecialNode = true;
+            if (!d.hasHealthedTowerThisTurn)
+            {
+                d.hasHealthedTowerThisTurn = true;
+                HealthTowerManager.instance.StartRecolectedHealth(d);
+                yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+            }
         }
         if (TowerManager.instance.TryGetTowerAtNode(u.currentNode, out Tower tower)&& !u.hasAttackedTowerThisTurn&& TowerManager.instance.CanUnitAttackTower(u, tower))
         {
