@@ -14,6 +14,7 @@ public class Tower : MonoBehaviour
     private GlowTower glow;
     private bool isHovered = false;
     private ParticleSystem _healtParticles;
+    private ParticleSystem _damageParticles;
     private void Awake()
     {
         glow = GetComponent<GlowTower>();
@@ -26,6 +27,11 @@ public class Tower : MonoBehaviour
         {
             Debug.LogWarning("ParticleSystem de curación no asignado en " + name);
         }
+        _damageParticles = transform.GetChild(1).GetComponent<ParticleSystem>();
+        if (_damageParticles == null)
+        {
+            Debug.LogWarning("ParticleSystem de destruccion no asignado en " + name);
+        }
     }
     private void Update()
     {
@@ -37,6 +43,11 @@ public class Tower : MonoBehaviour
     }
     public void TakeDamage(int amount)
     {
+        if (_damageParticles != null)
+        {
+            _damageParticles.Play();
+        }
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("TowerImpact"), 1f, false);
         currentHealth -= amount;
         if (currentHealth <= 0 && !isDestroyed)
         {

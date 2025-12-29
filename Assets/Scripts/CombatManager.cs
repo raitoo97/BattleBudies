@@ -160,7 +160,6 @@ public class CombatManager : MonoBehaviour
                 }
             }
             pendingDamage = 0;
-            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("TowerImpact"), 1f, false);
             attackerDice.ResetDicePosition();
             remainingDice--;
             if (attacker.isPlayerUnit)
@@ -231,7 +230,6 @@ public class CombatManager : MonoBehaviour
                 }
             }
             pendingDamage = 0;
-            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("TowerImpact"), 1f, false);
             attackerDice.ResetDicePosition();
             remainingDice--;
             CanvasManager.instance.ShowTowerCombat(true, attacker,attacker.isPlayerUnit ? remainingDice : 0,!attacker.isPlayerUnit ? remainingDice : 0);
