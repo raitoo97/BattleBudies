@@ -18,6 +18,17 @@ public class IAMoveToResources : MonoBehaviour
     public IEnumerator MoveSingleUnit(Units enemy, int maxEnergy)
     {
         if (enemy == null) yield break;
+        if (enemy.isLockedOnSpecialNode)
+        {
+            actionInProgress = false;
+            yield break;
+        }
+        if (enemy is Ranger r &&enemy.currentNode != null &&NodeManager.GetResourcesNode().Contains(enemy.currentNode))
+        {
+            r.isLockedOnSpecialNode = true;
+            actionInProgress = false;
+            yield break;
+        }
         yield return new WaitUntil(() => isBusy());
         movedAnyUnit = false;
         actionInProgress = true;
