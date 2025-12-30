@@ -57,6 +57,52 @@ public class IAPlayCards : MonoBehaviour
         yield return new WaitUntil(() => !CardPlayManager.instance.placingMode);
         yield return new WaitForSeconds(2f);
     }
+    public IEnumerator PlayOneCard_NearThreat(Units threat)
+    {
+        Transform hand = DeckManager.instance.enemyHand;
+        CardInteraction cardToPlay = GetCardToPlay(hand);
+        if (cardToPlay == null) yield break;
+        SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CardPlay"), 1f, false);
+        //nodo más cercano a la amenaza en fila 14
+        Node spawnNode = GetClosestEmptyNodeOnRowToThreat(14, threat);
+        if (spawnNode == null)
+        {
+            spawnNode = NodeManager.GetRandomEmptyNodeOnRow(14);
+        }
+
+        if (spawnNode == null)
+        {
+            Debug.LogWarning("IA: No hay nodos disponibles en fila 14");
+            yield break;
+        }
+        yield return new WaitForSeconds(1f);
+        CardPlayManager.instance.GetcurrentUIcard = cardToPlay;
+        CardPlayManager.instance.GetcurrentCardData =cardToPlay.GetComponent<UICard>().cardData;
+        CardPlayManager.instance.GetselectedNode = spawnNode;
+        CardPlayManager.instance.placingMode = true;
+        CardPlayManager.instance.PlaceUnitAtNode();
+        yield return new WaitUntil(() => !CardPlayManager.instance.placingMode);
+        yield return new WaitForSeconds(0.5f);
+    }
+    private Node GetClosestEmptyNodeOnRowToThreat(int row, Units threat)
+    {
+        if (threat == null) return null;
+        Node bestNode = null;
+        float minDist = float.MaxValue;
+        foreach (Node node in NodeManager.GetAllNodes())
+        {
+            if (node == null) continue;
+            if (node.gridIndex.x != row) continue;
+            if (!node.IsEmpty() || node._isBlock) continue;
+            float dist = Vector3.Distance(node.transform.position,threat.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                bestNode = node;
+            }
+        }
+        return bestNode;
+    }
     private CardInteraction GetCardToPlay(Transform hand)
     {
         CardInteraction cardToPlay = null;

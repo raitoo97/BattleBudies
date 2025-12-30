@@ -7,6 +7,7 @@ public class IABrainManager : MonoBehaviour
     private float chanceToPlayCards = 0.85f;
     private int maxStepsPerUnit = 3;
     [SerializeField]private float defendTriggerDistance;
+    private bool reactedToSpecialNodeThisTurn = false;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -77,6 +78,7 @@ public class IABrainManager : MonoBehaviour
             u.hasHealthedTowerThisTurn = false;
             u.hasAttackedTowerThisTurn = false;
         }
+        reactedToSpecialNodeThisTurn = false;
         CardPlayManager.instance?.HideAllHandsAtAITurn();
         EnergyManager.instance?.RefillEnemyEnergy();
         DeckManager.instance?.DrawEnemyCard();
@@ -110,43 +112,27 @@ public class IABrainManager : MonoBehaviour
     private bool IsPlayerUsingSpecialNode(out Units target)
     {
         target = null;
-        List<Node> resourceNodes = NodeManager.GetResourcesNode();
-        List<Node> healthNodes = NodeManager.GetHealthNodes();
-        Units[] allUnits = FindObjectsOfType<Units>();
-        foreach (Units u in allUnits)
+        Units rangerOnResource = null;
+        Units defenderOnHealth = null;
+        foreach (Units u in FindObjectsOfType<Units>())
         {
-            if (u == null || !u.isPlayerUnit || u.currentNode == null)
-                continue;
-            if (u is Ranger && resourceNodes.Contains(u.currentNode))
-            {
-                print("Ranger detectado en nodo de recursos: " + u.name);
-                bool iaHasRanger = false;
-                foreach (Units unit in allUnits)
-                {
-                    if (!unit.isPlayerUnit && unit is Ranger)
-                    {
-                        iaHasRanger = true;
-                        break;
-                    }
-                }
-                if (iaHasRanger)
-                {
-                    print("IA ya tiene un Ranger, no invoca otro");
-                }
-                else
-                {
-                    print("IA NO tiene un Ranger, trata de invocar uno");
-                    StartCoroutine(IAPlayCards.instance?.PlayOneCard_PrioritizeRanger());
-                }
-                target = u;
-                return true;
-            }
-            if (u is Defenders && healthNodes.Contains(u.currentNode))
-            {
-                print("Defender detectado en nodo de recursos: " + u.name);
-                target = u;
-                return true;
-            }
+            if (u == null || !u.isPlayerUnit || u.currentNode == null) continue;
+            if (u is Ranger && NodeManager.GetResourcesNode().Contains(u.currentNode))
+                rangerOnResource = u;
+            else if (u is Defenders && NodeManager.GetHealthNodes().Contains(u.currentNode))
+                defenderOnHealth = u;
+        }
+        if (rangerOnResource != null)
+        {
+            Debug.Log("IA: Ranger del jugador en nodo de recursos objetivo detectado");
+            target = rangerOnResource;
+            return true;
+        }
+        if (defenderOnHealth != null)
+        {
+            Debug.Log("IA: Defender del jugador en nodo de vida objetivo detectado");
+            target = defenderOnHealth;
+            return true;
         }
         return false;
     }
@@ -238,7 +224,7 @@ public class IABrainManager : MonoBehaviour
                         }
                     }
                 }
-                // Prioridad 3: Rangers si no hay Attackers ni Defenders
+                // Prioridad 3: no mando nada si no hay Attackers ni Defenders
                 if (bestUnit == null)
                 {
                     Debug.Log("IA: No hay Attackers o Defenders disponibles para enviar al nodo de salud");
@@ -432,15 +418,21 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator IACheckEnemies()
     {
+        if (reactedToSpecialNodeThisTurn)yield break;
         Units threat;
         if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
+            reactedToSpecialNodeThisTurn = true;
             yield return StartCoroutine(MoveAllUnitsToThreat(threat));
+            yield break;
         }
+
         Units specialTarget;
         if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
+            reactedToSpecialNodeThisTurn = true;
             yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
+            yield break;
         }
     }
     private IEnumerator HandleUnitsMoves(List<Attackers> attackers,List<Defenders> defenders,List<Ranger> rangers,int totalUnits)
