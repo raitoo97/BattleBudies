@@ -3795,6 +3795,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defendTriggerDistance: 90
+  maxEnemyUnits: 8
 --- !u!114 &563951300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10127,7 +10128,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1537052781}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GORDAAAAAAAAAAAAAA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
