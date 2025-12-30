@@ -8,6 +8,7 @@ public class IABrainManager : MonoBehaviour
     private int maxStepsPerUnit = 3;
     [SerializeField]private float defendTriggerDistance;
     private bool reactedToSpecialNodeThisTurn = false;
+    [SerializeField] private int maxEnemyUnits = 8;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -346,6 +347,7 @@ public class IABrainManager : MonoBehaviour
         {
             if (u != null && !u.isPlayerUnit)
             {
+                if (u is Ranger) continue;
                 float dist = Vector3.Distance(u.transform.position, threat.transform.position);
                 if (dist < minDist)
                 {

@@ -3766,7 +3766,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxEnergy: 10
-  currentEnergy: 0
+  currentEnergy: 10
   enemyMaxEnergy: 10
   enemyCurrentEnergy: 0
 --- !u!114 &563951298
