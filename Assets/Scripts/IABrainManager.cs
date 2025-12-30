@@ -36,8 +36,13 @@ public class IABrainManager : MonoBehaviour
         {
             Debug.Log("IA no tiene unidades: juega cartas iniciales");
             yield return StartCoroutine(IACheckEnemies());
-            yield return new WaitForSeconds(4f);
-            yield return StartCoroutine(IAPlayCards.instance?.PlayCards());
+            if (reactedToSpecialNodeThisTurn)
+            {
+                Debug.Log("IA reaccionó a amenaza: corta el turno");
+                yield break;
+            }
+            yield return new WaitForSeconds(1f);
+            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
             List<Units> newlySpawnedUnits = new List<Units>();
@@ -423,6 +428,10 @@ public class IABrainManager : MonoBehaviour
         if (IsPlayerThreateningTower(out threat) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
             reactedToSpecialNodeThisTurn = true;
+            if (EnergyManager.instance.enemyCurrentEnergy > 0)
+            {
+                yield return StartCoroutine(IAPlayCards.instance.PlayOneCard_NearThreat(threat));
+            }
             yield return StartCoroutine(MoveAllUnitsToThreat(threat));
             yield break;
         }
