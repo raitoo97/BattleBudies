@@ -43,7 +43,14 @@ public class IABrainManager : MonoBehaviour
                 yield break;
             }
             yield return new WaitForSeconds(1f);
-            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            if (CanIAPlayCards(totalUnits))
+            {
+                yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            }
+            else
+            {
+                Debug.Log("IA: Demasiadas unidades, prioriza movimiento y ataque");
+            }
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
             List<Units> newlySpawnedUnits = new List<Units>();
@@ -699,6 +706,10 @@ public class IABrainManager : MonoBehaviour
             u.hasAttackedTowerThisTurn = true;
             yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(u, tower));
         }
+    }
+    private bool CanIAPlayCards(int totalUnits)
+    {
+        return totalUnits < maxEnemyUnits;
     }
     public bool isBusy()
     {
