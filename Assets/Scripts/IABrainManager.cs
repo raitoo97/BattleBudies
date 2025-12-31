@@ -75,7 +75,7 @@ public class IABrainManager : MonoBehaviour
         allUnits.RemoveAll(u => u == null || !u);
         yield return StartCoroutine(UseResidualEnergy(allUnits));
         yield return new WaitUntil(() => isBusy());
-        GameManager.instance.StartPlayerTurn();
+        BellEndTurn.instance.RingFromIA();
     }
     IEnumerator InitializedTurn()
     {
