@@ -79,6 +79,7 @@ public class IABrainManager : MonoBehaviour
     }
     IEnumerator InitializedTurn()
     {
+        ClearPendingTargetsIfPlayerLeftSpecialNode();
         ClearAllPaths();
         foreach (Ranger r in FindObjectsOfType<Ranger>())
         {
@@ -710,6 +711,22 @@ public class IABrainManager : MonoBehaviour
     private bool CanIAPlayCards(int totalUnits)
     {
         return totalUnits < maxEnemyUnits;
+    }
+    private void ClearPendingTargetsIfPlayerLeftSpecialNode()
+    {
+        Units playerTarget;
+        bool playerStillOnSpecialNode = IsPlayerUsingSpecialNode(out playerTarget);
+        if (playerStillOnSpecialNode) return;
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u == null || u.isPlayerUnit) continue;
+            if (u.isPendingTarget)
+            {
+                u.isPendingTarget = false;
+                u.isLockedOnSpecialNode = false;
+            }
+        }
+        Debug.Log("IA: Inicio de turno player no está en nodo especial, se limpian pendingTarget");
     }
     public bool isBusy()
     {
