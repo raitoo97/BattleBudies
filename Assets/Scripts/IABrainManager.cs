@@ -8,6 +8,7 @@ public class IABrainManager : MonoBehaviour
     private int maxStepsPerUnit = 3;
     [SerializeField]private float defendTriggerDistance;
     private bool reactedToSpecialNodeThisTurn = false;
+    [SerializeField] private int maxEnemyUnits = 8;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -42,7 +43,14 @@ public class IABrainManager : MonoBehaviour
                 yield break;
             }
             yield return new WaitForSeconds(1f);
-            yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            if (CanIAPlayCards(totalUnits))
+            {
+                yield return StartCoroutine(IAPlayCards.instance.PlayCards());
+            }
+            else
+            {
+                Debug.Log("IA: Demasiadas unidades, prioriza movimiento y ataque");
+            }
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
             List<Units> newlySpawnedUnits = new List<Units>();
@@ -67,10 +75,11 @@ public class IABrainManager : MonoBehaviour
         allUnits.RemoveAll(u => u == null || !u);
         yield return StartCoroutine(UseResidualEnergy(allUnits));
         yield return new WaitUntil(() => isBusy());
-        GameManager.instance.StartPlayerTurn();
+        BellEndTurn.instance.RingFromIA();
     }
     IEnumerator InitializedTurn()
     {
+        ClearPendingTargetsIfPlayerLeftSpecialNode();
         ClearAllPaths();
         foreach (Ranger r in FindObjectsOfType<Ranger>())
         {
@@ -346,6 +355,7 @@ public class IABrainManager : MonoBehaviour
         {
             if (u != null && !u.isPlayerUnit)
             {
+                if (u is Ranger) continue;
                 float dist = Vector3.Distance(u.transform.position, threat.transform.position);
                 if (dist < minDist)
                 {
@@ -697,6 +707,26 @@ public class IABrainManager : MonoBehaviour
             u.hasAttackedTowerThisTurn = true;
             yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(u, tower));
         }
+    }
+    private bool CanIAPlayCards(int totalUnits)
+    {
+        return totalUnits < maxEnemyUnits;
+    }
+    private void ClearPendingTargetsIfPlayerLeftSpecialNode()
+    {
+        Units playerTarget;
+        bool playerStillOnSpecialNode = IsPlayerUsingSpecialNode(out playerTarget);
+        if (playerStillOnSpecialNode) return;
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u == null || u.isPlayerUnit) continue;
+            if (u.isPendingTarget)
+            {
+                u.isPendingTarget = false;
+                u.isLockedOnSpecialNode = false;
+            }
+        }
+        Debug.Log("IA: Inicio de turno player no está en nodo especial, se limpian pendingTarget");
     }
     public bool isBusy()
     {
