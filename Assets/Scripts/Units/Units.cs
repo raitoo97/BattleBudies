@@ -121,12 +121,25 @@ public abstract class Units : MonoBehaviour
     }
     public void SetCurrentNode(Node newNode)
     {
-        if (currentNode != null && currentNode.unitOnNode == this.gameObject)
-            currentNode.unitOnNode = null;
+        // Salida
+        if (currentNode != null)
+        {
+            if (this is Defenders defender && currentNode._isDefendTowerNode)
+            {
+                defender.OnExitHealNode();
+            }
+            if (currentNode.unitOnNode == this.gameObject)
+                currentNode.unitOnNode = null;
+        }
         currentNode = newNode;
+        // Entrada
         if (currentNode != null)
         {
             currentNode.unitOnNode = this.gameObject;
+            if (this is Defenders defender && currentNode._isDefendTowerNode)
+            {
+                defender.OnEnterHealNode();
+            }
         }
     }
     public bool PathEmpty()
