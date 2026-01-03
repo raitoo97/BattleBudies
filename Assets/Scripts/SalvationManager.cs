@@ -96,6 +96,7 @@ public class SalvationManager : MonoBehaviour
             if (safeNodeBeforeRoll != null)
             {
                 SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("ExplosionImpact"), 1f, false);
+                ParticleManager.instance.PlayParticleEffect(ParticleType.Explosion, unit.transform,Vector3.up + Vector3.forward * 2);
                 unit.SetCurrentNode(safeNodeBeforeRoll);
                 unit.transform.position = unit.GetSnappedPosition(safeNodeBeforeRoll);
                 unit.TakeDamage(3);

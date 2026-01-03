@@ -5,6 +5,7 @@ using UnityEngine;
 public enum ParticleType
 {
     DeathUnit,
+    Explosion
 }
 public class ParticleManager : MonoBehaviour
 {
@@ -30,7 +31,7 @@ public class ParticleManager : MonoBehaviour
         var entry = particleSystemDict[type];
         if (entry != null && entry.particleSystemPrefab != null)
         {
-            ParticleSystem ps = Instantiate(entry.particleSystemPrefab, pos.position, Quaternion.identity);
+            ParticleSystem ps = Instantiate(entry.particleSystemPrefab, pos.position + offset, Quaternion.identity);
             ps.Play();
             Destroy(ps.gameObject, ps.main.duration);
         }
