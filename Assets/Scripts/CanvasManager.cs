@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 public class CanvasManager : MonoBehaviour
 {
-    //PreHover
     public static CanvasManager instance;
     [Header("Energy")]
     public List<GameObject> energyPlayer = new List<GameObject>();
@@ -41,6 +40,9 @@ public class CanvasManager : MonoBehaviour
     public Button changeCameraButton;
     public TextMeshProUGUI changeCameraText;
     public TextMeshProUGUI changeCameraTextRotation;
+    [Header("MapObjects")]
+    public GameObject _panelObjects;
+    public TextMeshProUGUI mapText;
     private void Awake()
     {
         if (instance == null) instance = this;
