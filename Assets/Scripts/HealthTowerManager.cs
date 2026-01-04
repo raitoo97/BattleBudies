@@ -31,6 +31,36 @@ public class HealthTowerManager : MonoBehaviour
     {
         if (onColectedHealth) return;
         if (defender == null) return;
+        bool hasDamagedTower = false;
+        if (defender.isPlayerUnit && GameManager.instance.isPlayerTurn)
+        {
+            foreach (var t in TowerManager.instance.playerTowers)
+            {
+                if (t.currentHealth < t.maxHealth)
+                {
+                    Debug.Log("Hay torres heridas, se inicia curación del player");
+                    hasDamagedTower = true;
+                    break;
+                }
+            }
+        }
+        else if(!defender.isPlayerUnit && !GameManager.instance.isPlayerTurn)
+        {
+            foreach (var t in TowerManager.instance.enemyTowers)
+            {
+                if (t.currentHealth < t.maxHealth)
+                {
+                    hasDamagedTower = true;
+                    Debug.Log("Hay torres heridas, se inicia curación del enemigo");
+                    break;
+                }
+            }
+        }
+        if (!hasDamagedTower)
+        {
+            Debug.Log("No hay torres heridas, no se inicia curación");
+            return; // Salimos si no hay torres heridas
+        }
         onColectedHealth = true;
         diceRoll = defender.diceInstance;
         pendingHealth = 0;
