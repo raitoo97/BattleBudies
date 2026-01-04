@@ -85,15 +85,21 @@ public class Node : MonoBehaviour
         {
             _cost+= 3;
             _isDangerous = true;
+            this.gameObject.layer = 13;// DangerNodeText
         }
         if (collision.gameObject.layer == 9)//resources
         {
             _isBlock = true;
             _isResourceNode = true;
+            foreach(var neighboard in _gridNeighbors)
+            {
+                neighboard.gameObject.layer = 11;// ResourceNodeText
+            }
         }
         if (collision.gameObject.layer == 10)//resources
         {
             _isDefendTowerNode = true;
+            this.gameObject.layer = 12;// HelathNodeText
         }
     }
     public float Cost { get => _cost; }

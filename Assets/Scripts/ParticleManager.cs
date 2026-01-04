@@ -1,10 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public enum ParticleType
 {
     DeathUnit,
+    Explosion,
+    HealNode
 }
 public class ParticleManager : MonoBehaviour
 {
@@ -30,7 +31,7 @@ public class ParticleManager : MonoBehaviour
         var entry = particleSystemDict[type];
         if (entry != null && entry.particleSystemPrefab != null)
         {
-            ParticleSystem ps = Instantiate(entry.particleSystemPrefab, pos.position, Quaternion.identity);
+            ParticleSystem ps = Instantiate(entry.particleSystemPrefab, pos.position + offset, Quaternion.identity);
             ps.Play();
             Destroy(ps.gameObject, ps.main.duration);
         }
@@ -39,6 +40,26 @@ public class ParticleManager : MonoBehaviour
             Debug.LogWarning("Particle system for type " + type + " not found or prefab is null.");
         }
     }
+    public ParticleSystem SpawnPersistentParticle(ParticleType type,Transform pos,Vector3 offset = default)
+    {
+        if (!particleSystemDict.ContainsKey(type))
+        {
+            Debug.LogWarning("Particle type not found: " + type);
+            return null;
+        }
+        var entry = particleSystemDict[type];
+        if (entry.particleSystemPrefab == null)
+            return null;
+        ParticleSystem ps = Instantiate(entry.particleSystemPrefab,pos.position + offset,Quaternion.identity);
+        ps.Play();
+        return ps;
+    }
+    public void StopPersistentParticle(ParticleSystem ps)
+    {
+        if (ps == null) return;
+        Destroy(ps.gameObject);
+    }
+
 }
 [Serializable]
 public class ParticleSystemEntry

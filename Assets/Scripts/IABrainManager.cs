@@ -128,6 +128,7 @@ public class IABrainManager : MonoBehaviour
         target = null;
         Units rangerOnResource = null;
         Units defenderOnHealth = null;
+        bool IaPossesRanger = false;
         foreach (Units u in FindObjectsOfType<Units>())
         {
             if (u == null || !u.isPlayerUnit || u.currentNode == null) continue;
@@ -136,11 +137,22 @@ public class IABrainManager : MonoBehaviour
             else if (u is Defenders && NodeManager.GetHealthNodes().Contains(u.currentNode))
                 defenderOnHealth = u;
         }
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u != null && !u.isPlayerUnit && u is Ranger)
+            {
+                IaPossesRanger = true;
+                break;
+            }
+        }
         if (rangerOnResource != null)
         {
-            Debug.Log("IA: Ranger del jugador en nodo de recursos objetivo detectado");
-            target = rangerOnResource;
-            return true;
+            if (IAPlayCards.instance.CanPlayRanger() || IaPossesRanger)
+            {
+                Debug.Log("IA: Ranger del jugador en nodo de recursos objetivo detectado");
+                target = rangerOnResource;
+                return true;
+            }
         }
         if (defenderOnHealth != null)
         {
@@ -450,6 +462,13 @@ public class IABrainManager : MonoBehaviour
         if (IsPlayerUsingSpecialNode(out specialTarget) && EnergyManager.instance.enemyCurrentEnergy > 0)
         {
             reactedToSpecialNodeThisTurn = true;
+            int playerRangers = GetPlayerRangerCount();
+            int enemyRangers = GetEnemyRangerCount();
+            int toInvoke = playerRangers - enemyRangers;
+            if (toInvoke > 0)
+            {
+                yield return StartCoroutine(InvokeRangersAsPossible(toInvoke, specialTarget));
+            }
             yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
             yield break;
         }
@@ -555,22 +574,26 @@ public class IABrainManager : MonoBehaviour
         if (allUnits == null || allUnits.Count == 0) yield break;
         int safetyCounter = 0;
         bool anyMoved;
+        bool reactedToThreat = false;
+        bool reactedToSpecialNode = false;
         do
         {
             anyMoved = false;
             safetyCounter++;
             if (safetyCounter > 50) break;
             Units threat;
-            if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerThreateningTower(out threat))
+            if (!reactedToThreat && EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerThreateningTower(out threat))
             {
                 yield return StartCoroutine(MoveAllUnitsToThreat(threat));
+                reactedToThreat = true;
                 anyMoved = true;
                 continue;
             }
             Units specialTarget;
-            if (EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerUsingSpecialNode(out specialTarget))
+            if (!reactedToSpecialNode && EnergyManager.instance.enemyCurrentEnergy > 0 && IsPlayerUsingSpecialNode(out specialTarget))
             {
                 yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
+                reactedToSpecialNode = true;
                 anyMoved = true;
                 continue;
             }
@@ -714,20 +737,68 @@ public class IABrainManager : MonoBehaviour
     }
     private void ClearPendingTargetsIfPlayerLeftSpecialNode()
     {
-        Units playerTarget;
-        bool playerStillOnSpecialNode = IsPlayerUsingSpecialNode(out playerTarget);
+        bool playerStillOnSpecialNode = false;
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u == null || !u.isPlayerUnit || u.currentNode == null) continue;
+            // Check PASIVO: solo detectar, no reaccionar
+            if ((u is Ranger && NodeManager.GetResourcesNode().Contains(u.currentNode)) ||(u is Defenders && NodeManager.GetHealthNodes().Contains(u.currentNode)))
+            {
+                playerStillOnSpecialNode = true;
+                break;
+            }
+        }
+        // Si el player sigue en un nodo especial, no limpiamos nada
         if (playerStillOnSpecialNode) return;
+        // Limpieza segura de targets pendientes
         foreach (Units u in FindObjectsOfType<Units>())
         {
             if (u == null || u.isPlayerUnit) continue;
-            if (u.isPendingTarget)
+
+            if (u.isPendingTarget || u.isLockedOnSpecialNode)
             {
                 u.isPendingTarget = false;
                 u.isLockedOnSpecialNode = false;
             }
         }
-        Debug.Log("IA: Inicio de turno player no está en nodo especial, se limpian pendingTarget");
+        Debug.Log("IA: Inicio de turno — player NO está en nodo especial, se limpian pendingTarget");
     }
+    #region RangerCountHelpers
+    int GetPlayerRangerCount()
+    {
+        int count = 0;
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u != null && u.isPlayerUnit && u is Ranger)
+                count++;
+        }
+        return count;
+    }
+    int GetEnemyRangerCount()
+    {
+        int count = 0;
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u != null && !u.isPlayerUnit && u is Ranger)
+                count++;
+        }
+        return count;
+    }
+    private IEnumerator InvokeRangersAsPossible(int amount, Units rangerTarget)
+    {
+        int maxRangersAllowed = 2;
+        for (int i = 0; i < amount; i++)
+        {
+            if (GetEnemyRangerCount() >= maxRangersAllowed)
+            {
+                Debug.Log("IA: ya hay 2 Rangers enemigos, no invoca más");
+                yield break;
+            }
+            if (!IAPlayCards.instance.CanPlayRanger()) yield break;
+            yield return StartCoroutine(IAPlayCards.instance.PlayOneCard_PrioritizeRanger(rangerTarget));
+        }
+    }
+    #endregion
     public bool isBusy()
     {
         return !CombatManager.instance.GetCombatActive
