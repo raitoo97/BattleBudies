@@ -197,4 +197,15 @@ public class IAPlayCards : MonoBehaviour
         yield return new WaitUntil(() => !CardPlayManager.instance.placingMode);
         yield return new WaitForSeconds(2f);
     }
+    public bool CanPlayRanger()
+    {
+        foreach (Transform c in DeckManager.instance.enemyHand)
+        {
+            UICard card = c.GetComponent<UICard>();
+            if (card != null &&card.cardData.unitType == UnitType.Ranger &&card.cardData.cost <= EnergyManager.instance.enemyCurrentEnergy)
+                return true;
+        }
+        Debug.Log("IA: No puede jugar cartas de Ranger porque no tiene.");
+        return false;
+    }
 }
