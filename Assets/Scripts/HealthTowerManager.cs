@@ -87,6 +87,12 @@ public class HealthTowerManager : MonoBehaviour
             int dicesLeft = numberOfDiceToRoll - i;
             if (defender.isPlayerUnit)
             {
+                bool anyDamagedTower = TowerManager.instance.playerTowers.Exists(t => t.currentHealth < t.maxHealth);
+                if (!anyDamagedTower)
+                {
+                    Debug.Log("Todas las torres ya están curadas, saliendo de la corutina");
+                    break; // Sale del for, no muestra botón
+                }
                 CanvasManager.instance.rollClicked = false;
                 CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: true, result: -1, dicesLeft: dicesLeft);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
@@ -104,6 +110,15 @@ public class HealthTowerManager : MonoBehaviour
             {
                 if (defender.isPlayerUnit)
                 {
+                    // Re-verificacion por si alguna torre se curó antes
+                    bool anyDamagedTower = TowerManager.instance.playerTowers.Exists(t => t.currentHealth < t.maxHealth);
+                    if (!anyDamagedTower)
+                    {
+                        Debug.Log("Todas las torres ya están curadas, se salta la selección");
+                        pendingHealth = 0;
+                        break; // salimos del for
+                    }
+
                     yield return StartCoroutine(WaitForPlayerSelectTower((Tower selectedTower) =>
                     {
                         if (selectedTower != null)
@@ -140,7 +155,7 @@ public class HealthTowerManager : MonoBehaviour
                 if (Physics.Raycast(ray, out RaycastHit hit))
                 {
                     Tower t = hit.collider.GetComponent<Tower>();
-                    if (t != null && t.faction == Faction.Player)
+                    if (t != null && t.faction == Faction.Player && t.currentHealth < t.maxHealth)
                     {
                         selected = t;
                     }
