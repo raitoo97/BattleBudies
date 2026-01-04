@@ -467,7 +467,7 @@ public class IABrainManager : MonoBehaviour
             int toInvoke = playerRangers - enemyRangers;
             if (toInvoke > 0)
             {
-                yield return StartCoroutine(InvokeRangersAsPossible(toInvoke));
+                yield return StartCoroutine(InvokeRangersAsPossible(toInvoke, specialTarget));
             }
             yield return StartCoroutine(SendUnitToKillTarget(specialTarget));
             yield break;
@@ -784,13 +784,13 @@ public class IABrainManager : MonoBehaviour
         }
         return count;
     }
-    private IEnumerator InvokeRangersAsPossible(int amount)
+    private IEnumerator InvokeRangersAsPossible(int amount, Units rangerTarget)
     {
         for (int i = 0; i < amount; i++)
         {
             if (!IAPlayCards.instance.CanPlayRanger())
                 yield break;
-            yield return StartCoroutine(IAPlayCards.instance.PlayOneCard_PrioritizeRanger());
+            yield return StartCoroutine(IAPlayCards.instance.PlayOneCard_PrioritizeRanger(rangerTarget));
         }
     }
     #endregion

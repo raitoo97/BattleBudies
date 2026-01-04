@@ -180,14 +180,22 @@ public class IAPlayCards : MonoBehaviour
         }
         return cardToPlay;
     }
-    public IEnumerator PlayOneCard_PrioritizeRanger()
+    public IEnumerator PlayOneCard_PrioritizeRanger(Units rangerTarget)
     {
         Transform hand = DeckManager.instance.enemyHand;
         CardInteraction cardToPlay = GetCardToPlay_PrioritizeRanger(hand);
         if (cardToPlay == null) yield break;
         SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CardPlay"), 1f, false);
-        Node spawnNode = NodeManager.GetRandomEmptyNodeOnRow(14);
-        if (spawnNode == null) yield break;
+        Node spawnNode = GetClosestEmptyNodeOnRowToThreat(14, rangerTarget);
+        if (spawnNode == null)
+        {
+            spawnNode = NodeManager.GetRandomEmptyNodeOnRow(14);
+        }
+        if (spawnNode == null)
+        {
+            Debug.LogWarning("IA: No hay nodos disponibles en fila 14");
+            yield break;
+        }
         yield return new WaitForSeconds(1f);
         CardPlayManager.instance.GetcurrentUIcard = cardToPlay;
         CardPlayManager.instance.GetcurrentCardData = cardToPlay.GetComponent<UICard>().cardData;
@@ -195,7 +203,7 @@ public class IAPlayCards : MonoBehaviour
         CardPlayManager.instance.placingMode = true;
         CardPlayManager.instance.PlaceUnitAtNode();
         yield return new WaitUntil(() => !CardPlayManager.instance.placingMode);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
     }
     public bool CanPlayRanger()
     {
