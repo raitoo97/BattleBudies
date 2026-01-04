@@ -9,6 +9,7 @@ public class TowerManager : MonoBehaviour
     public List<Tower> enemyTowers = new();
     private Dictionary<Tower, HashSet<string>> attackNodes = new();
     private bool nodesRegistered = false;
+    private int towerAttackNodeLayer = 14;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -54,8 +55,21 @@ public class TowerManager : MonoBehaviour
     private void AddNodes(Tower t, params string[] nodes)
     {
         if (!attackNodes.ContainsKey(t)) attackNodes[t] = new HashSet<string>();
+        bool applyLayer = t.faction == Faction.Enemy;
         foreach (var n in nodes)
+        {
             attackNodes[t].Add(n);
+            // Parse "_x_y"
+            string[] parts = n.Split('_');
+            if (parts.Length != 3) continue;
+            if (!int.TryParse(parts[1], out int x)) continue;
+            if (!int.TryParse(parts[2], out int y)) continue;
+            Node node = NodeManager.GetAllNodes().Find(nd => nd.gridIndex.x == x && nd.gridIndex.y == y);
+            if (node != null && applyLayer)
+            {
+                node.gameObject.layer = towerAttackNodeLayer;
+            }
+        }
     }
     public bool CanUnitAttackTower(Units unit, Tower tower)
     {
