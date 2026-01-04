@@ -100,6 +100,12 @@ public class HealthTowerManager : MonoBehaviour
             }
             else
             {
+                bool anyDamagedTower = TowerManager.instance.enemyTowers.Exists(t => t.currentHealth < t.maxHealth);
+                if (!anyDamagedTower)
+                {
+                    Debug.Log("Todas las torres ya están curadas, saliendo de la corutina");
+                    break; // Sale del for, no muestra botón
+                }
                 CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: false, result: -1, dicesLeft: dicesLeft);
                 yield return new WaitForSeconds(0.5f);
             }
@@ -118,7 +124,6 @@ public class HealthTowerManager : MonoBehaviour
                         pendingHealth = 0;
                         break; // salimos del for
                     }
-
                     yield return StartCoroutine(WaitForPlayerSelectTower((Tower selectedTower) =>
                     {
                         if (selectedTower != null)
@@ -130,6 +135,14 @@ public class HealthTowerManager : MonoBehaviour
                 }
                 else
                 {
+                    // Re-verificacion por si alguna torre se curó antes
+                    bool anyDamagedTower = TowerManager.instance.enemyTowers.Exists(t => t.currentHealth < t.maxHealth);
+                    if (!anyDamagedTower)
+                    {
+                        Debug.Log("Todas las torres ya están curadas, se salta la selección");
+                        pendingHealth = 0;
+                        break; // salimos del for
+                    }
                     AddHealthTower(isPlayer: false, pendingHealth);
                 }
             }
