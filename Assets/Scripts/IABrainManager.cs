@@ -43,13 +43,13 @@ public class IABrainManager : MonoBehaviour
                 yield break;
             }
             yield return new WaitForSeconds(1f);
-            if (CanIAPlayCards(totalUnits))
+            if (CanInvokeMoreUnits())
             {
                 yield return StartCoroutine(IAPlayCards.instance.PlayCards());
             }
             else
             {
-                Debug.Log("IA: Demasiadas unidades, prioriza movimiento y ataque");
+                Debug.Log("IA: Ya tiene máximo de unidades, no juega cartas de invocación");
             }
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
@@ -484,7 +484,7 @@ public class IABrainManager : MonoBehaviour
         }
         //MOVIMIENTOS INDIVIDUALES NORMALES
         float random = Random.value;
-        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
             Debug.Log("IA decide jugar carta iniciar movimiento fichas");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
@@ -510,7 +510,7 @@ public class IABrainManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
         float random = Random.value;
-        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
             Debug.Log("IA decide jugar carta tras mover Attackers");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
@@ -536,7 +536,7 @@ public class IABrainManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
         float random = Random.value;
-        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
             Debug.Log("IA decide jugar carta tras mover Defender");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
@@ -563,7 +563,7 @@ public class IABrainManager : MonoBehaviour
         }
         UpgradeManager.instance.UpgradeEnemyUnits();
         float random = Random.value;
-        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
             Debug.Log("IA decide jugar carta tras mover Ranger");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
@@ -623,7 +623,7 @@ public class IABrainManager : MonoBehaviour
                 u.isPendingTarget = false;
                 if (anyMoved) break;
             }
-            if (!anyMoved && EnergyManager.instance.enemyCurrentEnergy > 0)
+            if (!anyMoved && EnergyManager.instance.enemyCurrentEnergy > 0 &&CanInvokeMoreUnits())
             {
                 yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
                 anyMoved = true;
@@ -650,7 +650,7 @@ public class IABrainManager : MonoBehaviour
             }
         }
         float random = Random.value;
-        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1)
+        if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
             Debug.Log("IA decide jugar carta tras mover Attackers");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
@@ -731,10 +731,6 @@ public class IABrainManager : MonoBehaviour
             yield return StartCoroutine(CombatManager.instance.StartCombatWithTowerAI_Coroutine(u, tower));
         }
     }
-    private bool CanIAPlayCards(int totalUnits)
-    {
-        return totalUnits < maxEnemyUnits;
-    }
     private void ClearPendingTargetsIfPlayerLeftSpecialNode()
     {
         bool playerStillOnSpecialNode = false;
@@ -763,7 +759,7 @@ public class IABrainManager : MonoBehaviour
         }
         Debug.Log("IA: Inicio de turno — player NO está en nodo especial, se limpian pendingTarget");
     }
-    #region RangerCountHelpers
+    #region UnitsCountHelpers
     int GetPlayerRangerCount()
     {
         int count = 0;
@@ -783,6 +779,16 @@ public class IABrainManager : MonoBehaviour
                 count++;
         }
         return count;
+    }
+    private bool CanInvokeMoreUnits()
+    {
+        int count = 0;
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u != null && !u.isPlayerUnit)
+                count++;
+        }
+        return count < maxEnemyUnits;
     }
     private IEnumerator InvokeRangersAsPossible(int amount, Units rangerTarget)
     {
