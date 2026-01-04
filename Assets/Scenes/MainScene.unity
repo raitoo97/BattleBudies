@@ -4307,7 +4307,6 @@ MonoBehaviour:
   - {fileID: 1424559025}
   - {fileID: 2023784090}
   - {fileID: 1086302019}
-  towerAttackNodeLayer: 11
 --- !u!114 &563951303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11244,37 +11243,6 @@ PrefabInstance:
       addedObject: {fileID: 404274247}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4143e5853258dae4c938aeec0dd46119, type: 3}
---- !u!1 &1537052780
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1537052781}
-  m_Layer: 0
-  m_Name: GORDAAAAAAAAAAAAAAPAMA
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1537052781
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1537052780}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -69.5, y: 15.12398, z: -71.6}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1540719047 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1307394776392956217, guid: 4c3bf4486704c084f9c9acb1df7ffcbf,
@@ -15935,10 +15903,9 @@ SceneRoots:
   - {fileID: 1613607758}
   - {fileID: 8210771769232108480}
   - {fileID: 1801075851}
-  - {fileID: 1738589249392455080}
-  - {fileID: 186942367}
-  - {fileID: 1571885260}
-  - {fileID: 1165260219}
   - {fileID: 1195250057}
   - {fileID: 1525578474}
-  - {fileID: 1537052781}
+  - {fileID: 1738589249392455080}
+  - {fileID: 1571885260}
+  - {fileID: 186942367}
+  - {fileID: 1165260219}
