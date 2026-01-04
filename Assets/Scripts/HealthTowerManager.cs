@@ -31,6 +31,36 @@ public class HealthTowerManager : MonoBehaviour
     {
         if (onColectedHealth) return;
         if (defender == null) return;
+        bool hasDamagedTower = false;
+        if (defender.isPlayerUnit && GameManager.instance.isPlayerTurn)
+        {
+            foreach (var t in TowerManager.instance.playerTowers)
+            {
+                if (t.currentHealth < t.maxHealth)
+                {
+                    Debug.Log("Hay torres heridas, se inicia curación del player");
+                    hasDamagedTower = true;
+                    break;
+                }
+            }
+        }
+        else if(!defender.isPlayerUnit && !GameManager.instance.isPlayerTurn)
+        {
+            foreach (var t in TowerManager.instance.enemyTowers)
+            {
+                if (t.currentHealth < t.maxHealth)
+                {
+                    hasDamagedTower = true;
+                    Debug.Log("Hay torres heridas, se inicia curación del enemigo");
+                    break;
+                }
+            }
+        }
+        if (!hasDamagedTower)
+        {
+            Debug.Log("No hay torres heridas, no se inicia curación");
+            return; // Salimos si no hay torres heridas
+        }
         onColectedHealth = true;
         diceRoll = defender.diceInstance;
         pendingHealth = 0;
@@ -57,6 +87,12 @@ public class HealthTowerManager : MonoBehaviour
             int dicesLeft = numberOfDiceToRoll - i;
             if (defender.isPlayerUnit)
             {
+                bool anyDamagedTower = TowerManager.instance.playerTowers.Exists(t => t.currentHealth < t.maxHealth);
+                if (!anyDamagedTower)
+                {
+                    Debug.Log("Todas las torres ya están curadas, saliendo de la corutina");
+                    break; // Sale del for, no muestra botón
+                }
                 CanvasManager.instance.rollClicked = false;
                 CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: true, result: -1, dicesLeft: dicesLeft);
                 yield return new WaitUntil(() => CanvasManager.instance.rollClicked);
@@ -64,6 +100,12 @@ public class HealthTowerManager : MonoBehaviour
             }
             else
             {
+                bool anyDamagedTower = TowerManager.instance.enemyTowers.Exists(t => t.currentHealth < t.maxHealth);
+                if (!anyDamagedTower)
+                {
+                    Debug.Log("Todas las torres ya están curadas, saliendo de la corutina");
+                    break; // Sale del for, no muestra botón
+                }
                 CanvasManager.instance.HealingTowerUI(true, defender, playerCanRoll: false, result: -1, dicesLeft: dicesLeft);
                 yield return new WaitForSeconds(0.5f);
             }
@@ -74,6 +116,14 @@ public class HealthTowerManager : MonoBehaviour
             {
                 if (defender.isPlayerUnit)
                 {
+                    // Re-verificacion por si alguna torre se curó antes
+                    bool anyDamagedTower = TowerManager.instance.playerTowers.Exists(t => t.currentHealth < t.maxHealth);
+                    if (!anyDamagedTower)
+                    {
+                        Debug.Log("Todas las torres ya están curadas, se salta la selección");
+                        pendingHealth = 0;
+                        break; // salimos del for
+                    }
                     yield return StartCoroutine(WaitForPlayerSelectTower((Tower selectedTower) =>
                     {
                         if (selectedTower != null)
@@ -85,6 +135,14 @@ public class HealthTowerManager : MonoBehaviour
                 }
                 else
                 {
+                    // Re-verificacion por si alguna torre se curó antes
+                    bool anyDamagedTower = TowerManager.instance.enemyTowers.Exists(t => t.currentHealth < t.maxHealth);
+                    if (!anyDamagedTower)
+                    {
+                        Debug.Log("Todas las torres ya están curadas, se salta la selección");
+                        pendingHealth = 0;
+                        break; // salimos del for
+                    }
                     AddHealthTower(isPlayer: false, pendingHealth);
                 }
             }
@@ -110,7 +168,7 @@ public class HealthTowerManager : MonoBehaviour
                 if (Physics.Raycast(ray, out RaycastHit hit))
                 {
                     Tower t = hit.collider.GetComponent<Tower>();
-                    if (t != null && t.faction == Faction.Player)
+                    if (t != null && t.faction == Faction.Player && t.currentHealth < t.maxHealth)
                     {
                         selected = t;
                     }

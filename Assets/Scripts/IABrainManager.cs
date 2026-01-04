@@ -8,7 +8,7 @@ public class IABrainManager : MonoBehaviour
     private int maxStepsPerUnit = 3;
     [SerializeField]private float defendTriggerDistance;
     private bool reactedToSpecialNodeThisTurn = false;
-    [SerializeField] private int maxEnemyUnits = 8;
+    private int maxEnemyUnits = 5;
     private void Awake()
     {
         if (instance == null) instance = this;

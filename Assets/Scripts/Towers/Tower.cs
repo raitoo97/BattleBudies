@@ -66,6 +66,7 @@ public class Tower : MonoBehaviour
         }
         SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("HealtTower"), 1.0f, false);
         currentHealth += amount;
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
     }
     private void HandleHover()
     {
