@@ -35,21 +35,11 @@ public class IABrainManager : MonoBehaviour
         //  Si no tiene unidades, jugar cartas primero
         if (totalUnits == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
-            Debug.Log("IA no tiene unidades: juega cartas iniciales");
-            yield return StartCoroutine(IACheckEnemies());
-            if (reactedToSpecialNodeThisTurn)
-            {
-                Debug.Log("IA reaccionó a amenaza: corta el turno");
-                yield break;
-            }
+            Debug.Log("IA no tiene unidades: solo invoca cartas, no chequea amenazas");
             yield return new WaitForSeconds(1f);
             if (CanInvokeMoreUnits())
             {
                 yield return StartCoroutine(IAPlayCards.instance.PlayCards());
-            }
-            else
-            {
-                Debug.Log("IA: Ya tiene máximo de unidades, no juega cartas de invocación");
             }
             // Actualizar lista de unidades recién invocadas
             GetEnemyUnitsByType(ref attackers, ref defenders, ref rangers);
