@@ -368,7 +368,6 @@ public class CanvasManager : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Cursor.visible = false;
             if (hit.collider.gameObject.layer == 11) // Recoleted
             {
                 _panelObjects.gameObject.SetActive(true);
@@ -406,7 +405,6 @@ public class CanvasManager : MonoBehaviour
                 return;
             }
         }
-        Cursor.visible = true;
         _panelObjects.gameObject.SetActive(false);
     }
 }
