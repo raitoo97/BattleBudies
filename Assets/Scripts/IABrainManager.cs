@@ -786,10 +786,15 @@ public class IABrainManager : MonoBehaviour
     }
     private IEnumerator InvokeRangersAsPossible(int amount, Units rangerTarget)
     {
+        int maxRangersAllowed = 2;
         for (int i = 0; i < amount; i++)
         {
-            if (!IAPlayCards.instance.CanPlayRanger())
+            if (GetEnemyRangerCount() >= maxRangersAllowed)
+            {
+                Debug.Log("IA: ya hay 2 Rangers enemigos, no invoca más");
                 yield break;
+            }
+            if (!IAPlayCards.instance.CanPlayRanger()) yield break;
             yield return StartCoroutine(IAPlayCards.instance.PlayOneCard_PrioritizeRanger(rangerTarget));
         }
     }
