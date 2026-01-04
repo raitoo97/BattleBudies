@@ -53,11 +53,13 @@ public class CanvasManager : MonoBehaviour
         UpgradeUnits.onClick.AddListener(UpgradeUnitsPlayerCall);
         ResetUICombat();
         ChangeCameraText(false);
+        UpdateObjectUIHover(false);
     }
     private void Update()
     {
         UpdateUnitStatsHover();
         UpdateTowerStatsHover();
+        UpdateObjectUIHover();
         if(CameraManager.instance.GetCanTransposed)
             changeCameraButton.interactable = true;
         else
@@ -360,5 +362,51 @@ public class CanvasManager : MonoBehaviour
     private void PlayRollSound()
     {
         SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("RollDice"),1f,false);
+    }
+    public void UpdateObjectUIHover(bool activate = true, string text = "", Color color = default)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Cursor.visible = false;
+            if (hit.collider.gameObject.layer == 11) // Recoleted
+            {
+                _panelObjects.gameObject.SetActive(true);
+                mapText.text = "Resource Node";
+                mapText.color = Color.green;
+                Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
+                _panelObjects.transform.position = panelPos;
+                return;
+            }
+            if (hit.collider.gameObject.layer == 12) // HelathNode
+            {
+                _panelObjects.gameObject.SetActive(true);
+                mapText.text = "Health Node";
+                mapText.color = Color.green;
+                Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
+                _panelObjects.transform.position = panelPos;
+                return;
+            }
+            if (hit.collider.gameObject.layer == 13) // DangerNode
+            {
+                _panelObjects.gameObject.SetActive(true);
+                mapText.text = "Salvation Throw";
+                mapText.color = new Vector4(1.0f, 0.5f, 0.0f, 1.0f);
+                Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
+                _panelObjects.transform.position = panelPos;
+                return;
+            }
+            if (hit.collider.gameObject.layer == 14) // TowerAttackNode
+            {
+                _panelObjects.gameObject.SetActive(true);
+                mapText.text = "Atack Tower";
+                mapText.color = Color.red;
+                Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
+                _panelObjects.transform.position = panelPos;
+                return;
+            }
+        }
+        Cursor.visible = true;
+        _panelObjects.gameObject.SetActive(false);
     }
 }

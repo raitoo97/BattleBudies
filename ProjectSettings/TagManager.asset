@@ -17,10 +17,10 @@ TagManager:
   - Traps
   - Resource
   - HealthTower
-  - 
-  - 
-  - 
-  - 
+  - ResourceNodeText
+  - HealtNodeText
+  - DangerNodeText
+  - AtackTowersNodeText
   - 
   - 
   - 
