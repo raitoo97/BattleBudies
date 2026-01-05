@@ -509,6 +509,7 @@ public class IABrainManager : MonoBehaviour
     private IEnumerator MoveDefenders(List<Defenders> defenders, List<Ranger> rangers)
     {
         if (defenders == null || defenders.Count == 0) yield break;
+        bool anyDamagedTower = TowerManager.instance.enemyTowers.Exists(t => t.currentHealth < t.maxHealth);
         int remainingUnits = defenders.Count + rangers.Count;
         int currentEnergy = EnergyManager.instance.enemyCurrentEnergy;
         int energyPerUnit = Mathf.Max(1, Mathf.Min((remainingUnits > 0 ? currentEnergy / remainingUnits : 1), maxStepsPerUnit));
@@ -521,8 +522,19 @@ public class IABrainManager : MonoBehaviour
             if (EnergyManager.instance.enemyCurrentEnergy < 1) break;
             Debug.Log($"IA moviendo Defenders {u.gameObject.name}");
             int moveEnergy = Mathf.Min(energyPerUnit, EnergyManager.instance.enemyCurrentEnergy);
-            yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
-            yield return StartCoroutine(HandleSingleUnitOnSpecialNode(u));
+            if (anyDamagedTower)
+            {
+                Debug.Log("IA: Hay torres dañadas, moviendo Defender para curar");
+                // Mover normal para curar torres
+                yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u, moveEnergy));
+                yield return StartCoroutine(HandleSingleUnitOnSpecialNode(u));
+            }
+            else
+            {
+                Debug.Log("IA: NO Hay torres dañadas, moviendo Defender para atacar");
+                // No hay torres para curar  mover como attacker
+                yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u, moveEnergy));
+            }
             yield return new WaitForSeconds(0.2f);
         }
         float random = Random.value;
@@ -600,8 +612,20 @@ public class IABrainManager : MonoBehaviour
                 }
                 else if (u is Defenders)
                 {
-                    yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u as Defenders, energyAvailable));
-                    yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+                    bool anyDamagedTower = TowerManager.instance.enemyTowers.Exists(t => t.currentHealth < t.maxHealth);
+                    if (anyDamagedTower)
+                    {
+                        Debug.Log("IA: Hay torres dañadas, moviendo Defender para curar");
+                        // Mover normal para curar torres
+                        yield return StartCoroutine(IADefendTowers.instance.MoveSingleUnit(u as Defenders, energyAvailable));
+                        yield return new WaitUntil(() => !HealthTowerManager.instance.onColectedHealth);
+                    }
+                    else
+                    {
+                        Debug.Log("IA: NO Hay torres dañadas, moviendo Defender para atacar");
+                        // No hay torres para curar  mover como attacker
+                        yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(u as Defenders, energyAvailable));
+                    }
                     anyMoved = true;
                 }
                 else if (u is Ranger)
