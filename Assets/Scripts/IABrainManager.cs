@@ -7,6 +7,7 @@ public class IABrainManager : MonoBehaviour
     private float chanceToPlayCards = 0.85f;
     private int maxStepsPerUnit = 3;
     [SerializeField]private float defendTriggerDistance;
+    [SerializeField]private float attackTriggerDistance;
     private bool reactedToSpecialNodeThisTurn = false;
     private int maxEnemyUnits = 5;
     private void Awake()
