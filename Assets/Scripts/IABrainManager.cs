@@ -796,13 +796,20 @@ public class IABrainManager : MonoBehaviour
     }
     private bool CanInvokeMoreUnits()
     {
-        int count = 0;
+        int enemyCount = 0;
         foreach (Units u in FindObjectsOfType<Units>())
         {
             if (u != null && !u.isPlayerUnit)
-                count++;
+                enemyCount++;
         }
-        return count < maxEnemyUnits;
+        int playerCount = 0;
+        foreach (Units u in FindObjectsOfType<Units>())
+        {
+            if (u != null && u.isPlayerUnit)
+                playerCount++;
+        }
+        int targetCount = Mathf.Max(maxEnemyUnits, playerCount);
+        return enemyCount < targetCount;
     }
     private IEnumerator InvokeRangersAsPossible(int amount, Units rangerTarget)
     {
