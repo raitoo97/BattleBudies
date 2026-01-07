@@ -36,7 +36,6 @@ public class IABrainManager : MonoBehaviour
         //  Si no tiene unidades, jugar cartas primero
         if (totalUnits == 0 && EnergyManager.instance.enemyCurrentEnergy >= 1)
         {
-            Debug.Log("IA no tiene unidades: solo invoca cartas, no chequea amenazas");
             yield return new WaitForSeconds(1f);
             if (CanInvokeMoreUnits())
             {
@@ -56,6 +55,7 @@ public class IABrainManager : MonoBehaviour
         }
         yield return new WaitForSeconds(1.5f);
         yield return StartCoroutine(IACheckEnemies());
+        yield return StartCoroutine(AttackPlayerTowersDirectly());
         yield return StartCoroutine(HandleUnitsMoves(attackers, defenders, rangers, totalUnits));
         yield return new WaitForSeconds(0.5f);
         List<Units> allUnits = new List<Units>();
@@ -477,7 +477,6 @@ public class IABrainManager : MonoBehaviour
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
-            Debug.Log("IA decide jugar carta iniciar movimiento fichas");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
         yield return StartCoroutine(MoveAttackers(attackers, totalUnits));
@@ -503,7 +502,6 @@ public class IABrainManager : MonoBehaviour
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
-            Debug.Log("IA decide jugar carta tras mover Attackers");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
     }
@@ -541,7 +539,6 @@ public class IABrainManager : MonoBehaviour
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
-            Debug.Log("IA decide jugar carta tras mover Defender");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
     }
@@ -568,7 +565,6 @@ public class IABrainManager : MonoBehaviour
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
-            Debug.Log("IA decide jugar carta tras mover Ranger");
             yield return StartCoroutine(IAPlayCards.instance?.PlayOneCard());
         }
     }
@@ -600,6 +596,7 @@ public class IABrainManager : MonoBehaviour
                 anyMoved = true;
                 continue;
             }
+            yield return StartCoroutine(AttackPlayerTowersDirectly());
             foreach (Units u in allUnits)
             {
                 if (u == null || !u) continue;
@@ -664,6 +661,7 @@ public class IABrainManager : MonoBehaviour
                 if (EnergyManager.instance.enemyCurrentEnergy <= 0) break;
             }
         }
+        yield return StartCoroutine(AttackPlayerTowersDirectly());
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
@@ -772,7 +770,61 @@ public class IABrainManager : MonoBehaviour
                 u.isLockedOnSpecialNode = false;
             }
         }
-        Debug.Log("IA: Inicio de turno — player NO está en nodo especial, se limpian pendingTarget");
+    }
+    private IEnumerator AttackPlayerTowersDirectly()
+    {
+        Tower targetTower = null;
+        Units closestUnit = null;
+        float minDist = float.MaxValue;
+        foreach (Tower tower in TowerManager.instance.playerTowers)
+        {
+            if (tower == null || tower.currentHealth <= 0) continue;
+            foreach (Attackers attacker in FindObjectsOfType<Attackers>())
+            {
+                if (attacker == null || attacker.isPlayerUnit) continue;
+                float dist = Vector3.Distance(attacker.transform.position, tower.transform.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    targetTower = tower;
+                    closestUnit = attacker;
+                }
+            }
+        }
+        // 2. Si no hubo attackers, buscar DEFENDERS
+        if (closestUnit == null)
+        {
+            foreach (Tower tower in TowerManager.instance.playerTowers)
+            {
+                if (tower == null || tower.currentHealth <= 0) continue;
+                foreach (Defenders defender in FindObjectsOfType<Defenders>())
+                {
+                    if (defender == null || defender.isPlayerUnit) continue;
+                    float dist = Vector3.Distance(defender.transform.position, tower.transform.position);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        targetTower = tower;
+                        closestUnit = defender;
+                    }
+                }
+            }
+        }
+        // 2. Si hay una unidad dentro del rango de ataque
+        if (targetTower != null && closestUnit != null && minDist <= attackTriggerDistance)
+        {
+            int energy = EnergyManager.instance.enemyCurrentEnergy;
+            if (energy <= 0) yield break;
+            Debug.Log($"IA: {closestUnit.name} va attacker atacar la torre {targetTower.name} por distancia de{minDist} ");
+            if (closestUnit is Attackers)
+            {
+                yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(closestUnit as Attackers, energy));
+            }
+            else if (closestUnit is Defenders)
+            {
+                yield return StartCoroutine(IAMoveToTowers.instance.MoveSingleUnit(closestUnit as Defenders, energy));
+            }
+        }
     }
     #region UnitsCountHelpers
     int GetPlayerRangerCount()

@@ -4234,7 +4234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defendTriggerDistance: 90
-  attackTriggerDistance: 0
+  attackTriggerDistance: 90
 --- !u!114 &563951300
 MonoBehaviour:
   m_ObjectHideFlags: 0
