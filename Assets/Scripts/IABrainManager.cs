@@ -575,7 +575,6 @@ public class IABrainManager : MonoBehaviour
         bool anyMoved;
         bool reactedToThreat = false;
         bool reactedToSpecialNode = false;
-        bool attackDirectly = false;
         do
         {
             anyMoved = false;
@@ -596,12 +595,6 @@ public class IABrainManager : MonoBehaviour
                 reactedToSpecialNode = true;
                 anyMoved = true;
                 continue;
-            }
-            if (!attackDirectly && EnergyManager.instance.enemyCurrentEnergy > 0)
-            {
-                yield return StartCoroutine(AttackPlayerTowersDirectly());
-                attackDirectly = true;
-                anyMoved = true;
             }
             foreach (Units u in allUnits)
             {
