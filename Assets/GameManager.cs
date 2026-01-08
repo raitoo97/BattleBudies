@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
@@ -72,10 +73,13 @@ public class GameManager : MonoBehaviour
         if (playerWon)
         {
             Debug.Log("VICTORIA DEL JUGADOR");
+            SceneManager.LoadScene(2);
+
         }
         else
         {
             Debug.Log("DERROTA DEL JUGADOR");
+            SceneManager.LoadScene(3);
         }
     }
     private IEnumerator HandleUnitsOnSpecialNodes()
