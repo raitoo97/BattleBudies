@@ -43,6 +43,8 @@ public class CanvasManager : MonoBehaviour
     [Header("MapObjects")]
     public GameObject _panelObjects;
     public TextMeshProUGUI mapText;
+    [Header("PauseManager")]
+    [SerializeField] private Button[] ButtonsPause;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -55,8 +57,16 @@ public class CanvasManager : MonoBehaviour
         ChangeCameraText(false);
         UpdateObjectUIHover(false);
     }
+    private void Start()
+    {
+        ButtonsPause[0].onClick.AddListener(PauseManager.instance.Continue);
+        ButtonsPause[1].onClick.AddListener(PauseManager.instance.GoToMainMenu);
+        ButtonsPause[2].onClick.AddListener(PauseManager.instance.ExitGame);
+
+    }
     private void Update()
     {
+        if (PauseManager.instance.on_pause) return;
         UpdateUnitStatsHover();
         UpdateTowerStatsHover();
         UpdateObjectUIHover();
@@ -72,6 +82,10 @@ public class CanvasManager : MonoBehaviour
         Color cu = updateUnitsText.color;
         cu.a = canUpgrade ? 1f : 0.3f;
         updateUnitsText.color = cu;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseManager.instance.MenuState();
+        }
     }
     public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
     {
