@@ -123,6 +123,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &336348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 336349}
+  m_Layer: 0
+  m_Name: DefensePointReference
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &336349
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 336348}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 43.934525, y: 14.9, z: -4.328888}
+  m_LocalScale: {x: 988, y: 988, z: 988}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1850951881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2148473
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2455,6 +2486,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1818024187}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &319903804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 319903805}
+  m_Layer: 0
+  m_Name: AttackPointReference
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &319903805
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 319903804}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 43.934525, y: 10.488621, z: -164.12889}
+  m_LocalScale: {x: 988, y: 988, z: 988}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1850951881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &325438671 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4989770517351312298, guid: 4143e5853258dae4c938aeec0dd46119,
@@ -13830,7 +13892,9 @@ Transform:
   m_LocalPosition: {x: -43.934525, y: 7.6513786, z: 82.22889}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 319903805}
+  - {fileID: 336349}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1850951882
@@ -13861,8 +13925,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movedAnyUnit: 0
-  ReferencePoint: {fileID: 891817838}
-  maxDistanceFromReference: 60
+  ReferencePoint: {fileID: 319903805}
+  maxDistanceFromReference: 50
 --- !u!114 &1850951884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13876,8 +13940,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movedAnyUnit: 0
-  ReferenceTower: {fileID: 523587279}
-  maxDistanceFromReference: 60
+  ReferenceTower: {fileID: 336349}
+  maxDistanceFromReference: 50
 --- !u!1001 &1862862575
 PrefabInstance:
   m_ObjectHideFlags: 0
