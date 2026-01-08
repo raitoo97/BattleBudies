@@ -788,9 +788,8 @@ public class IABrainManager : MonoBehaviour
             if (tower == null || tower.currentHealth <= 0) continue;
             foreach (Attackers attacker in FindObjectsOfType<Attackers>())
             {
-                if (attacker == null || attacker.isPlayerUnit) continue;
+                if (attacker == null || attacker.isPlayerUnit || attacker.hasAttackedTowerThisTurn) continue;
                 float dist = Vector3.Distance(attacker.transform.position, tower.transform.position);
-                if (dist <= 15f) continue;
                 if (dist < minDist)
                 {
                     minDist = dist;
@@ -807,9 +806,8 @@ public class IABrainManager : MonoBehaviour
                 if (tower == null || tower.currentHealth <= 0) continue;
                 foreach (Defenders defender in FindObjectsOfType<Defenders>())
                 {
-                    if (defender == null || defender.isPlayerUnit) continue;
+                    if (defender == null || defender.isPlayerUnit || defender.hasAttackedTowerThisTurn) continue;
                     float dist = Vector3.Distance(defender.transform.position, tower.transform.position);
-                    if (dist <= 15f) continue;
                     if (dist < minDist)
                     {
                         minDist = dist;
