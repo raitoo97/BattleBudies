@@ -66,26 +66,30 @@ public class CanvasManager : MonoBehaviour
     }
     private void Update()
     {
-        if (PauseManager.instance.on_pause) return;
-        UpdateUnitStatsHover();
-        UpdateTowerStatsHover();
-        UpdateObjectUIHover();
-        if(CameraManager.instance.GetCanTransposed)
-            changeCameraButton.interactable = true;
-        else
-            changeCameraButton.interactable = false;
-        Color c = changeCameraTextRotation.color;
-        c.a = CameraManager.instance.GetCanTransposed ? 1f : 0.3f;
-        changeCameraTextRotation.color = c;
-        bool canUpgrade = UpgradeManager.instance.GetCanUpgradePlayer && !UnitController.instance.IsSelectingUpgradeUnit && !UnitController.instance.IsBusy();
-        UpgradeUnits.interactable = canUpgrade;
-        Color cu = updateUnitsText.color;
-        cu.a = canUpgrade ? 1f : 0.3f;
-        updateUnitsText.color = cu;
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PauseManager.instance.MenuState();
         }
+        changeCameraButton.interactable = CameraManager.instance.GetCanTransposed && !PauseManager.instance.on_pause;
+        bool canUpgrade = UpgradeManager.instance.GetCanUpgradePlayer && !UnitController.instance.IsSelectingUpgradeUnit && !UnitController.instance.IsBusy();
+        UpgradeUnits.interactable = canUpgrade;
+        Color c = changeCameraTextRotation.color;
+        if(CameraManager.instance.GetCanTransposed && !PauseManager.instance.on_pause)
+        {
+            c.a = 1f;
+        }
+        else
+        {
+            c.a = 0.3f;
+        }
+        changeCameraTextRotation.color = c;
+        Color cu = updateUnitsText.color;
+        cu.a = canUpgrade ? 1f : 0.3f;
+        updateUnitsText.color = cu;
+        if (PauseManager.instance.on_pause) return;
+        UpdateUnitStatsHover();
+        UpdateTowerStatsHover();
+        UpdateObjectUIHover();
     }
     public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
     {

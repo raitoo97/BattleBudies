@@ -21,7 +21,7 @@ public class BellEndTurn : MonoBehaviour
     }
     public bool IsBusy()
     {
-        return !GameManager.instance.isPlayerTurn || GameManager.instance.IsAnyPlayerUnitMoving() || CombatManager.instance.GetCombatActive || CardPlayManager.instance.placingMode || SalvationManager.instance.GetOnSavingThrow || ResourcesManager.instance.onColectedResources || HealthTowerManager.instance.onColectedHealth;
+        return PauseManager.instance.on_pause ||!GameManager.instance.isPlayerTurn || GameManager.instance.IsAnyPlayerUnitMoving() || CombatManager.instance.GetCombatActive || CardPlayManager.instance.placingMode || SalvationManager.instance.GetOnSavingThrow || ResourcesManager.instance.onColectedResources || HealthTowerManager.instance.onColectedHealth;
     }
     public void ChangeTurn()
     {

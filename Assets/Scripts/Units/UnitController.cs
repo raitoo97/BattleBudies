@@ -317,6 +317,8 @@ public class UnitController : MonoBehaviour
             return true;
         if(CardInteraction.isOnDraging)
             return true;
+        if(PauseManager.instance.on_pause)
+            return true;
         return false;
     }
 }

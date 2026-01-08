@@ -36,7 +36,10 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayClip(AudioClip clip, float volumen, bool loop)
     {
-        if (PauseManager.instance.on_pause) return;
+        if(PauseManager.instance != null)
+        {
+            if (PauseManager.instance.on_pause) return;
+        }
         var audioSource = GetAudioSourceFromList();
         if (audioSource == null) return;
         audioSource.volume = volumen;
