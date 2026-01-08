@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     {
         DeckManager.instance.FillHandsAtStart();
         SoundManager.Instance.PlayMusic(SoundManager.Instance.GetAudioClip("MusicBackground"), 0.5f, true);
+        FadesAnimationsManager.instance.StartCoroutine(FadesAnimationsManager.instance.FadeOut());
         StartCoroutine(TurnLoop());
     }
     private IEnumerator TurnLoop()
@@ -73,13 +74,13 @@ public class GameManager : MonoBehaviour
         if (playerWon)
         {
             Debug.Log("VICTORIA DEL JUGADOR");
-            SceneManager.LoadScene(2);
+            FadesAnimationsManager.instance.StartCoroutine(FadesAnimationsManager.instance.FadeIn(2));
 
         }
         else
         {
             Debug.Log("DERROTA DEL JUGADOR");
-            SceneManager.LoadScene(3);
+            FadesAnimationsManager.instance.StartCoroutine(FadesAnimationsManager.instance.FadeIn(3));
         }
     }
     private IEnumerator HandleUnitsOnSpecialNodes()
