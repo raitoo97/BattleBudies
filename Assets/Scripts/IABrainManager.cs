@@ -575,6 +575,7 @@ public class IABrainManager : MonoBehaviour
         bool anyMoved;
         bool reactedToThreat = false;
         bool reactedToSpecialNode = false;
+        bool attackDirectly = false;
         do
         {
             anyMoved = false;
@@ -596,7 +597,12 @@ public class IABrainManager : MonoBehaviour
                 anyMoved = true;
                 continue;
             }
-            yield return StartCoroutine(AttackPlayerTowersDirectly());
+            if (!attackDirectly && EnergyManager.instance.enemyCurrentEnergy > 0)
+            {
+                yield return StartCoroutine(AttackPlayerTowersDirectly());
+                attackDirectly = true;
+                anyMoved = true;
+            }
             foreach (Units u in allUnits)
             {
                 if (u == null || !u) continue;
@@ -661,7 +667,8 @@ public class IABrainManager : MonoBehaviour
                 if (EnergyManager.instance.enemyCurrentEnergy <= 0) break;
             }
         }
-        yield return StartCoroutine(AttackPlayerTowersDirectly());
+        if (EnergyManager.instance.enemyCurrentEnergy > 0)
+            yield return StartCoroutine(AttackPlayerTowersDirectly());
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {
