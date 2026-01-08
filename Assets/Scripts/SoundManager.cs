@@ -56,6 +56,15 @@ public class SoundManager : MonoBehaviour
         audioSource.clip = clip;
         audioSource.Play();
     }
+    public void PlayClipMenu(AudioClip clip, float volumen, bool loop)
+    {
+        var audioSource = GetAudioSourceFromList();
+        if (audioSource == null) return;
+        audioSource.volume = volumen;
+        audioSource.loop = loop;
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
     public AudioClip GetAudioClip(string clip)
     {
         return clips.Find(x => x.name == clip);

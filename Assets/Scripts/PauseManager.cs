@@ -14,7 +14,9 @@ public class PauseManager : MonoBehaviour
     }
     private void Start()
     {
-        Continue();
+        Time.timeScale = 1.0f;
+        pause_menu.SetActive(false);
+        on_pause = false;
     }
     public void MenuState()
     {
@@ -29,15 +31,18 @@ public class PauseManager : MonoBehaviour
     }
     public void GoToMainMenu()
     {
+        SoundManager.Instance.PlayClipMenu(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         SceneManager.LoadScene(0);
     }
     public void ExitGame()
     {
+        SoundManager.Instance.PlayClipMenu(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         Application.Quit();
         Debug.Log("Funciona solo en build");
     }
     public void Continue()
     {
+        SoundManager.Instance.PlayClipMenu(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         Time.timeScale = 1.0f;
         pause_menu.SetActive(false);
         on_pause = false;
