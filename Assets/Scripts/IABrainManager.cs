@@ -667,8 +667,6 @@ public class IABrainManager : MonoBehaviour
                 if (EnergyManager.instance.enemyCurrentEnergy <= 0) break;
             }
         }
-        if (EnergyManager.instance.enemyCurrentEnergy > 0)
-            yield return StartCoroutine(AttackPlayerTowersDirectly());
         float random = Random.value;
         if (random < chanceToPlayCards && EnergyManager.instance.enemyCurrentEnergy >= 1 && CanInvokeMoreUnits())
         {

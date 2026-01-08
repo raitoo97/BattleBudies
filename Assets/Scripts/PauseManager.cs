@@ -49,6 +49,7 @@ public class PauseManager : MonoBehaviour
     }
     private void Pause()
     {
+        SoundManager.Instance.PlayClipMenu(SoundManager.Instance.GetAudioClip("SelectGrid"), 1f, false);
         Time.timeScale = 0.0f;
         pause_menu.SetActive(true);
         on_pause = true;
