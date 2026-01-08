@@ -137,6 +137,7 @@ public class CardInteraction : MonoBehaviour , IBeginDragHandler, IDragHandler, 
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (PauseManager.instance.on_pause) return;
         if (!isPlayerCard || dragLayer == null) return;
         isDragging = true;
         originalParent = transform.parent;
