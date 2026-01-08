@@ -1935,6 +1935,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fc888fda7cdaf94c80b176838e92b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  on_pause: 0
   pause_menu: {fileID: 1739764427}
 --- !u!1001 &265195169
 PrefabInstance:
@@ -12824,7 +12825,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1748367416}
   m_Layer: 0
-  m_Name: PREPAUSA
+  m_Name: PREWIN
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

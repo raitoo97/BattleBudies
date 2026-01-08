@@ -790,6 +790,7 @@ public class IABrainManager : MonoBehaviour
             {
                 if (attacker == null || attacker.isPlayerUnit) continue;
                 float dist = Vector3.Distance(attacker.transform.position, tower.transform.position);
+                if (dist <= 15f) continue;
                 if (dist < minDist)
                 {
                     minDist = dist;
@@ -808,6 +809,7 @@ public class IABrainManager : MonoBehaviour
                 {
                     if (defender == null || defender.isPlayerUnit) continue;
                     float dist = Vector3.Distance(defender.transform.position, tower.transform.position);
+                    if (dist <= 15f) continue;
                     if (dist < minDist)
                     {
                         minDist = dist;

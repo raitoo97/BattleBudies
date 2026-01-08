@@ -70,9 +70,13 @@ public class GameManager : MonoBehaviour
     {
         StopAllCoroutines();
         if (playerWon)
+        {
             Debug.Log("VICTORIA DEL JUGADOR");
+        }
         else
+        {
             Debug.Log("DERROTA DEL JUGADOR");
+        }
     }
     private IEnumerator HandleUnitsOnSpecialNodes()
     {
