@@ -7,7 +7,7 @@ public class IAMoveToTowers : MonoBehaviour
     [HideInInspector] public bool movedAnyUnit = false;
     private bool actionInProgress = false;
     public Transform ReferencePoint;
-    public float maxDistanceFromReference = 10f;
+    [SerializeField]private float maxDistanceFromReference;
     private void Awake()
     {
         if (instance == null)
@@ -35,10 +35,13 @@ public class IAMoveToTowers : MonoBehaviour
         bool foundPath = GetClosestTowerPlayer(enemy, validNodes, out Node closestNode, out List<Node> path);
         if (!foundPath)
         {
-            if (!GetRandomNodeNearReference(enemy, out closestNode, out path))
+            Debug.LogWarning($"IA: {enemy.gameObject.name} no encontró camino hacia torre, se moverá aleatoriamente.");
+            GetRandomNodeNearReference(enemy, out closestNode, out path);
+            if (path == null || path.Count == 0)
             {
+                Debug.LogWarning($"IA: {enemy.gameObject.name} no encontró ningún nodo válido cerca del ReferencePoint. Se detiene.");
                 actionInProgress = false;
-                yield break;
+                yield break; // No hay nodos válidos, terminar
             }
         }
         int pathOffset = (path.Count > 0 && path[0] == enemy.currentNode) ? 1 : 0;
@@ -158,22 +161,55 @@ public class IAMoveToTowers : MonoBehaviour
     {
         targetNode = null;
         path = null;
-        if (ReferencePoint == null) return false;
+        if (ReferencePoint == null) 
+        {
+            Debug.Log($"IA: ReferencePoint es null.");
+            return false;
+        }
+        if (enemy == null)
+        {
+            Debug.Log($"IA:  enemy es null.");
+            return false;
+        }
         List<Node> allValidNodes = GetAllValidNodes();
-        if (allValidNodes.Count == 0) return false;
+        if (allValidNodes.Count == 0) 
+        {
+            Debug.Log($"IA: No hay nodos válidos en el mapa.");
+            return false;
+        }
         List<Node> candidates = new List<Node>();
         foreach (Node n in allValidNodes)
         {
             float dist = Vector3.Distance(n.transform.position, ReferencePoint.position);
             if (dist <= maxDistanceFromReference)
+            {
                 candidates.Add(n);
+            }
         }
         if (candidates.Count == 0)
+        {
+            Debug.Log($"IA: No hay nodos dentro de {maxDistanceFromReference} unidades del ReferencePoint");
             return false;
-        targetNode = candidates[Random.Range(0, candidates.Count)];
-        path = PathFinding.CalculateAstart(enemy.currentNode, targetNode);
-        if (path == null || path.Count == 0) return false;
-        return true;
+        }
+        int attempts = Mathf.Min(10, candidates.Count); // máximo 10 intentos
+        for (int i = 0; i < attempts; i++)
+        {
+            Node randomNode = candidates[Random.Range(0, candidates.Count)];
+            List<Node> testPath = PathFinding.CalculateAstart(enemy.currentNode, randomNode);
+            if (testPath != null && testPath.Count > 0)
+            {
+                targetNode = randomNode;
+                Debug.Log($"IA: Nodo aleatorio accesible encontrado: {targetNode.gameObject.name}");
+                path = testPath;
+                return true;
+            }
+            else
+            {
+                candidates.Remove(randomNode); // no intentar otra vez con este nodo
+            }
+        }
+        Debug.Log($"IA: No se encontró ningún nodo accesible cerca del ReferencePoint después de {attempts} intentos.");
+        return false;
     }
     private IEnumerator StartCombatAfterMove(Units attacker, Units defender)
     {
@@ -243,7 +279,7 @@ public class IAMoveToTowers : MonoBehaviour
     private void OnDrawGizmos()
     {
         if (ReferencePoint == null) return;
-        Gizmos.color = Color.cyan;
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(ReferencePoint.position, maxDistanceFromReference);//ERROR
     }
 }

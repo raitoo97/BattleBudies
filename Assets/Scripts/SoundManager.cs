@@ -36,6 +36,28 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayClip(AudioClip clip, float volumen, bool loop)
     {
+        if(PauseManager.instance != null)
+        {
+            if (PauseManager.instance.on_pause) return;
+        }
+        var audioSource = GetAudioSourceFromList();
+        if (audioSource == null) return;
+        audioSource.volume = volumen;
+        audioSource.loop = loop;
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
+    public void PlayMusic(AudioClip clip, float volumen, bool loop)
+    {
+        var audioSource = GetAudioSourceFromList();
+        if (audioSource == null) return;
+        audioSource.volume = volumen;
+        audioSource.loop = loop;
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
+    public void PlayClipMenu(AudioClip clip, float volumen, bool loop)
+    {
         var audioSource = GetAudioSourceFromList();
         if (audioSource == null) return;
         audioSource.volume = volumen;

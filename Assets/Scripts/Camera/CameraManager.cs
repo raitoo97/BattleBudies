@@ -24,6 +24,7 @@ public class CameraManager : MonoBehaviour
     }
     public void ChangeCameras()
     {
+        if (PauseManager.instance.on_pause) return;
         if (CanTransposed)
         {
             SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("CameraMove"), 0.2f, false);

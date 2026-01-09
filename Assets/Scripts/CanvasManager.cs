@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,6 +34,7 @@ public class CanvasManager : MonoBehaviour
     public GameObject towerStatsPanel;
     public TextMeshProUGUI towerHealthText;
     private Tower hoveredTower = null;
+    public TextMeshProUGUI towerMaxHealth;
     [Header("Resources")]
     public TextMeshProUGUI enemyResources;
     public TextMeshProUGUI playerResources;
@@ -43,6 +45,8 @@ public class CanvasManager : MonoBehaviour
     [Header("MapObjects")]
     public GameObject _panelObjects;
     public TextMeshProUGUI mapText;
+    [Header("PauseManager")]
+    [SerializeField] private Button[] ButtonsPause;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -54,24 +58,40 @@ public class CanvasManager : MonoBehaviour
         ResetUICombat();
         ChangeCameraText(false);
         UpdateObjectUIHover(false);
+        towerMaxHealth.gameObject.SetActive(false);
+    }
+    private void Start()
+    {
+        ButtonsPause[0].onClick.AddListener(PauseManager.instance.Continue);
+        ButtonsPause[1].onClick.AddListener(PauseManager.instance.GoToMainMenu);
+        ButtonsPause[2].onClick.AddListener(PauseManager.instance.ExitGame);
     }
     private void Update()
     {
-        UpdateUnitStatsHover();
-        UpdateTowerStatsHover();
-        UpdateObjectUIHover();
-        if(CameraManager.instance.GetCanTransposed)
-            changeCameraButton.interactable = true;
-        else
-            changeCameraButton.interactable = false;
-        Color c = changeCameraTextRotation.color;
-        c.a = CameraManager.instance.GetCanTransposed ? 1f : 0.3f;
-        changeCameraTextRotation.color = c;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseManager.instance.MenuState();
+        }
+        changeCameraButton.interactable = CameraManager.instance.GetCanTransposed && !PauseManager.instance.on_pause;
         bool canUpgrade = UpgradeManager.instance.GetCanUpgradePlayer && !UnitController.instance.IsSelectingUpgradeUnit && !UnitController.instance.IsBusy();
         UpgradeUnits.interactable = canUpgrade;
+        Color c = changeCameraTextRotation.color;
+        if(CameraManager.instance.GetCanTransposed && !PauseManager.instance.on_pause)
+        {
+            c.a = 1f;
+        }
+        else
+        {
+            c.a = 0.3f;
+        }
+        changeCameraTextRotation.color = c;
         Color cu = updateUnitsText.color;
         cu.a = canUpgrade ? 1f : 0.3f;
         updateUnitsText.color = cu;
+        if (PauseManager.instance.on_pause) return;
+        UpdateUnitStatsHover();
+        UpdateTowerStatsHover();
+        UpdateObjectUIHover();
     }
     public void UpdateDiceRemaining(int playerRemaining, int enemyRemaining)
     {
@@ -406,5 +426,24 @@ public class CanvasManager : MonoBehaviour
             }
         }
         _panelObjects.gameObject.SetActive(false);
+    }
+    public IEnumerator ShowTowerError()
+    {
+        towerMaxHealth.gameObject.SetActive(true);
+        Color mainColor = towerMaxHealth.color;
+        mainColor.a = 1f;
+        towerMaxHealth.color = mainColor;
+        float elapsedTime = 0f;
+        float totalTime = 1f;
+        while (elapsedTime < totalTime)
+        {
+            mainColor.a = Mathf.Lerp(1f, 0f, elapsedTime / totalTime);
+            towerMaxHealth.color = mainColor;
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        mainColor.a = 0f;
+        towerMaxHealth.color = mainColor;
+        towerMaxHealth.gameObject.SetActive(false);
     }
 }
