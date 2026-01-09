@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,6 +34,7 @@ public class CanvasManager : MonoBehaviour
     public GameObject towerStatsPanel;
     public TextMeshProUGUI towerHealthText;
     private Tower hoveredTower = null;
+    public TextMeshProUGUI towerMaxHealth;
     [Header("Resources")]
     public TextMeshProUGUI enemyResources;
     public TextMeshProUGUI playerResources;
@@ -56,13 +58,13 @@ public class CanvasManager : MonoBehaviour
         ResetUICombat();
         ChangeCameraText(false);
         UpdateObjectUIHover(false);
+        towerMaxHealth.gameObject.SetActive(false);
     }
     private void Start()
     {
         ButtonsPause[0].onClick.AddListener(PauseManager.instance.Continue);
         ButtonsPause[1].onClick.AddListener(PauseManager.instance.GoToMainMenu);
         ButtonsPause[2].onClick.AddListener(PauseManager.instance.ExitGame);
-
     }
     private void Update()
     {
@@ -424,5 +426,24 @@ public class CanvasManager : MonoBehaviour
             }
         }
         _panelObjects.gameObject.SetActive(false);
+    }
+    public IEnumerator ShowTowerError()
+    {
+        towerMaxHealth.gameObject.SetActive(true);
+        Color mainColor = towerMaxHealth.color;
+        mainColor.a = 1f;
+        towerMaxHealth.color = mainColor;
+        float elapsedTime = 0f;
+        float totalTime = 1f;
+        while (elapsedTime < totalTime)
+        {
+            mainColor.a = Mathf.Lerp(1f, 0f, elapsedTime / totalTime);
+            towerMaxHealth.color = mainColor;
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        mainColor.a = 0f;
+        towerMaxHealth.color = mainColor;
+        towerMaxHealth.gameObject.SetActive(false);
     }
 }

@@ -172,6 +172,10 @@ public class HealthTowerManager : MonoBehaviour
                     {
                         selected = t;
                     }
+                    if (t != null && t.faction == Faction.Player && t.currentHealth >= t.maxHealth)
+                    {
+                        StartCoroutine(CanvasManager.instance.ShowTowerError());
+                    }
                 }
             }
             yield return null;
