@@ -68,11 +68,15 @@ public class HealthTowerManager : MonoBehaviour
         {
             CameraFocusManager.instance.FocusOnUnit(defender);
         }
+        if(SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("StaticNoise"), 1f, false);
+        }
         StartCoroutine(DefenderRollDiceHealth(defender));
     }
     IEnumerator DefenderRollDiceHealth(Defenders defender)
     {
-        CanvasManager.instance.ChangeCameraText(true, "Health Tower", Color.green);
+        CanvasManager.instance.ChangeCameraText(true, "Heal Tower", Color.green);
         yield return new WaitForSeconds(2.5f);
         CanvasManager.instance.ChangeCameraText(false);
         if (defender == null)
@@ -174,6 +178,10 @@ public class HealthTowerManager : MonoBehaviour
                     }
                     if (t != null && t.faction == Faction.Player && t.currentHealth >= t.maxHealth)
                     {
+                        if(SoundManager.Instance != null)
+                        {
+                            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("Error"), 1f, false);
+                        }
                         StartCoroutine(CanvasManager.instance.ShowTowerError());
                     }
                 }

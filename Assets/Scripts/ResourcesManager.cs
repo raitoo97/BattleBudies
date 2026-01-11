@@ -43,7 +43,7 @@ public class ResourcesManager : MonoBehaviour
     }
     IEnumerator RangerRollDiceResources(Ranger ranger)
     {
-        CanvasManager.instance.ChangeCameraText(true, "Recoleted Resources", Color.green);
+        CanvasManager.instance.ChangeCameraText(true, "Collect Resources", Color.green);
         yield return new WaitForSeconds(2.5f);
         CanvasManager.instance.ChangeCameraText(false);
         if (ranger == null)
