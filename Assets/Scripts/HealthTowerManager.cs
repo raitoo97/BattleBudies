@@ -178,6 +178,10 @@ public class HealthTowerManager : MonoBehaviour
                     }
                     if (t != null && t.faction == Faction.Player && t.currentHealth >= t.maxHealth)
                     {
+                        if(SoundManager.Instance != null)
+                        {
+                            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("Error"), 1f, false);
+                        }
                         StartCoroutine(CanvasManager.instance.ShowTowerError());
                     }
                 }
