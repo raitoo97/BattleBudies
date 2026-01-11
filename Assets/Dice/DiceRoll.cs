@@ -87,11 +87,27 @@ public class DiceRoll : MonoBehaviour
         {
             isOnTable = true;
         }
+
         float impactStrength = collision.relativeVelocity.magnitude;
         if (impactStrength >= minImpactVelocity && Time.time - lastSoundTime > soundCooldown)
         {
             PlayDiceImpactSound(impactStrength);
             lastSoundTime = Time.time;
+        }
+        if (collision.gameObject.layer == LayerMask.NameToLayer("WallDice"))
+        {
+            Debug.Log("Dado golpeó la pared y está casi quieto, aplicando impulso.");
+            // Solo si el dado ya fue lanzado y está casi quieto
+            if (hasBeenThrown && rb.velocity.magnitude < 0.2f)
+            {
+                // Dirección física real (alejarse de la pared)
+                Vector3 kickDir = collision.contacts[0].normal;
+                // Pequeño impulso
+                rb.AddForce(kickDir * 5f, ForceMode.Impulse);
+                // Torque para romper apoyos raros
+                Vector3 randomTorque = Random.insideUnitSphere * 1f;
+                rb.AddTorque(randomTorque, ForceMode.Impulse);
+            }
         }
     }
     private void OnCollisionExit(Collision collision)
