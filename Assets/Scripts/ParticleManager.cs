@@ -5,7 +5,8 @@ public enum ParticleType
 {
     DeathUnit,
     Explosion,
-    HealNode
+    HealNode,
+    ExplosionTower
 }
 public class ParticleManager : MonoBehaviour
 {

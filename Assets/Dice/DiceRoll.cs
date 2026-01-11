@@ -24,6 +24,7 @@ public class DiceRoll : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.interpolation = RigidbodyInterpolation.None;
     }
     void Update()
     {
@@ -63,6 +64,8 @@ public class DiceRoll : MonoBehaviour
     }
     public void RollDice()
     {
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.WakeUp();
         hasBeenThrown = true;
         hasBeenCounted = false;
         stillTimer = 0f;
@@ -105,10 +108,14 @@ public class DiceRoll : MonoBehaviour
     }
     public void ResetDicePosition()
     {
+        rb.interpolation = RigidbodyInterpolation.None;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        transform.position = resetPoint.position;
-        transform.rotation = resetPoint.rotation;
+        rb.position = resetPoint.position;
+        rb.rotation = resetPoint.rotation;
+        rb.Sleep();
+        isOnTable = false;
+        stillTimer = 0f;
         hasBeenThrown = false;
         hasBeenCounted = false;
     }
