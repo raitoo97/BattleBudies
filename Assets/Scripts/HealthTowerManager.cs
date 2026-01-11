@@ -72,7 +72,7 @@ public class HealthTowerManager : MonoBehaviour
     }
     IEnumerator DefenderRollDiceHealth(Defenders defender)
     {
-        CanvasManager.instance.ChangeCameraText(true, "Health Tower", Color.green);
+        CanvasManager.instance.ChangeCameraText(true, "Heal Tower", Color.green);
         yield return new WaitForSeconds(2.5f);
         CanvasManager.instance.ChangeCameraText(false);
         if (defender == null)

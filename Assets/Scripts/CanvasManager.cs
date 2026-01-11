@@ -418,7 +418,7 @@ public class CanvasManager : MonoBehaviour
             if (hit.collider.gameObject.layer == 14) // TowerAttackNode
             {
                 _panelObjects.gameObject.SetActive(true);
-                mapText.text = "Atack Tower";
+                mapText.text = "Attack Tower";
                 mapText.color = Color.red;
                 Vector3 panelPos = Input.mousePosition + new Vector3(15, -15, 0);
                 _panelObjects.transform.position = panelPos;
