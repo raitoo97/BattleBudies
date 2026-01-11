@@ -21,6 +21,11 @@ public class DiceRoll : MonoBehaviour
     public float soundCooldown = 0.1f;
     private float lastSoundTime = 0f;
     private bool resetSoundPlayed = false;
+    [Header("Fail Safe Roll")]
+    private float maxRollTime = 5f;
+    public float rollTimer = 0f;
+    private bool failSafeApplied = false;
+    private Vector3 lastContactNormal = Vector3.up;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -28,6 +33,14 @@ public class DiceRoll : MonoBehaviour
     }
     void Update()
     {
+        if (hasBeenThrown && !hasBeenCounted)
+        {
+            rollTimer += Time.deltaTime;
+            if (rollTimer >= maxRollTime && !failSafeApplied)
+            {
+                ApplyFailSafeImpulse();
+            }
+        }
         CheckIfDiceIsStill();
     }
     void FixedUpdate()
@@ -68,6 +81,8 @@ public class DiceRoll : MonoBehaviour
         rb.WakeUp();
         hasBeenThrown = true;
         hasBeenCounted = false;
+        rollTimer = 0f;
+        failSafeApplied = false;
         stillTimer = 0f;
         resetSoundPlayed = false;
         foreach (FaceDetector fd in GetComponentsInChildren<FaceDetector>())
@@ -83,11 +98,14 @@ public class DiceRoll : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
+        if (!collision.collider.isTrigger)
+        {
+            lastContactNormal = collision.contacts[0].normal;
+        }
         if (!collision.collider.isTrigger && collision.gameObject.CompareTag("Mesa"))
         {
             isOnTable = true;
         }
-
         float impactStrength = collision.relativeVelocity.magnitude;
         if (impactStrength >= minImpactVelocity && Time.time - lastSoundTime > soundCooldown)
         {
@@ -97,13 +115,13 @@ public class DiceRoll : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("WallDice"))
         {
             // Solo si el dado ya fue lanzado
-            if (hasBeenThrown && rb.velocity.magnitude < 4f)
+            if (hasBeenThrown && rb.velocity.magnitude < 1.5f)
             {
                 Debug.Log("Dado golpeó la pared y está casi quieto, aplicando impulso.");
                 // Dirección física real (alejarse de la pared)
                 Vector3 kickDir = collision.contacts[0].normal;
                 // Pequeño impulso
-                rb.AddForce(kickDir * 5f, ForceMode.Impulse);
+                rb.AddForce(kickDir * 10f, ForceMode.Impulse);
                 // Torque para romper apoyos raros
                 Vector3 randomTorque = Random.insideUnitSphere * 1f;
                 rb.AddTorque(randomTorque, ForceMode.Impulse);
@@ -139,5 +157,16 @@ public class DiceRoll : MonoBehaviour
     {
         float volume = Mathf.Clamp01(impact / 5f);
         SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("DiceHit"),volume,false);
+    }
+    private void ApplyFailSafeImpulse()
+    {
+        failSafeApplied = true;
+        Debug.Log("FailSafe: el dado tardó demasiado, aplicando impulso por normal");
+        Vector3 kickDir = lastContactNormal;
+        if (kickDir.y < 0.3f)
+            kickDir.y = 0.6f;
+        kickDir.Normalize();
+        rb.AddForce(kickDir * 10f, ForceMode.Impulse);
+        rb.AddTorque(Random.insideUnitSphere * 2f, ForceMode.Impulse);
     }
 }
