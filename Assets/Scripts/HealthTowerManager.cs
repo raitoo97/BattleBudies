@@ -68,6 +68,10 @@ public class HealthTowerManager : MonoBehaviour
         {
             CameraFocusManager.instance.FocusOnUnit(defender);
         }
+        if(SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayClip(SoundManager.Instance.GetAudioClip("StaticNoise"), 1f, false);
+        }
         StartCoroutine(DefenderRollDiceHealth(defender));
     }
     IEnumerator DefenderRollDiceHealth(Defenders defender)
