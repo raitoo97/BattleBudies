@@ -9,7 +9,7 @@ public class IABrainManager : MonoBehaviour
     [SerializeField]private float defendTriggerDistance;
     [SerializeField]private float attackTriggerDistance;
     private bool reactedToSpecialNodeThisTurn = false;
-    private int maxEnemyUnits = 5;
+    private int maxEnemyUnits = 8;
     private void Awake()
     {
         if (instance == null) instance = this;
