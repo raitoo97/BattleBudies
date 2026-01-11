@@ -469,7 +469,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &126448960
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2175,7 +2175,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -128, y: -25}
+  m_AnchoredPosition: {x: -176, y: 208}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &666865712
@@ -2205,7 +2205,10 @@ MonoBehaviour:
 
     Click en campana: Pasar turno.
 
-    TAB: Ver/Ocultar mano.'
+    TAB: Ver/Ocultar mano.
+
+    Esc:
+    Pausa'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2268,7 +2271,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -240.79077, w: -248.26172}
+  m_margin: {x: 0, y: 0, z: -256.48022, w: -248.26172}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -3778,11 +3781,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 126448960}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -270, y: -20}
-  m_SizeDelta: {x: 336.9, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 238, y: -384}
+  m_SizeDelta: {x: 336.90002, y: 50}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1226339346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3803,13 +3806,21 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Arroyo Valentina
+  m_text: 'Game Designer: Nicolas Migues
 
+    Programador: Nicolas Migues
+
+    Artistas
+    2D/3D: Pitra Luana
+
+    Artistas 2D/3D: Arroyo Valentina
+
+    Artistas 2D/3D:
     Suarez Ariana
 
-    Fuego Joaquin
+    Colaborador: Fuego Joaquin
 
-    Pitra Luana'
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3872,7 +3883,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -126.12506, y: 0, z: 0, w: 0}
+  m_margin: {x: -126.12506, y: -648.70496, z: -480.373, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
