@@ -1,9 +1,13 @@
+using Unity.VisualScripting;
 using UnityEngine;
 public class BellEndTurn : MonoBehaviour
 {
     private Animator _animator;
     public static BellEndTurn instance;
     [SerializeField] private LayerMask bellLayer;
+    [SerializeField] private Material outline;
+    private bool isHovered = false;
+    [SerializeField] private float glowThickness = 3.15f;
     private void Awake()
     {
         if(instance == null)
@@ -28,6 +32,7 @@ public class BellEndTurn : MonoBehaviour
                 }
             }
         }
+        HandleHover();
     }
     private void HandleClick()
     {
@@ -50,5 +55,29 @@ public class BellEndTurn : MonoBehaviour
     public void RingFromIA()
     {
         _animator.SetTrigger("Ring");
+    }
+    private void HandleHover()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        bool currentlyHovered = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, bellLayer);
+        if (currentlyHovered != isHovered)
+        {
+            isHovered = currentlyHovered;
+            if (isHovered)
+            {
+                if (outline == null) return;
+                outline.SetInt("_ActivateGlow", 1);
+                outline.SetFloat("_GlowIntensity", 1f);
+                bool canPlayerBell = !IsBusy() && GameManager.instance.isPlayerTurn;
+                outline.SetColor("_GlowColor", canPlayerBell? Color.green : Color.red);
+                outline.SetFloat("_OutLineThickness", glowThickness);
+            }
+            else
+            {
+                if (outline == null) return;
+                outline.SetFloat("_GlowIntensity", 0f);
+                outline.SetInt("_ActivateGlow", 0);
+            }
+        }
     }
 }
