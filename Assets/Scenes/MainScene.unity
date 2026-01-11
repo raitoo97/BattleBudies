@@ -4770,6 +4770,9 @@ MonoBehaviour:
   - type: 2
     particleSystemPrefab: {fileID: 6172400332157226099, guid: 28888e9dc1f5226439269fe40e97c661,
       type: 3}
+  - type: 3
+    particleSystemPrefab: {fileID: 5274805666710861527, guid: fc513243c9b64594f9b06bed50ff1e7a,
+      type: 3}
 --- !u!1 &576580599
 GameObject:
   m_ObjectHideFlags: 0
@@ -18091,74 +18094,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c3baca44408bfe4490d5f3be6c73578, type: 3}
---- !u!1001 &7938809889902072150
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.02
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 20.34
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -82.22
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -90
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5494216865800766814, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8267469868827844189, guid: fc513243c9b64594f9b06bed50ff1e7a,
-        type: 3}
-      propertyPath: m_Name
-      value: GordolfoZapallongoPungos
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: fc513243c9b64594f9b06bed50ff1e7a, type: 3}
 --- !u!1001 &8210771769232108480
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18373,5 +18308,4 @@ SceneRoots:
   - {fileID: 186942367}
   - {fileID: 1165260219}
   - {fileID: 678470739}
-  - {fileID: 7938809889902072150}
   - {fileID: 373814065}
