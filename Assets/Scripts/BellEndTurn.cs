@@ -58,17 +58,16 @@ public class BellEndTurn : MonoBehaviour
     private void HandleHover()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        bool currentlyHovered = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, bellLayer);
+        bool currentlyHovered = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, bellLayer)&& hit.collider.gameObject == gameObject;
         if (currentlyHovered != isHovered)
         {
             isHovered = currentlyHovered;
+
             if (isHovered)
             {
                 if (outline == null) return;
                 outline.SetInt("_ActivateGlow", 1);
                 outline.SetFloat("_GlowIntensity", 1f);
-                bool canPlayerBell = !IsBusy() && GameManager.instance.isPlayerTurn;
-                outline.SetColor("_GlowColor", canPlayerBell? Color.green : Color.red);
                 outline.SetFloat("_OutLineThickness", glowThickness);
             }
             else
@@ -77,6 +76,11 @@ public class BellEndTurn : MonoBehaviour
                 outline.SetFloat("_GlowIntensity", 0f);
                 outline.SetInt("_ActivateGlow", 0);
             }
+        }
+        if (isHovered)
+        {
+            bool canPlayerBell = !IsBusy() && GameManager.instance.isPlayerTurn;
+            outline.SetColor("_GlowColor", canPlayerBell ? Color.green : Color.red);
         }
     }
 }
