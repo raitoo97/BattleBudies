@@ -96,10 +96,10 @@ public class DiceRoll : MonoBehaviour
         }
         if (collision.gameObject.layer == LayerMask.NameToLayer("WallDice"))
         {
-            Debug.Log("Dado golpeó la pared y está casi quieto, aplicando impulso.");
-            // Solo si el dado ya fue lanzado y está casi quieto
-            if (hasBeenThrown && rb.velocity.magnitude < 0.2f)
+            // Solo si el dado ya fue lanzado
+            if (hasBeenThrown && rb.velocity.magnitude < 4f)
             {
+                Debug.Log("Dado golpeó la pared y está casi quieto, aplicando impulso.");
                 // Dirección física real (alejarse de la pared)
                 Vector3 kickDir = collision.contacts[0].normal;
                 // Pequeño impulso

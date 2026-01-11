@@ -208,7 +208,7 @@ public class CombatManager : MonoBehaviour
     }
     private IEnumerator TowerCombatFlowAI(Units attacker, Tower tower)
     {
-        CanvasManager.instance.ChangeCameraText(true, "Tower Atack", Color.red);
+        CanvasManager.instance.ChangeCameraText(true, "Attack Tower", Color.red);
         yield return new WaitForSeconds(_delayAfterFocus);
         CanvasManager.instance.ChangeCameraText(false);
         int remainingDice = attacker.diceCount;
