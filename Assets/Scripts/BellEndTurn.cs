@@ -3,6 +3,7 @@ public class BellEndTurn : MonoBehaviour
 {
     private Animator _animator;
     public static BellEndTurn instance;
+    [SerializeField] private LayerMask bellLayer;
     private void Awake()
     {
         if(instance == null)
@@ -14,7 +15,21 @@ public class BellEndTurn : MonoBehaviour
     {
         _animator = GetComponent<Animator>();
     }
-    private void OnMouseDown()
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, bellLayer))
+            {
+                if (hit.collider.gameObject == gameObject)
+                {
+                    HandleClick();
+                }
+            }
+        }
+    }
+    private void HandleClick()
     {
         if (IsBusy()) return;
         _animator.SetTrigger("Ring");
